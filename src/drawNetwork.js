@@ -11,7 +11,7 @@ export default class DrawNetwork {
         this.activateEdgeLabels = true;
 
         //Edges with value equal or below to this wont be drawn
-        this.edgeValueThreshold = 1;
+        this.edgeValueThreshold = 0.5;
 
         //In case value key changes, this is what is compared while parsing edges json
         this.edgeValue = "value";
@@ -63,9 +63,17 @@ export default class DrawNetwork {
             delete edge["u2"];
 
             edge["value"] = edge[this.edgeValue];
-
             if (this.edgeValue !== "value")
                 delete edge[this.edgeValue];
+
+            // Graph doesnt look cool if edges are hidden using the hidde attribute
+            /*
+            if (edge["value"] <= this.edgeValueThreshold)
+                edge["hidden"] = true;
+            */
+
+            if (edge["value"] <= this.edgeValueThreshold)
+                this.changeEdgeOpacity(edge, true);
 
 
             if (this.activateEdgeLabels)
@@ -73,9 +81,17 @@ export default class DrawNetwork {
 
         }
         const edges = new DataSet(json.similarity);
-        console.log(json.similarity);
 
         return edges;
+    }
+
+    changeEdgeOpacity(edge, hide = true) {
+        let newAlpha = 1;
+        if (hide)
+            newAlpha = 0;
+
+        edge.color = { opacity: newAlpha };
+        edge.font = { color: "rgb(0, 0, 0, "+newAlpha+")" };
     }
 
     chooseOptions() {
@@ -126,6 +142,12 @@ export default class DrawNetwork {
 
     drawNetwork() {
         this.network = new Network(this.container, this.data, this.options);
+
+        this.network.on("beforeDrawing", this.preDrawEvent);
+    }
+
+    preDrawEvent() {
+        console.log("Pre draw Event");
     }
 
     clearNetwork() {
