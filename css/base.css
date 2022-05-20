@@ -1,0 +1,38 @@
+.title {
+  font-size: 300%;
+}
+
+h1 {
+  text-align: center;
+  font-weight: 800;
+}
+
+h2 {
+  font-weight: 800;
+}
+
+body {
+  background-color: rgb(104, 104, 104);
+  color: rgb(221, 221, 221);
+}
+
+canvas {
+  margin: auto;
+  display: block;
+}
+
+.middle {
+  float: middle;
+  text-align: center;
+  margin-top: auto;
+  margin-bottom: 20px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.middle.network {
+  border-style: dotted;
+
+  width: 60.00%;
+  height: 400px;
+}
