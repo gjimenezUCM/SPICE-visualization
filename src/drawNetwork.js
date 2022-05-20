@@ -7,12 +7,21 @@ export default class DrawNetwork {
     constructor(jsonInput, container) {
         this.container = container;
 
+
+        this.activateEdgeLabels = true;
+
+        //Edges with value equal or below to this wont be drawn
+        this.edgeValueThreshold = 1;
+
+        //In case value key changes, this is what is compared while parsing edges json
+        this.edgeValue = "value";
+
         //In case explicit_community key changes, this is what is compared while parsing edges json
         this.groupColor_key = "explicit_community";
-        
+
         this.groupColor_0 = "#4ADEDE";
         this.groupColor_1 = "#37983B";
-        this.groupColor_2 = "#FFFFFF";   
+        this.groupColor_2 = "#FFFFFF";
 
         this.parseJson(jsonInput);
         this.chooseOptions(jsonInput);
@@ -39,8 +48,6 @@ export default class DrawNetwork {
 
             node["group"] = "group_" + node[this.groupColor_key]
             delete node[this.groupColor_key];
-
-            console.log(node);
         }
         const nodes = new DataSet(json.users);
         return nodes;
@@ -54,8 +61,20 @@ export default class DrawNetwork {
 
             edge["to"] = edge["u2"];
             delete edge["u2"];
+
+            edge["value"] = edge[this.edgeValue];
+
+            if (this.edgeValue !== "value")
+                delete edge[this.edgeValue];
+
+
+            if (this.activateEdgeLabels)
+                edge["label"] = edge["value"].toString();
+
         }
         const edges = new DataSet(json.similarity);
+        console.log(json.similarity);
+
         return edges;
     }
 
@@ -64,7 +83,15 @@ export default class DrawNetwork {
             edges: {
                 scaling: {
                     min: 3,
-                    max: 15
+                    max: 15,
+                    label: {
+                        enabled: false
+                    }
+                },
+                font: {
+                    strokeWidth: 0,
+                    size: 20,
+                    color: "#000000"
                 }
             },
             nodes: {
@@ -90,6 +117,9 @@ export default class DrawNetwork {
                         background: this.groupColor_2
                     }
                 }
+            },
+            physics: {
+                enabled: false
             }
         };
     }
