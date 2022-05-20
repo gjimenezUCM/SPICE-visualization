@@ -2,6 +2,7 @@ import DrawNetwork from "./drawNetwork";
 
 window.onload = function () {
 
+	//PARSE THE FILE AND CREATE THE NETWORK
 	const fileInput = document.getElementById('jsonInput');
 	const reader = new FileReader();
 	let activeNetwork = null;
@@ -32,5 +33,20 @@ window.onload = function () {
 			alert("Error trying to read the selected file");
 		}
 	}, false);
+
+	//UPDATE THE SLIDER VALUE AND THE NETWORK
+	document.getElementById('edgeThreshold').oninput = function() {
+		let ThresholdValue = this.value;
+
+		if(ThresholdValue === "0") ThresholdValue = "0.0";
+		if(ThresholdValue === "1") ThresholdValue = "1.0";
+
+		document.getElementById('thresholdValue').innerHTML = ThresholdValue;
+
+		if(activeNetwork !== null){
+			activeNetwork.edgeValueThreshold = parseFloat(ThresholdValue);
+			activeNetwork.hideEdgesbelowThreshold();
+		}
+	}
 
 }

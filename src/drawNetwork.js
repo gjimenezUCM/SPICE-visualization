@@ -11,7 +11,7 @@ export default class DrawNetwork {
         this.activateEdgeLabels = true;
 
         //Edges with value equal or below to this wont be drawn
-        this.edgeValueThreshold = 0.5;
+        this.edgeValueThreshold = document.getElementById('edgeThreshold').value;
 
         //In case value key changes, this is what is compared while parsing edges json
         this.edgeValue = "value";
@@ -66,32 +66,14 @@ export default class DrawNetwork {
             if (this.edgeValue !== "value")
                 delete edge[this.edgeValue];
 
-            // Graph doesnt look cool if edges are hidden using the hidde attribute
-            /*
-            if (edge["value"] <= this.edgeValueThreshold)
-                edge["hidden"] = true;
-            */
-
-            if (edge["value"] <= this.edgeValueThreshold)
-                this.changeEdgeOpacity(edge, true);
-
-
             if (this.activateEdgeLabels)
                 edge["label"] = edge["value"].toString();
 
+            edge["hidden"] = false;
         }
         const edges = new DataSet(json.similarity);
 
         return edges;
-    }
-
-    changeEdgeOpacity(edge, hide = true) {
-        let newAlpha = 1;
-        if (hide)
-            newAlpha = 0;
-
-        edge.color = { opacity: newAlpha };
-        edge.font = { color: "rgb(0, 0, 0, "+newAlpha+")" };
     }
 
     chooseOptions() {
@@ -142,15 +124,36 @@ export default class DrawNetwork {
 
     drawNetwork() {
         this.network = new Network(this.container, this.data, this.options);
+        this.hideEdgesbelowThreshold();
 
-        this.network.on("beforeDrawing", this.preDrawEvent);
+        this.network.on("beforeDrawing", this.preDrawEvent.bind(this));
     }
 
     preDrawEvent() {
-        console.log("Pre draw Event");
+        console.log("PreDraw Event");
+        //this.hideEdgesbelowThreshold();
     }
 
     clearNetwork() {
         this.network.destroy();
+    }
+
+    hideEdgesbelowThreshold() {
+        this.data.edges.forEach((edge) => {
+
+            if (edge["value"] < this.edgeValueThreshold) {
+                if (edge["hidden"] === false) {
+                    edge["hidden"] = true;
+                    this.data.edges.update(edge);
+                }
+            } else {
+                if (edge["hidden"] === true) {
+                    edge["hidden"] = false;
+                    this.data.edges.update(edge);
+                }
+
+            }
+        })
+
     }
 }
