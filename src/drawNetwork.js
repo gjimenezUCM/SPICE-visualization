@@ -9,19 +9,30 @@ export default class DrawNetwork {
 
         this.activateEdgeLabels = true;
 
+        //EDGES
         //Edges with value equal or below to this wont be drawn
         this.edgeValueThreshold = document.getElementById('edgeThreshold').value;
 
         //In case value key changes, this is what is compared while parsing edges json
         this.edgeValue = "value";
 
+        this.maxEdgeWidth = 13;
+        this.minEdgeWidth = 3;
+
+        if (document.getElementById('changeMaxEdgeWidth').checked) {
+            this.changeMaxEdgeWidth = true;
+        } else {
+            this.changeMaxEdgeWidth = false;
+        }
+
+        //NODE GROUP COLORS
         //In case explicit_community key changes, this is what is compared while parsing nodes json
         this.groupColor_key = "explicit_community";
 
         this.groupColor = new Array();
-        this.groupColor.push({color: "#6E6EFD", border: "#5C5CEB"}); //Blue
-        this.groupColor.push({color: "#FF8284", border: "#E06467"}); //Red
-        this.groupColor.push({color: "#000000", border: "#000000"}); //Black to track untracker groups
+        this.groupColor.push({ color: "#6E8FFE", border: "#5C5CEB" }); //Blue
+        this.groupColor.push({ color: "#FF8284", border: "#E06467" }); //Red
+        this.groupColor.push({ color: "#000000", border: "#000000" }); //Black to track untracker groups
 
         //BOUNDING GROUPS BOXES
         //In case group key changes, this is what is compared while parsing nodes json
@@ -30,11 +41,11 @@ export default class DrawNetwork {
         this.boxBorderWidth = 3;
 
         this.boxGroupColor = new Array();
-        this.boxGroupColor.push({color: "#F8D4FB", border: "#F2A9F9"}); //Purple
-        this.boxGroupColor.push({color: "#FFFFAA", border: "#FFDE78"}); //Yellow
-        this.boxGroupColor.push({color: "#D3F5C0", border: "#A9DD8C"}); //Green
-        this.boxGroupColor.push({color: "#FED4D5", border: "#FC999C"}); //Red
-        this.boxGroupColor.push({color: "#DCEBFE", border: "#A8C9F8"}); //Blue
+        this.boxGroupColor.push({ color: "#F8D4FB", border: "#F2A9F9" }); //Purple
+        this.boxGroupColor.push({ color: "#FFFFAA", border: "#FFDE78" }); //Yellow
+        this.boxGroupColor.push({ color: "#D3F5C0", border: "#A9DD8C" }); //Green
+        this.boxGroupColor.push({ color: "#FED4D5", border: "#FC999C" }); //Red
+        this.boxGroupColor.push({ color: "#DCEBFE", border: "#A8C9F8" }); //Blue
 
 
         this.parseJson(jsonInput);
@@ -97,11 +108,22 @@ export default class DrawNetwork {
     }
 
     chooseOptions() {
+
+        //EDGE OPTIONS
+        console.log(this.changeMaxEdgeWidth)
+        let max;
+        if (this.changeMaxEdgeWidth) {
+            max = this.maxEdgeWidth
+        } else {
+            max = this.minEdgeWidth;
+        }
+
         this.options = {
+            autoResize: true,
             edges: {
                 scaling: {
-                    min: 3,
-                    max: 15,
+                    min: this.minEdgeWidth,
+                    max: max,
                     label: {
                         enabled: false
                     }
@@ -109,11 +131,14 @@ export default class DrawNetwork {
                 font: {
                     strokeWidth: 0,
                     size: 20,
-                    color: "#000000"
+                    color: "#000000",
+                    align: "top",
+                    vadjust: -7
                 }
             },
             nodes: {
                 shape: 'circle',
+                borderWidth: 4,
                 widthConstraint: 30,
                 font: {
                     size: 20
@@ -146,18 +171,18 @@ export default class DrawNetwork {
     }
 
     drawNetwork() {
-        this.counter = 0;
-
         this.network = new Network(this.container, this.data, this.options);
-        this.hideEdgesbelowThreshold();
+        this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
 
+        this.hideEdgesbelowThreshold();
     }
 
-    //This event is executed for every node and edge
     preDrawEvent(ctx) {
-        this.counter++;
-        console.log("PreDraw Event" + this.counter);
 
+        this.drawBoundingBoxes(ctx);
+    }
+
+    drawBoundingBoxes(ctx) {
         const bigBoundBoxes = new Array();
         bigBoundBoxes.push(null);
         bigBoundBoxes.push(null);
@@ -165,54 +190,42 @@ export default class DrawNetwork {
         bigBoundBoxes.push(null);
         bigBoundBoxes.push(null);
 
-
         //Obtain the bounding box of every boxGroup of nodes
         this.data.nodes.forEach((node) => {
             const group = node["boxGroup"];
 
             let bb = this.network.getBoundingBox(node.id)
-            if (bigBoundBoxes[group] === null) {
+            if (bigBoundBoxes[group] === null) 
                 bigBoundBoxes[group] = bb;
-            } else {
-                if (bb.left < bigBoundBoxes[group].left) {
+            else {
+                if (bb.left < bigBoundBoxes[group].left) 
                     bigBoundBoxes[group].left = bb.left;
-                }
-                if (bb.top < bigBoundBoxes[group].top) {
+                
+                if (bb.top < bigBoundBoxes[group].top) 
                     bigBoundBoxes[group].top = bb.top;
-                }
-                if (bb.right > bigBoundBoxes[group].right) {
+                
+                if (bb.right > bigBoundBoxes[group].right) 
                     bigBoundBoxes[group].right = bb.right;
-                }
-                if (bb.bottom > bigBoundBoxes[group].bottom) {
-                    bigBoundBoxes[group].bottom = bb.bottom;
-                }
-
+                
+                if (bb.bottom > bigBoundBoxes[group].bottom) 
+                    bigBoundBoxes[group].bottom = bb.bottom;  
             }
-
         })
         //Draw the bounding box of all groups
-        for(let i = 0; i < bigBoundBoxes.length; i++ ){
-            if( bigBoundBoxes[i] !== null){
+        for (let i = 0; i < bigBoundBoxes.length; i++) {
+            if (bigBoundBoxes[i] !== null) {
                 const bb = bigBoundBoxes[i];
-
+                //Draw Border
                 ctx.fillStyle = this.boxGroupColor[i].border;
-                ctx.fillRect(bb.left-this.boxBorderWidth, bb.top-this.boxBorderWidth, bb.right - bb.left +this.boxBorderWidth*2, bb.bottom - bb.top+this.boxBorderWidth*2);
-
+                ctx.fillRect(bb.left - this.boxBorderWidth, bb.top - this.boxBorderWidth, bb.right - bb.left + this.boxBorderWidth * 2, bb.bottom - bb.top + this.boxBorderWidth * 2);
+                //Draw Background
                 ctx.fillStyle = this.boxGroupColor[i].color;
-                ctx.fillRect(bb.left, bb.top, bb.right - bb.left , bb.bottom - bb.top);
+                ctx.fillRect(bb.left, bb.top, bb.right - bb.left, bb.bottom - bb.top);
             }
         }
- 
     }
-
-    clearNetwork() {
-        this.network.destroy();
-    }
-
 
     hideEdgesbelowThreshold() {
-        this.network.off("beforeDrawing");
-
         this.data.edges.forEach((edge) => {
 
             if (edge["value"] < this.edgeValueThreshold) {
@@ -227,7 +240,27 @@ export default class DrawNetwork {
                 }
             }
         })
+    }
 
-        this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
+    clearNetwork() {
+        this.network.destroy();
+    }
+
+    
+    changeAllMaxEdgesWidth() {
+        let max;
+        if (this.changeMaxEdgeWidth) {
+            max = this.maxEdgeWidth
+        } else {
+            max = this.minEdgeWidth;
+        }
+        this.options.edges.scaling.max = max;
+
+        this.network.setOptions(this.options);
+
+        //Update all edges with the new options
+        this.data.edges.forEach((edge) => {
+            this.data.edges.update(edge);
+        })
     }
 }
