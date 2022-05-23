@@ -7,7 +7,6 @@ export default class DrawNetwork {
     constructor(jsonInput, container) {
         this.container = container;
 
-
         this.activateEdgeLabels = true;
 
         //Edges with value equal or below to this wont be drawn
@@ -16,12 +15,27 @@ export default class DrawNetwork {
         //In case value key changes, this is what is compared while parsing edges json
         this.edgeValue = "value";
 
-        //In case explicit_community key changes, this is what is compared while parsing edges json
+        //In case explicit_community key changes, this is what is compared while parsing nodes json
         this.groupColor_key = "explicit_community";
 
-        this.groupColor_0 = "#4ADEDE";
-        this.groupColor_1 = "#37983B";
-        this.groupColor_2 = "#FFFFFF";
+        this.groupColor = new Array();
+        this.groupColor.push({color: "#6E6EFD", border: "#5C5CEB"}); //Blue
+        this.groupColor.push({color: "#FF8284", border: "#E06467"}); //Red
+        this.groupColor.push({color: "#000000", border: "#000000"}); //Black to track untracker groups
+
+        //BOUNDING GROUPS BOXES
+        //In case group key changes, this is what is compared while parsing nodes json
+        this.boxGroup_key = "group";
+
+        this.boxBorderWidth = 3;
+
+        this.boxGroupColor = new Array();
+        this.boxGroupColor.push({color: "#F8D4FB", border: "#F2A9F9"}); //Purple
+        this.boxGroupColor.push({color: "#FFFFAA", border: "#FFDE78"}); //Yellow
+        this.boxGroupColor.push({color: "#D3F5C0", border: "#A9DD8C"}); //Green
+        this.boxGroupColor.push({color: "#FED4D5", border: "#FC999C"}); //Red
+        this.boxGroupColor.push({color: "#DCEBFE", border: "#A8C9F8"}); //Blue
+
 
         this.parseJson(jsonInput);
         this.chooseOptions(jsonInput);
@@ -44,8 +58,11 @@ export default class DrawNetwork {
 
     parseNodes(json) {
         for (const node of json.users) {
-            node["oldgroup"] = node["group"];   //Just in case we need the group in the future
 
+            //"BoxGroup" is the key we will use to track what nodes should be inside the same big bounding box
+            node["boxGroup"] = parseInt(node[this.boxGroup_key]);
+
+            //Vis uses "group" key to change the color of all nodes with the same key
             node["group"] = "group_" + node[this.groupColor_key]
             delete node[this.groupColor_key];
         }
@@ -56,16 +73,19 @@ export default class DrawNetwork {
     parseEdges(json) {
         //Get edges from json
         for (const edge of json.similarity) {
+            //Update targets to vis format
             edge["from"] = edge["u1"];
-            delete edge["u1"];
-
             edge["to"] = edge["u2"];
+
+            delete edge["u1"];
             delete edge["u2"];
 
+            //Vis use "value" key to change edges width. This way edges with higher similarity will be stronger
             edge["value"] = edge[this.edgeValue];
             if (this.edgeValue !== "value")
                 delete edge[this.edgeValue];
 
+            //Vis use "label" key to show text above each edge. We can use it to see the similarity of each edge
             if (this.activateEdgeLabels)
                 edge["label"] = edge["value"].toString();
 
@@ -102,17 +122,20 @@ export default class DrawNetwork {
             groups: {
                 group_0: {
                     color: {
-                        background: this.groupColor_0
+                        background: this.groupColor[0].color,
+                        border: this.groupColor[0].border
                     }
                 },
                 group_1: {
                     color: {
-                        background: this.groupColor_1
+                        background: this.groupColor[1].color,
+                        border: this.groupColor[1].border
                     }
                 },
                 group_2: {
                     color: {
-                        background: this.groupColor_2
+                        background: this.groupColor[2].color,
+                        border: this.groupColor[2].border
                     }
                 }
             },
@@ -123,22 +146,73 @@ export default class DrawNetwork {
     }
 
     drawNetwork() {
+        this.counter = 0;
+
         this.network = new Network(this.container, this.data, this.options);
         this.hideEdgesbelowThreshold();
 
-        this.network.on("beforeDrawing", this.preDrawEvent.bind(this));
     }
 
-    preDrawEvent() {
-        console.log("PreDraw Event");
-        //this.hideEdgesbelowThreshold();
+    //This event is executed for every node and edge
+    preDrawEvent(ctx) {
+        this.counter++;
+        console.log("PreDraw Event" + this.counter);
+
+        const bigBoundBoxes = new Array();
+        bigBoundBoxes.push(null);
+        bigBoundBoxes.push(null);
+        bigBoundBoxes.push(null);
+        bigBoundBoxes.push(null);
+        bigBoundBoxes.push(null);
+
+
+        //Obtain the bounding box of every boxGroup of nodes
+        this.data.nodes.forEach((node) => {
+            const group = node["boxGroup"];
+
+            let bb = this.network.getBoundingBox(node.id)
+            if (bigBoundBoxes[group] === null) {
+                bigBoundBoxes[group] = bb;
+            } else {
+                if (bb.left < bigBoundBoxes[group].left) {
+                    bigBoundBoxes[group].left = bb.left;
+                }
+                if (bb.top < bigBoundBoxes[group].top) {
+                    bigBoundBoxes[group].top = bb.top;
+                }
+                if (bb.right > bigBoundBoxes[group].right) {
+                    bigBoundBoxes[group].right = bb.right;
+                }
+                if (bb.bottom > bigBoundBoxes[group].bottom) {
+                    bigBoundBoxes[group].bottom = bb.bottom;
+                }
+
+            }
+
+        })
+        //Draw the bounding box of all groups
+        for(let i = 0; i < bigBoundBoxes.length; i++ ){
+            if( bigBoundBoxes[i] !== null){
+                const bb = bigBoundBoxes[i];
+
+                ctx.fillStyle = this.boxGroupColor[i].border;
+                ctx.fillRect(bb.left-this.boxBorderWidth, bb.top-this.boxBorderWidth, bb.right - bb.left +this.boxBorderWidth*2, bb.bottom - bb.top+this.boxBorderWidth*2);
+
+                ctx.fillStyle = this.boxGroupColor[i].color;
+                ctx.fillRect(bb.left, bb.top, bb.right - bb.left , bb.bottom - bb.top);
+            }
+        }
+ 
     }
 
     clearNetwork() {
         this.network.destroy();
     }
 
+
     hideEdgesbelowThreshold() {
+        this.network.off("beforeDrawing");
+
         this.data.edges.forEach((edge) => {
 
             if (edge["value"] < this.edgeValueThreshold) {
@@ -151,9 +225,9 @@ export default class DrawNetwork {
                     edge["hidden"] = false;
                     this.data.edges.update(edge);
                 }
-
             }
         })
 
+        this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
     }
 }
