@@ -3,13 +3,31 @@ import { Network } from "vis-network/peer";
 
 export default class DrawNetwork {
 
-
+    /** Constructor that will draw the network
+     * 
+     * @param {*} jsonInput json with all the necesary data to create the nodes and edges
+     * @param {*} container container where the network will be created
+     */
     constructor(jsonInput, container) {
         this.container = container;
 
         this.activateEdgeLabels = true;
 
-        //EDGES
+        this.initEdgesParameters();
+        this.initNodesParameters();
+        this.initBoundingBoxesParameters();
+
+        this.parseJson(jsonInput);
+
+        this.chooseOptions(jsonInput);
+
+        this.drawNetwork();
+    }
+
+    /**
+     * Initialize all parameters related with Edges
+     */
+    initEdgesParameters() {
         //Edges with value equal or below to this wont be drawn
         this.edgeValueThreshold = document.getElementById('edgeThreshold').value;
 
@@ -19,43 +37,48 @@ export default class DrawNetwork {
         this.maxEdgeWidth = 13;
         this.minEdgeWidth = 3;
 
+        //If true, edgesWidth will change based on the value (similarity) between the nodes they link
         if (document.getElementById('changeMaxEdgeWidth').checked) {
             this.changeMaxEdgeWidth = true;
         } else {
             this.changeMaxEdgeWidth = false;
         }
+    }
 
-        //NODE GROUP COLORS
+    /**
+     * Initialize all parameters related with Nodes
+     */
+    initNodesParameters() {
         //In case explicit_community key changes, this is what is compared while parsing nodes json
         this.groupColor_key = "explicit_community";
 
         this.groupColor = new Array();
         this.groupColor.push({ color: "#6E8FFE", border: "#5C5CEB" }); //Blue
         this.groupColor.push({ color: "#FF8284", border: "#E06467" }); //Red
-        this.groupColor.push({ color: "#000000", border: "#000000" }); //Black to track untracker groups
-
-        //BOUNDING GROUPS BOXES
+        this.groupColor.push({ color: "#000000", border: "#000000" }); //Black to track untracked groups
+    }
+    
+    /**
+     * Initialize all parameters related with bounding boxes of node groups
+     */
+    initBoundingBoxesParameters() {
         //In case group key changes, this is what is compared while parsing nodes json
         this.boxGroup_key = "group";
 
         this.boxBorderWidth = 3;
 
         this.boxGroupColor = new Array();
-        this.boxGroupColor.push({ color: "#F8D4FB", border: "#F2A9F9" }); //Purple
-        this.boxGroupColor.push({ color: "#FFFFAA", border: "#FFDE78" }); //Yellow
-        this.boxGroupColor.push({ color: "#D3F5C0", border: "#A9DD8C" }); //Green
-        this.boxGroupColor.push({ color: "#FED4D5", border: "#FC999C" }); //Red
-        this.boxGroupColor.push({ color: "#DCEBFE", border: "#A8C9F8" }); //Blue
-
-
-        this.parseJson(jsonInput);
-        this.chooseOptions(jsonInput);
-
-        this.drawNetwork();
+        this.boxGroupColor.push({ color: "#F8D4FBFF", border: "#F2A9F9" }); //Purple
+        this.boxGroupColor.push({ color: "#FFFFAACC", border: "#FFDE78" }); //Yellow
+        this.boxGroupColor.push({ color: "#D3F5C0AA", border: "#A9DD8C" }); //Green
+        this.boxGroupColor.push({ color: "#FED4D522", border: "#FC999C" }); //Red
+        this.boxGroupColor.push({ color: "#DCEBFE00", border: "#A8C9F8" }); //Blue
     }
 
-
-
+    /** Parse the JSON object to get the necesary data to create the network
+     * 
+     * @param {*} json //JSON object that will be parsed to get the necesary data to create the network
+     */
     parseJson(json) {
         //Get nodes from json
         const nodes = this.parseNodes(json);
@@ -67,6 +90,11 @@ export default class DrawNetwork {
         };
     }
 
+    /** Parse the JSON object to get the nodes of the network
+     * 
+     * @param {*} json //JSON object that will be parsed to get its nodes
+     * @returns 
+     */
     parseNodes(json) {
         for (const node of json.users) {
 
@@ -74,13 +102,18 @@ export default class DrawNetwork {
             node["boxGroup"] = parseInt(node[this.boxGroup_key]);
 
             //Vis uses "group" key to change the color of all nodes with the same key
-            node["group"] = "group_" + node[this.groupColor_key]
+            node["group"] = "group_" + node[this.groupColor_key];
             delete node[this.groupColor_key];
         }
         const nodes = new DataSet(json.users);
         return nodes;
     }
 
+    /** Parse the JSON object to get the edges of the network
+     * 
+     * @param {*} json //JSON object that will be parsed to get its nodes
+     * @returns 
+     */
     parseEdges(json) {
         //Get edges from json
         for (const edge of json.similarity) {
@@ -107,17 +140,19 @@ export default class DrawNetwork {
         return edges;
     }
 
+    /**
+     * Initialize vis.network options
+     */
     chooseOptions() {
-
-        //EDGE OPTIONS
-        console.log(this.changeMaxEdgeWidth)
+        //Edge generic options
         let max;
         if (this.changeMaxEdgeWidth) {
-            max = this.maxEdgeWidth
+            max = this.maxEdgeWidth;
         } else {
             max = this.minEdgeWidth;
         }
 
+        //Global generic options
         this.options = {
             autoResize: true,
             edges: {
@@ -170,6 +205,9 @@ export default class DrawNetwork {
         };
     }
 
+    /**
+     * Draw the network with the parsed data and options chosen in the container and initialize the preDrawEvent and edges hidden attribute
+     */
     drawNetwork() {
         this.network = new Network(this.container, this.data, this.options);
         this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
@@ -177,11 +215,18 @@ export default class DrawNetwork {
         this.hideEdgesbelowThreshold();
     }
 
+    /** Function executed when "beforeDrawing" event is launched.
+     * 
+     * @param {*} ctx Context object necesary to draw in the network canvas
+     */
     preDrawEvent(ctx) {
-
         this.drawBoundingBoxes(ctx);
     }
 
+    /** Iterate over all nodes getting the bounding box of every "boxGroup", and draw them
+     * 
+     * @param {*} ctx Context object necesary to draw in the network canvas
+     */
     drawBoundingBoxes(ctx) {
         const bigBoundBoxes = new Array();
         bigBoundBoxes.push(null);
@@ -195,26 +240,27 @@ export default class DrawNetwork {
             const group = node["boxGroup"];
 
             let bb = this.network.getBoundingBox(node.id)
-            if (bigBoundBoxes[group] === null) 
+            if (bigBoundBoxes[group] === null)
                 bigBoundBoxes[group] = bb;
             else {
-                if (bb.left < bigBoundBoxes[group].left) 
+                if (bb.left < bigBoundBoxes[group].left)
                     bigBoundBoxes[group].left = bb.left;
-                
-                if (bb.top < bigBoundBoxes[group].top) 
+
+                if (bb.top < bigBoundBoxes[group].top)
                     bigBoundBoxes[group].top = bb.top;
-                
-                if (bb.right > bigBoundBoxes[group].right) 
+
+                if (bb.right > bigBoundBoxes[group].right)
                     bigBoundBoxes[group].right = bb.right;
-                
-                if (bb.bottom > bigBoundBoxes[group].bottom) 
-                    bigBoundBoxes[group].bottom = bb.bottom;  
+
+                if (bb.bottom > bigBoundBoxes[group].bottom)
+                    bigBoundBoxes[group].bottom = bb.bottom;
             }
         })
         //Draw the bounding box of all groups
         for (let i = 0; i < bigBoundBoxes.length; i++) {
             if (bigBoundBoxes[i] !== null) {
                 const bb = bigBoundBoxes[i];
+
                 //Draw Border
                 ctx.fillStyle = this.boxGroupColor[i].border;
                 ctx.fillRect(bb.left - this.boxBorderWidth, bb.top - this.boxBorderWidth, bb.right - bb.left + this.boxBorderWidth * 2, bb.bottom - bb.top + this.boxBorderWidth * 2);
@@ -225,6 +271,9 @@ export default class DrawNetwork {
         }
     }
 
+    /**
+     * Hide all edges below a set threshold
+     */
     hideEdgesbelowThreshold() {
         this.data.edges.forEach((edge) => {
 
@@ -242,15 +291,20 @@ export default class DrawNetwork {
         })
     }
 
+    /**
+     * Destroy the network 
+     */
     clearNetwork() {
         this.network.destroy();
     }
 
-    
+    /**
+     * Update the max width based on current this.changeMaxEdgeWidth parameter. If true, the width of edges will vary based on their "value" parameter
+     */
     changeAllMaxEdgesWidth() {
         let max;
         if (this.changeMaxEdgeWidth) {
-            max = this.maxEdgeWidth
+            max = this.maxEdgeWidth;
         } else {
             max = this.minEdgeWidth;
         }
@@ -261,6 +315,6 @@ export default class DrawNetwork {
         //Update all edges with the new options
         this.data.edges.forEach((edge) => {
             this.data.edges.update(edge);
-        })
+        });
     }
 }
