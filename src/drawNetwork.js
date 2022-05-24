@@ -53,11 +53,11 @@ export default class DrawNetwork {
         this.groupColor_key = "explicit_community";
 
         this.groupColor = new Array();
-        this.groupColor.push({ color: "#6E8FFE", border: "#5C5CEB" }); //Blue
-        this.groupColor.push({ color: "#FF8284", border: "#E06467" }); //Red
+        this.groupColor.push({ color: "rgba(110, 143, 254, 1)", border: "rgba(92, 92, 235, 1)" }); //Blue
+        this.groupColor.push({ color: "rgba(255, 130, 132, 1)", border: "rgba(224, 100, 103, 1)" }); //Red
         this.groupColor.push({ color: "#000000", border: "#000000" }); //Black to track untracked groups
     }
-    
+
     /**
      * Initialize all parameters related with bounding boxes of node groups
      */
@@ -68,11 +68,11 @@ export default class DrawNetwork {
         this.boxBorderWidth = 3;
 
         this.boxGroupColor = new Array();
-        this.boxGroupColor.push({ color: "#F8D4FBFF", border: "#F2A9F9" }); //Purple
-        this.boxGroupColor.push({ color: "#FFFFAACC", border: "#FFDE78" }); //Yellow
-        this.boxGroupColor.push({ color: "#D3F5C0AA", border: "#A9DD8C" }); //Green
-        this.boxGroupColor.push({ color: "#FED4D522", border: "#FC999C" }); //Red
-        this.boxGroupColor.push({ color: "#DCEBFE00", border: "#A8C9F8" }); //Blue
+        this.boxGroupColor.push({ color: "rgba(248, 212, 251, 0.6)", border: "rgba(242, 169, 249, 1)" }); //Purple
+        this.boxGroupColor.push({ color: "rgba(255, 255, 170, 0.6)", border: "rgba(255, 222, 120, 1)" }); //Yellow
+        this.boxGroupColor.push({ color: "rgba(211, 245, 192, 0.6)", border: "rgba(169, 221, 140, 1)" }); //Green
+        this.boxGroupColor.push({ color: "rgba(254, 212, 213, 0.6)", border: "rgba(252, 153, 156, 1)" }); //Red
+        this.boxGroupColor.push({ color: "rgba(220, 235, 254, 0.6)", border: "rgba(168, 201, 248, 1)" }); //Blue
     }
 
     /** Parse the JSON object to get the necesary data to create the network
@@ -169,6 +169,9 @@ export default class DrawNetwork {
                     color: "#000000",
                     align: "top",
                     vadjust: -7
+                },
+                selfReference: {
+                    smooth: false
                 }
             },
             nodes: {
@@ -256,15 +259,20 @@ export default class DrawNetwork {
                     bigBoundBoxes[group].bottom = bb.bottom;
             }
         })
+
+        
         //Draw the bounding box of all groups
         for (let i = 0; i < bigBoundBoxes.length; i++) {
             if (bigBoundBoxes[i] !== null) {
                 const bb = bigBoundBoxes[i];
 
                 //Draw Border
-                ctx.fillStyle = this.boxGroupColor[i].border;
-                ctx.fillRect(bb.left - this.boxBorderWidth, bb.top - this.boxBorderWidth, bb.right - bb.left + this.boxBorderWidth * 2, bb.bottom - bb.top + this.boxBorderWidth * 2);
+                ctx.lineWidth = this.boxBorderWidth;
+                ctx.strokeStyle = this.boxGroupColor[i].border;
+                ctx.strokeRect(bb.left, bb.top, bb.right - bb.left, bb.bottom - bb.top);
+
                 //Draw Background
+                ctx.lineWidth = 0;
                 ctx.fillStyle = this.boxGroupColor[i].color;
                 ctx.fillRect(bb.left, bb.top, bb.right - bb.left, bb.bottom - bb.top);
             }
@@ -278,12 +286,12 @@ export default class DrawNetwork {
         this.data.edges.forEach((edge) => {
 
             if (edge["value"] < this.edgeValueThreshold) {
-                if (edge["hidden"] === false) {
+                if (!edge["hidden"]) {
                     edge["hidden"] = true;
                     this.data.edges.update(edge);
                 }
             } else {
-                if (edge["hidden"] === true) {
+                if (edge["hidden"]) {
                     edge["hidden"] = false;
                     this.data.edges.update(edge);
                 }
