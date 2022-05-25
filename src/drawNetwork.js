@@ -53,9 +53,12 @@ export default class DrawNetwork {
         this.groupColor_key = "explicit_community";
 
         this.groupColor = new Array();
-        this.groupColor.push({ color: "rgba(110, 143, 254, 1)", border: "rgba(92, 92, 235, 1)" }); //Blue
-        this.groupColor.push({ color: "rgba(255, 130, 132, 1)", border: "rgba(224, 100, 103, 1)" }); //Red
-        this.groupColor.push({ color: "#000000", border: "#000000" }); //Black to track untracked groups
+        this.groupColor.push({ color: "rgba(110, 143, 254, 1)", border: "rgba(92, 92, 235, 1)", 
+                            colorSelected: "rgba(184, 202, 255, 1)", borderSelected: "rgba(164, 164, 238, 1)" }); //Blue
+        this.groupColor.push({ color: "rgba(255, 130, 132, 1)", border: "rgba(224, 100, 103, 1)", 
+                            colorSelected: "rgba(238, 193, 174, 1)", borderSelected: "rgba(230, 172, 173, 1)" }); //Red
+
+       
     }
 
     /**
@@ -175,7 +178,8 @@ export default class DrawNetwork {
             },
             nodes: {
                 shape: 'circle',
-                borderWidth: 4,
+                borderWidth: 3,
+                borderWidthSelected: 4,
                 widthConstraint: 30,
                 font: {
                     size: 20
@@ -185,36 +189,105 @@ export default class DrawNetwork {
                 group_0: {
                     color: {
                         background: this.groupColor[0].color,
-                        border: this.groupColor[0].border
+                        border: this.groupColor[0].border,
+                        highlight: {
+                            background: this.groupColor[0].colorSelected,
+                            border: this.groupColor[0].borderSelected,
+                        }
                     }
                 },
                 group_1: {
                     color: {
                         background: this.groupColor[1].color,
-                        border: this.groupColor[1].border
-                    }
-                },
-                group_2: {
-                    color: {
-                        background: this.groupColor[2].color,
-                        border: this.groupColor[2].border
+                        border: this.groupColor[1].border,
+                        highlight: {
+                            background: this.groupColor[1].colorSelected,
+                            border: this.groupColor[1].borderSelected,
+                        }
                     }
                 }
             },
             physics: {
                 enabled: false
+            },
+            interaction: {
+                zoomView: false,
+                dragView: false,
             }
         };
     }
 
     /**
-     * Draw the network with the parsed data and options chosen in the container and initialize the preDrawEvent and edges hidden attribute
+     * Draw the network with the parsed data and options chosen in the container and initialize the Events of the network
      */
     drawNetwork() {
         this.network = new Network(this.container, this.data, this.options);
         this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
 
+        this.network.on("selectNode", (event) => this.nodeSelected(event.nodes[0]));
+        this.network.on("deselectNode", () => this.nodeDeselected() );
+
         this.hideEdgesbelowThreshold();
+    }
+    /** Executed when any node is selected. It lights the selected node and their directly linked nodes, and darken any other node
+     * 
+     * @param {*} event //Triggeting event data
+     */
+    nodeSelected(node){
+        const selectedNodes = new Array();
+        selectedNodes.push( node )
+
+        const connected_edges = this.network.getConnectedEdges(selectedNodes[0]);
+        const clickedEdges = this.data.edges.get(connected_edges);
+
+        clickedEdges.forEach((edge) => {
+            if(!edge.hidden){
+                if(edge.from !== selectedNodes[0] ){
+                    selectedNodes.push( edge.from );
+                }else{
+                    selectedNodes.push( edge.to );
+                }
+            }
+        })
+
+        this.data.nodes.forEach((node) => {
+            if(selectedNodes.includes(node.id)){
+                this.lightNode(node);
+            }else
+                this.darkenNode(node);
+
+        });
+
+    }
+
+    nodeDeselected(){
+        this.data.nodes.forEach((node) => {
+                this.lightNode(node);
+        });
+    }
+    lightNode(node){
+        node.borderWidth = this.options.nodes.borderWidth;
+
+        const color = this.options.groups[node["group"]].color;
+        console.log(color);
+        console.log(node);
+
+        node["color"] = color;
+        console.log(node);
+        //node.color.border = color.border;
+
+        this.data.nodes.update(node);
+    }
+
+    darkenNode(node){
+        node.borderWidth = 1;
+        node.color = {background: "rgba(155, 155, 155, 1)", border: "rgba(100, 100, 100, 1)"};
+
+        this.data.nodes.update(node);
+    }
+
+    normalizeNode(id){
+
     }
 
     /** Function executed when "beforeDrawing" event is launched.
