@@ -8,8 +8,9 @@ export default class DrawNetwork {
      * @param {*} jsonInput json with all the necesary data to create the nodes and edges
      * @param {*} container container where the network will be created
      */
-    constructor(jsonInput, container) {
+    constructor(jsonInput, container, networkManager) {
         this.container = container;
+        this.networkManager = networkManager;
 
         this.activateEdgeLabels = true;
 
@@ -224,18 +225,39 @@ export default class DrawNetwork {
         this.network = new Network(this.container, this.data, this.options);
         this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
 
-        this.network.on("selectNode", (event) => this.nodeSelected(event.nodes[0]));
-        this.network.on("deselectNode", () => this.nodeDeselected() );
+        this.network.on("selectNode", (event) => this.nodeSelectedCallback(event.nodes[0]));
+        this.network.on("deselectNode", () => this.nodeDeselectedCallback());
 
         this.hideEdgesbelowThreshold();
     }
-    /** Executed when any node is selected. It lights the selected node and their directly linked nodes, and darken any other node
+
+    /** When a node is selected, it tells to the network manager to select the same node in all networks
      * 
-     * @param {*} event //Triggeting event data
+     * @param {*} id id of the node 
      */
-    nodeSelected(node){
+    nodeSelectedCallback(id){
+        console.log(id);
+        
+        if(id !== undefined)
+            this.networkManager.nodeSelected(id);
+    }
+
+    /** When a node is deselected, it tells to the network manager to deselect all nodes;
+     * 
+     */
+    nodeDeselectedCallback(){
+        this.networkManager.nodeDeselected();
+    }
+
+    /** Select the node whose id is id parameter and darken all other nodes
+     * 
+     * @param {*} id //Id of the node
+     */
+    nodeSelected(id){
+        this.network.selectNodes([id], true);
+
         const selectedNodes = new Array();
-        selectedNodes.push( node )
+        selectedNodes.push( id )
 
         const connected_edges = this.network.getConnectedEdges(selectedNodes[0]);
         const clickedEdges = this.data.edges.get(connected_edges);
@@ -252,7 +274,7 @@ export default class DrawNetwork {
 
         this.data.nodes.forEach((node) => {
             if(selectedNodes.includes(node.id)){
-                this.lightNode(node);
+                this.turnNodeColorToDefault(node);
             }else
                 this.darkenNode(node);
 
@@ -260,25 +282,34 @@ export default class DrawNetwork {
 
     }
 
+    /**
+     * Return all nodes to default color mode
+     */
     nodeDeselected(){
+        this.network.unselectAll();
+
         this.data.nodes.forEach((node) => {
-                this.lightNode(node);
+                this.turnNodeColorToDefault(node);
         });
     }
-    lightNode(node){
+
+    /** Reset node colors to default
+     * 
+     * @param {*} node 
+     */
+    turnNodeColorToDefault(node){
         node.borderWidth = this.options.nodes.borderWidth;
 
         const color = this.options.groups[node["group"]].color;
-        console.log(color);
-        console.log(node);
-
         node["color"] = color;
-        console.log(node);
-        //node.color.border = color.border;
 
         this.data.nodes.update(node);
     }
 
+    /** Change node colors to grey colors
+     * 
+     * @param {*} node 
+     */
     darkenNode(node){
         node.borderWidth = 1;
         node.color = {background: "rgba(155, 155, 155, 1)", border: "rgba(100, 100, 100, 1)"};
@@ -286,9 +317,6 @@ export default class DrawNetwork {
         this.data.nodes.update(node);
     }
 
-    normalizeNode(id){
-
-    }
 
     /** Function executed when "beforeDrawing" event is launched.
      * 

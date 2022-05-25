@@ -1,4 +1,5 @@
 import DrawNetwork from "./drawNetwork";
+import NetworkManager from "./networkManager";
 import RequestsManager from "./requestsManager";
 
 
@@ -6,6 +7,8 @@ export default class EventsManager {
 
     constructor() {
         this.requestManager = new RequestsManager();
+        this.networkManager = new NetworkManager();
+
         this.popupInit();
 
         this.sliderInputManager();
@@ -30,13 +33,9 @@ export default class EventsManager {
     popupManager(headersFile) {
         const n = headersFile.files.length;
         
-        this.activesNetworks = new Map();
-        
         const popupContainer = document.getElementById("dropdown");
 
         for (let i = 0; i < n; i++) {
-
-            this.activesNetworks.set(headersFile.files[i].name, null);
 
             const newContainer = document.createElement('div');
             newContainer.className = "row";
@@ -72,57 +71,21 @@ export default class EventsManager {
     popupClicked(name) {
         const checkbox = document.getElementById("check_" + name);
         if(checkbox.checked){
-            this.hideNetwork(name);
+            this.networkManager.removeNetwork(name);
 
             checkbox.checked = false;
         }else{
             this.requestManager.getNetwork(name+".json")
             .then((file) => {
-                this.initNetwork(name, file)
+                this.networkManager.addNetwork(name, file)
             });
 
             checkbox.checked = true;
         }
     }
-    /** Eliminate the network and the html div related to the name parameter
-     * 
-     * @param {*} name //Parameter used to identify the network and div to delete
-     */
-    hideNetwork(name){
-        const network = this.activesNetworks.get(name);
-        network.clearNetwork();
 
-        this.activesNetworks.set(name, null);
+ 
 
-        const networkContainer = document.getElementById("networksContainer");
-        const divToDelete = document.getElementById("network_" + name);
-
-        networkContainer.removeChild(divToDelete);
-    }
-    /** Create a network using the file parameter as the source json
-     * 
-     * @param {*} file name of the file that will be used as data 
-     */
-    initNetwork(name, file) {
-        try {
-            const networkContainer = document.getElementById("networksContainer");
-            
-            const newNetwork = document.createElement('div');
-            newNetwork.id ="network_" + name;
-            newNetwork.className = "middle network";
-            
-            networkContainer.appendChild(newNetwork);
-
-            const jsonFile = JSON.parse(file);
-
-            this.activesNetworks.set(name, new DrawNetwork(jsonFile, newNetwork));
-
-        } catch (e) {
-            console.log(e);
-
-            alert("The file is not a valid json file");
-        }
-    }
     /**
      *  Update the slider value and update the networks's edges to hide anyone below the threshold
      */
