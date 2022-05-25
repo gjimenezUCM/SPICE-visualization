@@ -65,7 +65,7 @@ export default class DrawNetwork {
         //In case group key changes, this is what is compared while parsing nodes json
         this.boxGroup_key = "group";
 
-        this.boxBorderWidth = 3;
+        this.boxBorderWidth = 4;
 
         this.boxGroupColor = new Array();
         this.boxGroupColor.push({ color: "rgba(248, 212, 251, 0.6)", border: "rgba(242, 169, 249, 1)" }); //Purple
@@ -170,9 +170,8 @@ export default class DrawNetwork {
                     align: "top",
                     vadjust: -7
                 },
-                selfReference: {
-                    smooth: false
-                }
+                smooth: false
+
             },
             nodes: {
                 shape: 'circle',
@@ -260,7 +259,7 @@ export default class DrawNetwork {
             }
         })
 
-        
+
         //Draw the bounding box of all groups
         for (let i = 0; i < bigBoundBoxes.length; i++) {
             if (bigBoundBoxes[i] !== null) {

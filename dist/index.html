@@ -13,7 +13,10 @@
     <h1 class="titulo"> Visualization testing </h1>
 
     <div class="middle">
-        <input type="file" id="jsonInput">
+        <div class="dropdown">
+            <button class="dropbtn">Select Network</button>
+            <div id="dropdown" class="dropdown-content"> </div>
+        </div>
     </div>
 
     <div class="middle">
@@ -26,7 +29,7 @@
         <input type="checkbox" id="changeMaxEdgeWidth">
     </div>
 
-    <div class="middle network" id="mynetwork"> </div>
+    <div id="networksContainer"> </div>
 </body>
 
 </html>

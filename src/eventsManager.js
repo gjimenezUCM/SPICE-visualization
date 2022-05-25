@@ -1,58 +1,128 @@
 import DrawNetwork from "./drawNetwork";
+import RequestsManager from "./requestsManager";
+
 
 export default class EventsManager {
 
     constructor() {
-        this.fileInputManager();
+        this.requestManager = new RequestsManager();
+        this.popupInit();
 
         this.sliderInputManager();
 
         this.checkBoxManager();
     }
-
     /**
-     * Create the parameters necesary for the fileInputChange function
+     * Get the number of available files from the database
      */
-    fileInputManager() {
-        this.fileInput = document.getElementById('jsonInput');
-        this.reader = new FileReader();
-
-        this.activeNetwork = null;
-
-        this.fileInput.addEventListener("change", () => this.fileInputChange(), false);
+    popupInit() {
+        this.requestManager.getNetwork("dataList.json")
+            .then((file) => {
+                file = JSON.parse(file);
+                this.popupManager(file)
+            });
     }
 
-    /**
-     * Executer when the file input changes. It trys to parse it to json and create a network, if it cant, an alert will be shown
+    /** Create an option in a popup for each file. The popup has a button to activate/deactivate and a checkbox to see the current state
+     * 
+     * @param {*} headersFile JSON file with all available files
      */
-    fileInputChange() {
-        const file = this.fileInput.files[0];
-        this.reader.readAsText(file, "UTF-8");
+    popupManager(headersFile) {
+        const n = headersFile.files.length;
+        
+        this.activesNetworks = new Map();
+        
+        const popupContainer = document.getElementById("dropdown");
 
-        //Check if the file selected is a valid json file
-        this.reader.onload = (evt) => {
-            try {
-                if (this.activeNetwork !== null) this.activeNetwork.clearNetwork();
+        for (let i = 0; i < n; i++) {
 
-                const jsonFile = JSON.parse(evt.target.result);
-                const container = document.getElementById('mynetwork');
+            this.activesNetworks.set(headersFile.files[i].name, null);
 
-                this.activeNetwork = new DrawNetwork(jsonFile, container);
+            const newContainer = document.createElement('div');
+            newContainer.className = "row";
 
-            } catch (e) {
-                console.log(e);
+            const newOption = document.createElement('input');
+            newOption.type = 'button';
+            newOption.value = headersFile.files[i].name;
+            newOption.className = 'dropDownOption';
 
-                alert("The file is not a valid json file");
-            }
-        };
-        this.reader.onerror = (evt) => {
-            if (this.activeNetwork !== null) this.activeNetwork.clearNetwork();
+            newOption.onclick = () => {
+                this.popupClicked(headersFile.files[i].name)
+            };
 
-            alert("Error trying to read the selected file");
+            newContainer.appendChild(newOption);
+
+            const newCheckBox = document.createElement('input');
+            newCheckBox.type = 'checkbox';
+            newCheckBox.disabled = true;
+            newCheckBox.checked = false;
+            newCheckBox.id ="check_" + headersFile.files[i].name;
+            newCheckBox.className = "dropdownCheck";
+
+            newContainer.appendChild(newCheckBox);
+
+            popupContainer.appendChild(newContainer)
+
         }
-
     }
+    /** Show/hide a network based on the name of the file input parameter
+     * 
+     * @param {*} name name of the file to show/hide 
+     */
+    popupClicked(name) {
+        const checkbox = document.getElementById("check_" + name);
+        if(checkbox.checked){
+            this.hideNetwork(name);
 
+            checkbox.checked = false;
+        }else{
+            this.requestManager.getNetwork(name+".json")
+            .then((file) => {
+                this.initNetwork(name, file)
+            });
+
+            checkbox.checked = true;
+        }
+    }
+    /** Eliminate the network and the html div related to the name parameter
+     * 
+     * @param {*} name //Parameter used to identify the network and div to delete
+     */
+    hideNetwork(name){
+        const network = this.activesNetworks.get(name);
+        network.clearNetwork();
+
+        this.activesNetworks.set(name, null);
+
+        const networkContainer = document.getElementById("networksContainer");
+        const divToDelete = document.getElementById("network_" + name);
+
+        networkContainer.removeChild(divToDelete);
+    }
+    /** Create a network using the file parameter as the source json
+     * 
+     * @param {*} file name of the file that will be used as data 
+     */
+    initNetwork(name, file) {
+        try {
+            const networkContainer = document.getElementById("networksContainer");
+            
+            const newNetwork = document.createElement('div');
+            newNetwork.id ="network_" + name;
+            newNetwork.className = "middle network";
+            
+            networkContainer.appendChild(newNetwork);
+
+            const jsonFile = JSON.parse(file);
+
+            this.activesNetworks.set(name, new DrawNetwork(jsonFile, newNetwork));
+
+        } catch (e) {
+            console.log(e);
+
+            alert("The file is not a valid json file");
+        }
+    }
     /**
      *  Update the slider value and update the networks's edges to hide anyone below the threshold
      */
