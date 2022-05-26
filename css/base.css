@@ -14,6 +14,7 @@ h2 {
 body {
   background-color: rgb(204, 204, 204);
   color: rgb(53, 53, 53);
+  overflow-y: scroll;
 }
 
 canvas {
