@@ -54,12 +54,16 @@ export default class DrawNetwork {
         this.groupColor_key = "explicit_community";
 
         this.groupColor = new Array();
-        this.groupColor.push({ color: "rgba(110, 143, 254, 1)", border: "rgba(92, 92, 235, 1)", 
-                            colorSelected: "rgba(184, 202, 255, 1)", borderSelected: "rgba(164, 164, 238, 1)" }); //Blue
-        this.groupColor.push({ color: "rgba(255, 130, 132, 1)", border: "rgba(224, 100, 103, 1)", 
-                            colorSelected: "rgba(238, 193, 174, 1)", borderSelected: "rgba(230, 172, 173, 1)" }); //Red
+        this.groupColor.push({
+            color: "rgba(110, 143, 254, 1)", border: "rgba(92, 92, 235, 1)",
+            colorSelected: "rgba(184, 202, 255, 1)", borderSelected: "rgba(164, 164, 238, 1)"
+        }); //Blue
+        this.groupColor.push({
+            color: "rgba(255, 130, 132, 1)", border: "rgba(224, 100, 103, 1)",
+            colorSelected: "rgba(238, 193, 174, 1)", borderSelected: "rgba(230, 172, 173, 1)"
+        }); //Red
 
-       
+
     }
 
     /**
@@ -108,6 +112,10 @@ export default class DrawNetwork {
             //Vis uses "group" key to change the color of all nodes with the same key
             node["group"] = "group_" + node[this.groupColor_key];
             delete node[this.groupColor_key];
+
+            //This attribute will be used to know if the node is with the default color. To improve performance
+            node["defaultColor"] = true;
+
         }
         const nodes = new DataSet(json.users);
         return nodes;
@@ -222,30 +230,39 @@ export default class DrawNetwork {
      * Draw the network with the parsed data and options chosen in the container and initialize the Events of the network
      */
     drawNetwork() {
+
         this.network = new Network(this.container, this.data, this.options);
         this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
 
-        this.network.on("selectNode", (event) => this.nodeSelectedCallback(event.nodes[0]));
-        this.network.on("deselectNode", () => this.nodeDeselectedCallback());
+        this.network.on("click", (event) => this.clickEventCallback(event));
+        //this.network.on("selectNode", (event) => this.nodeSelectedCallback(event.nodes[0]));
+        //this.network.on("deselectNode", () => this.nodeDeselectedCallback());
 
         this.hideEdgesbelowThreshold();
+    }
+
+    clickEventCallback(event) {
+
+        if (event.nodes.length > 0)
+            this.nodeHasBeenClicked(event.nodes[0]);
+        else {
+            this.noNodeIsClicked()
+        }
+
     }
 
     /** When a node is selected, it tells to the network manager to select the same node in all networks
      * 
      * @param {*} id id of the node 
      */
-    nodeSelectedCallback(id){
-        console.log(id);
-        
-        if(id !== undefined)
-            this.networkManager.nodeSelected(id);
+    nodeHasBeenClicked(id) {
+        this.networkManager.nodeSelected(id);
     }
 
     /** When a node is deselected, it tells to the network manager to deselect all nodes;
      * 
      */
-    nodeDeselectedCallback(){
+    noNodeIsClicked() {
         this.networkManager.nodeDeselected();
     }
 
@@ -253,29 +270,31 @@ export default class DrawNetwork {
      * 
      * @param {*} id //Id of the node
      */
-    nodeSelected(id){
+    nodeSelected(id) {
         this.network.selectNodes([id], true);
 
         const selectedNodes = new Array();
-        selectedNodes.push( id )
+        selectedNodes.push(id)
 
         const connected_edges = this.network.getConnectedEdges(selectedNodes[0]);
         const clickedEdges = this.data.edges.get(connected_edges);
 
         clickedEdges.forEach((edge) => {
-            if(!edge.hidden){
-                if(edge.from !== selectedNodes[0] ){
-                    selectedNodes.push( edge.from );
-                }else{
-                    selectedNodes.push( edge.to );
+            if (!edge.hidden) {
+                if (edge.from !== selectedNodes[0]) {
+                    selectedNodes.push(edge.from);
+                } else {
+                    selectedNodes.push(edge.to);
                 }
             }
         })
 
         this.data.nodes.forEach((node) => {
-            if(selectedNodes.includes(node.id)){
-                this.turnNodeColorToDefault(node);
-            }else
+            if (selectedNodes.includes(node.id)) {
+                if(!node.defaultColor)
+                    this.turnNodeColorToDefault(node);
+
+            } else if (node.defaultColor)
                 this.darkenNode(node);
 
         });
@@ -285,10 +304,11 @@ export default class DrawNetwork {
     /**
      * Return all nodes to default color mode
      */
-    nodeDeselected(){
+    nodeDeselected() {
         this.network.unselectAll();
 
         this.data.nodes.forEach((node) => {
+            if (!node.defaultColor)
                 this.turnNodeColorToDefault(node);
         });
     }
@@ -297,9 +317,10 @@ export default class DrawNetwork {
      * 
      * @param {*} node 
      */
-    turnNodeColorToDefault(node){
-        node.borderWidth = this.options.nodes.borderWidth;
+    turnNodeColorToDefault(node) {
+        node.defaultColor = true;
 
+        node.borderWidth = this.options.nodes.borderWidth;
         const color = this.options.groups[node["group"]].color;
         node["color"] = color;
 
@@ -310,9 +331,11 @@ export default class DrawNetwork {
      * 
      * @param {*} node 
      */
-    darkenNode(node){
+    darkenNode(node) {
+        node.defaultColor = false;
+
         node.borderWidth = 1;
-        node.color = {background: "rgba(155, 155, 155, 1)", border: "rgba(100, 100, 100, 1)"};
+        node.color = { background: "rgba(155, 155, 155, 1)", border: "rgba(100, 100, 100, 1)" };
 
         this.data.nodes.update(node);
     }
