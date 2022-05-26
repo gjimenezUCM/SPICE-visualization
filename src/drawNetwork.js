@@ -8,9 +8,10 @@ export default class DrawNetwork {
      * @param {*} jsonInput json with all the necesary data to create the nodes and edges
      * @param {*} container container where the network will be created
      */
-    constructor(jsonInput, container, networkManager) {
+    constructor(jsonInput, container, networkManager, config) {
         this.container = container;
         this.networkManager = networkManager;
+        this.config = config;
 
         this.activateEdgeLabels = true;
 
@@ -30,7 +31,7 @@ export default class DrawNetwork {
      */
     initEdgesParameters() {
         //Edges with value equal or below to this wont be drawn
-        this.edgeValueThreshold = document.getElementById('edgeThreshold').value;
+        this.edgeValueThreshold = this.config.edgeThreshold;
 
         //In case value key changes, this is what is compared while parsing edges json
         this.edgeValue = "value";
@@ -39,7 +40,7 @@ export default class DrawNetwork {
         this.minEdgeWidth = 3;
 
         //If true, edgesWidth will change based on the value (similarity) between the nodes they link
-        if (document.getElementById('changeMaxEdgeWidth').checked) {
+        if (this.config.variableEdge) {
             this.changeMaxEdgeWidth = true;
         } else {
             this.changeMaxEdgeWidth = false;
@@ -235,10 +236,8 @@ export default class DrawNetwork {
         this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
 
         this.network.on("click", (event) => this.clickEventCallback(event));
-        //this.network.on("selectNode", (event) => this.nodeSelectedCallback(event.nodes[0]));
-        //this.network.on("deselectNode", () => this.nodeDeselectedCallback());
 
-        this.hideEdgesbelowThreshold();
+        this.hideEdgesbelowThreshold(this.edgeValueThreshold);
     }
 
     clickEventCallback(event) {
@@ -405,7 +404,9 @@ export default class DrawNetwork {
     /**
      * Hide all edges below a set threshold
      */
-    hideEdgesbelowThreshold() {
+    hideEdgesbelowThreshold(newThreshold) {
+        this.edgeValueThreshold = newThreshold;
+
         this.data.edges.forEach((edge) => {
 
             if (edge["value"] < this.edgeValueThreshold) {
@@ -432,7 +433,9 @@ export default class DrawNetwork {
     /**
      * Update the max width based on current this.changeMaxEdgeWidth parameter. If true, the width of edges will vary based on their "value" parameter
      */
-    changeAllMaxEdgesWidth() {
+     updateVariableEdge(newBool) {
+        this.changeMaxEdgeWidth = newBool;
+        
         let max;
         if (this.changeMaxEdgeWidth) {
             max = this.maxEdgeWidth;

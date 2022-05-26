@@ -22,7 +22,14 @@ export default class RequestsManager {
         });
     }
 
-    addNetwork(name, json) {
+    getAllFileNames(){
+        let name = "dataList.json";
         
+        return this.axios.get('/data/'+name, {
+            params: {}
+        })
+        .then((response) => {
+             return response.data;
+        });
     }
 }
