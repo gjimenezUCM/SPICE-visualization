@@ -31,9 +31,13 @@ canvas {
   margin-left: auto;
 }
 
-.middle.network {
+.col-sm-8.network{
+  height: 40em;
   border-style: dotted;
-  width: 60.00%;
+}
+.middle.network {
+  width: 100.00%;
+  border-style: dotted;
   height: 40em;
   margin-left: 5%;
 }
@@ -81,14 +85,11 @@ canvas {
 }
 
 /*Div containers of each dropdown row*/
-.row{
+/* .row{
   display: grid;
-  grid-template-columns: 2;
-  grid-template-rows: 1;
-  padding: auto;
   min-width: 116px;
   min-height: 40px;
-}
+} */
 
 /* Change color of dropdown links on hover */
 .dropdown-content .dropDownOption:hover {

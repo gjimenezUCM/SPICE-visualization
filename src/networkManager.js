@@ -15,12 +15,6 @@ export default class NetworkManager {
      */
     addNetwork(key, file, container) {
         try {
-            const newNetwork = document.createElement('div');
-            newNetwork.id = "networkCanvas_" + key;
-            newNetwork.className = "middle network";
-
-            container.appendChild(newNetwork);
-
             const config = {
                 edgeThreshold: document.getElementById("thresholdSlider_" + key).value,
                 variableEdge: document.getElementById("thresholdVariableCheck_" + key).checked,
@@ -28,7 +22,7 @@ export default class NetworkManager {
 
             const jsonFile = JSON.parse(file);
 
-            const network = new DrawNetwork(jsonFile, newNetwork, this, config);
+            const network = new DrawNetwork(jsonFile, container, this, config);
             network.key = key;
 
             this.activesNetworksMap.set(key, network);

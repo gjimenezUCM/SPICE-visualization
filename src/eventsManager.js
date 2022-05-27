@@ -89,31 +89,60 @@ export default class EventsManager {
      * @param {*} file File with the network config data
      */
     createNetwork(key, file) {
-        const allNetworkContainer = document.getElementById("networksContainer");
+        //Top Container that always exist
+        const topContainer = document.getElementById("networksContainer");
 
-        const newNetworkContainer = document.createElement("div");
-        newNetworkContainer.id = "network_" + key;
-        
+        //Container that will be deleted when clearing the network
+        const networkContainer = document.createElement("div");
+        networkContainer.id = "network_" + key;
+        networkContainer.className = "container";
+
+        //Header with the name of the network
         const separator = document.createElement('hr');
 
         const titleContainer = document.createElement('div');
-        titleContainer.className = "middle";
+        titleContainer.className = "row";
 
         const title = document.createElement("h2");
         title.innerHTML = key;
+        titleContainer.appendChild(separator)
         titleContainer.appendChild(title);
+        
+        networkContainer.appendChild(titleContainer);
+        
+        //Row with the network to the left, and the data/input options to the right
+        const rowContainer = document.createElement('div');
+        rowContainer.className = "row";
+
+        const columnLeftContainer = document.createElement('div');
+        const columnRightContainer = document.createElement('div');
+        columnLeftContainer.className = "col-sm-8 network";
+        columnRightContainer.className = "col-sm-4";
+
+        rowContainer.appendChild(columnLeftContainer);
+        rowContainer.appendChild(columnRightContainer);
+        networkContainer.appendChild(rowContainer);
+
+        //Input options
+        const inputTitleContainer = document.createElement('div');
+        inputTitleContainer.className = "middle";
+        
+        const inputTitle = document.createElement("h5");
+        inputTitle.innerHTML = "View options: ";
+        inputTitleContainer.appendChild(inputTitle);
 
         const sliderContainer = this.createThresholdSliderContainer(key);
         const checkboxContainer = this.createVariableEdgeCheckBoxContainer(key);
 
-        newNetworkContainer.appendChild(separator);
-        newNetworkContainer.appendChild(titleContainer);
-        newNetworkContainer.appendChild(sliderContainer);
-        newNetworkContainer.appendChild(checkboxContainer);
+        columnRightContainer.appendChild(inputTitleContainer);
+        columnRightContainer.appendChild(sliderContainer);
+        columnRightContainer.appendChild(checkboxContainer);
 
-        allNetworkContainer.appendChild( newNetworkContainer);
+        //Network
 
-        this.networkManager.addNetwork(key, file, newNetworkContainer)
+        topContainer.appendChild( networkContainer );
+
+        this.networkManager.addNetwork(key, file, columnLeftContainer)
 
         
     }

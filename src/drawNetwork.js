@@ -222,8 +222,8 @@ export default class DrawNetwork {
                 enabled: false
             },
             interaction: {
-                zoomView: false,
-                dragView: false,
+                zoomView: true,
+                dragView: true,
             }
         };
     }
