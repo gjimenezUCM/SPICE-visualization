@@ -1,5 +1,6 @@
 import { DataSet } from "vis-data/peer";
 import { Network } from "vis-network/peer";
+import 'bootstrap'
 
 export default class DrawNetwork {
 
@@ -235,15 +236,18 @@ export default class DrawNetwork {
         this.network = new Network(this.container, this.data, this.options);
         this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
 
-        this.network.on("click", (event) => this.clickEventCallback(event));
+        this.network.on("click", (event) => this.clickEventCallback(event.nodes));
 
         this.hideEdgesbelowThreshold(this.edgeValueThreshold);
     }
 
-    clickEventCallback(event) {
-
-        if (event.nodes.length > 0)
-            this.nodeHasBeenClicked(event.nodes[0]);
+    /** Function executed when the user clicks inside the network canvas
+     * 
+     * @param {*} nodes Array with the nodes clicked
+     */
+    clickEventCallback(nodes) {
+        if (nodes.length > 0)
+            this.nodeHasBeenClicked(nodes[0]);
         else {
             this.noNodeIsClicked()
         }
@@ -271,6 +275,7 @@ export default class DrawNetwork {
      */
     nodeSelected(id) {
         this.network.selectNodes([id], true);
+        this.showPopoverInfo(id);
 
         const selectedNodes = new Array();
         selectedNodes.push(id)
@@ -290,7 +295,7 @@ export default class DrawNetwork {
 
         this.data.nodes.forEach((node) => {
             if (selectedNodes.includes(node.id)) {
-                if(!node.defaultColor)
+                if (!node.defaultColor)
                     this.turnNodeColorToDefault(node);
 
             } else if (node.defaultColor)
@@ -300,10 +305,74 @@ export default class DrawNetwork {
 
     }
 
+    /** Show a popover with the info of the node
+     * 
+     * @param {*} id Id of the node
+     */
+     showPopoverInfo(id) {
+        const title = "<h5> Name: " + id + "</h5>";
+        const content = this.createPopOverContent(id);
+
+        const aux = function(){return "right"};
+
+        const options = {
+            trigger: "manual",
+            title: "Placeholder Title",
+            content: "Placeholder Content",
+            placement: aux,
+            html: true,
+            fallbackPlacements: ["right"],
+        };
+
+        this.popOver = bootstrap.Popover.getOrCreateInstance(this.container, options);
+
+        this.popOver.setContent({
+            '.popover-header': title,
+            '.popover-body': content
+        })
+
+        this.popOver.show();
+    }
+
+    /** Create the content of the popover with the data of the node
+     * 
+     * @param {*} id Id of the nde
+     * @returns a html string with the content ready
+     */
+    createPopOverContent(id) {
+        const node = this.data.nodes.get(id);
+        let content = "";
+
+        for (const [key, value] of Object.entries(node)) {
+            if (this.canShowKey(key)) {
+                content += "<b>" + key + ": </b> " + value + "<br>";
+            }
+        }
+        return content;
+
+    }
+    /** Doesnt show in the content they keys that are not interesting to see
+     * 
+     * @param {*} key key that is going to be checked
+     * @returns a boolean if it can be shown or not
+     */
+    canShowKey(key) {
+        switch (key) {
+            case "defaultColor":
+            case 'borderWidth':
+            case 'color':
+                return false;
+            default:
+                return true;
+        }
+    }
+
     /**
      * Return all nodes to default color mode
      */
     nodeDeselected() {
+        if( this.popOver !== undefined) this.popOver.hide();
+
         this.network.unselectAll();
 
         this.data.nodes.forEach((node) => {
@@ -433,9 +502,9 @@ export default class DrawNetwork {
     /**
      * Update the max width based on current this.changeMaxEdgeWidth parameter. If true, the width of edges will vary based on their "value" parameter
      */
-     updateVariableEdge(newBool) {
+    updateVariableEdge(newBool) {
         this.changeMaxEdgeWidth = newBool;
-        
+
         let max;
         if (this.changeMaxEdgeWidth) {
             max = this.maxEdgeWidth;
