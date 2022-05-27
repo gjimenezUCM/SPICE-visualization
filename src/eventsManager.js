@@ -9,78 +9,90 @@ export default class EventsManager {
         this.requestManager = new RequestsManager();
         this.networkManager = new NetworkManager();
 
-        this.popupInit();
+        this.dropdownInit();
     }
 
     /**
      * Get the number of available files from the database
      */
-    popupInit() {
+    dropdownInit() {
         this.requestManager.getAllFileNames()
             .then((file) => {
                 file = JSON.parse(file);
-                this.popupManager(file)
+                this.createDropdown(file)
             });
     }
 
-    /** Create an option in a popup for each file. The popup has a button to activate/deactivate and a checkbox to see the current state
-     * 
-     * @param {*} headersFile JSON file with all available files
-     */
-    popupManager(headersFile) {
+    /** Create an option in a dropdown menu for each file to pen/close every network
+    * 
+    * @param {*} headersFile JSON file with all available files
+    */
+    createDropdown(headersFile) {
         const n = headersFile.files.length;
 
-        const popupContainer = document.getElementById("dropdown");
-        
+        //Fill the dropdown menu with all available data
+        const dropdownContainer = document.getElementById("network_dropdownMenu");
         for (let i = 0; i < n; i++) {
+
             const key = headersFile.files[i].name;
 
-            const newContainer = document.createElement('div');
-            newContainer.className = "row";
+            const newOptionContainer = document.createElement('li');
 
-            const newOption = document.createElement('input');
-            newOption.type = 'button';
-            newOption.value = key;
-            newOption.className = 'dropDownOption';
+            const newOptionButton = document.createElement('a');
+            newOptionButton.className = "dropdown-item";
+            newOptionButton.innerHTML = key;
+            newOptionButton.id = "networkOptionButton_" + key;
+            newOptionButton.onclick = () => this.optionClicked(key);
 
-            newOption.onclick = () => {
-                this.popupClicked(key)
-            };
+            newOptionContainer.appendChild(newOptionButton);
+            dropdownContainer.appendChild(newOptionContainer);
 
-            newContainer.appendChild(newOption);
-
-            const newCheckBox = document.createElement('input');
-            newCheckBox.type = 'checkbox';
-            newCheckBox.disabled = true;
-            newCheckBox.checked = false;
-            newCheckBox.id = "networkActiveCheck_" + key;
-            newCheckBox.className = "dropdownCheck";
-
-            newContainer.appendChild(newCheckBox);
-
-            popupContainer.appendChild(newContainer)
         }
+
+        //Create the dropdown 
+        const options = {
+            autoClose: 'outside'
+        }
+        const cont = document.getElementById("container");
+        const dropDown = new bootstrap.Dropdown(cont, options);
+
+        //This is a bit hacky because boostrap autoClose option is not working properly
+        const button = document.getElementById("dropdownButton");
+        this.menuActive = false;
+
+        button.onclick = () => dropDown.toggle();
+
+        document.addEventListener('click', function (event) {
+            if (!cont.contains(event.target))
+                dropDown.hide();
+        });
+
+
     }
 
-    /** Show/hide the network based on the file clicked
+    /** Show/hide the network based on the option clicked
      * 
      * @param {*} key Key of the network 
      */
-    popupClicked(key) {
-        const checkbox = document.getElementById("networkActiveCheck_" + key);
-        if (checkbox.checked) {
+    optionClicked(key) {
+        const option = document.getElementById("networkOptionButton_" + key);
+
+        const isActive = option.className.split(" ").pop();
+        if (isActive === "active") {
+            option.className = "dropdown-item";
             this.networkManager.removeNetwork(key);
 
-            checkbox.checked = false;
         } else {
             this.requestManager.getNetwork(key + ".json")
                 .then((file) => {
                     this.createNetwork(key, file);
 
                 });
-
-            checkbox.checked = true;
+                
+            option.className = "dropdown-item active";
         }
+
+
     }
 
     /** Create the network and all the user configuration options 
@@ -107,9 +119,9 @@ export default class EventsManager {
         title.innerHTML = key;
         titleContainer.appendChild(separator)
         titleContainer.appendChild(title);
-        
+
         networkContainer.appendChild(titleContainer);
-        
+
         //Row with the network to the left, and the data/input options to the right
         const rowContainer = document.createElement('div');
         rowContainer.className = "row";
@@ -126,7 +138,7 @@ export default class EventsManager {
         //Input options
         const inputTitleContainer = document.createElement('div');
         inputTitleContainer.className = "middle";
-        
+
         const inputTitle = document.createElement("h5");
         inputTitle.innerHTML = "View options: ";
         inputTitleContainer.appendChild(inputTitle);
@@ -140,11 +152,11 @@ export default class EventsManager {
 
         //Network
 
-        topContainer.appendChild( networkContainer );
+        topContainer.appendChild(networkContainer);
 
         this.networkManager.addNetwork(key, file, columnLeftContainer)
 
-        
+
     }
 
     /** Create a container with a slider that controls the minimum similarity Threshold for edges to be visible in the network
@@ -196,7 +208,7 @@ export default class EventsManager {
         checkBox.type = 'checkbox';
         checkBox.checked = false;
         checkBox.id = "thresholdVariableCheck_" + key;
-    
+
         checkBox.onchange = () => this.variableEdgeChange(key);
 
         checkboxContainer.appendChild(text2);
@@ -224,13 +236,13 @@ export default class EventsManager {
     }
 
 
-   /** UUpdate the network with the new variableEdgeWidth value
-    * 
-    * @param {*} key key of the network
-    */
+    /** UUpdate the network with the new variableEdgeWidth value
+     * 
+     * @param {*} key key of the network
+     */
     variableEdgeChange(key) {
         const checkBox = document.getElementById("thresholdVariableCheck_" + key);
-        
+
         this.networkManager.variableEdgeChange(key, checkBox.checked);
     }
 }

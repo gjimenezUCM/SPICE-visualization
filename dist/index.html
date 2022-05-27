@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
 
     <script src="main.js"></script>
-    <script src=" ../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js" ></script>
+    <script src=" ../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/base.css">
@@ -16,15 +16,23 @@
 <body>
     <h1 class="titulo"> Visualization testing </h1>
 
+    <!-- Example split danger button -->
     <div class="middle">
-        <div class="dropdown">
-            <button class="dropbtn">Select Network</button>
-            <div id="dropdown" class="dropdown-content"> </div>
+        <div tabindex="1" id="container" class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownButton">
+                Select Network
+            </button>
+            <ul id="network_dropdownMenu" class="dropdown-menu">
+            
+            </ul>
         </div>
     </div>
+
+
     <div id="networksContainer"> </div>
 
 
-    
+
 </body>
+
 </html>

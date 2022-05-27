@@ -34,13 +34,9 @@ canvas {
 .col-sm-8.network{
   height: 40em;
   border-style: dotted;
+  margin-bottom: 1%;
 }
-.middle.network {
-  width: 100.00%;
-  border-style: dotted;
-  height: 40em;
-  margin-left: 5%;
-}
+
 
 /* POPUP */
 /* Dropdown Button */
