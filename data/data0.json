@@ -2,12 +2,16 @@
     "users": [{
         "id": 0,
         "label": "0",
+        "dummy_attribute": "test",
         "group": 0,
-        "explicit_community": 1,
-        "dummy_attribute": 3
+        "explicit_community": 1
+
     }, {
         "id": 1,
         "label": "1",
+        "Altura": "150,00 cm",
+        "Nota": "4",
+        "Clase": "la de la izquierda",
         "group": 0,
         "explicit_community": 1
     }, {

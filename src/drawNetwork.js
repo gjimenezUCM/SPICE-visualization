@@ -435,7 +435,7 @@ export default class DrawNetwork {
         for (let i = 0; i < this.mainShowAttributes.length; i++) {
             const currentKey = this.mainShowAttributes[i];
 
-            this.updateDataPanelRow(i, currentKey, node[currentKey], true);
+            this.updateDataPanelRow(rowIndex, currentKey, node[currentKey], true);
 
             lastRow = rowIndex;
             rowIndex++;
@@ -447,7 +447,7 @@ export default class DrawNetwork {
             if (!this.notShowAttributes.includes(keys[i]) && !this.mainShowAttributes.includes(keys[i])) {
                 const currentKey = keys[i];
 
-                this.updateDataPanelRow(i, currentKey, node[currentKey], true);
+                this.updateDataPanelRow(rowIndex, currentKey, node[currentKey], true);
 
                 lastRow = rowIndex;
                 rowIndex++;
