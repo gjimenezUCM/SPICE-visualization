@@ -65,6 +65,8 @@ export default class DrawNetwork {
             colorSelected: "rgba(238, 193, 174, 1)", borderSelected: "rgba(230, 172, 173, 1)"
         }); //Red
 
+        this.darkenColor = { background: "rgba(155, 155, 155, 0.3)", border: "rgba(100, 100, 100, 0.3)" };
+
 
     }
 
@@ -403,7 +405,7 @@ export default class DrawNetwork {
         node.defaultColor = false;
 
         node.borderWidth = 1;
-        node.color = { background: "rgba(155, 155, 155, 1)", border: "rgba(100, 100, 100, 1)" };
+        node.color = this.darkenColor;
 
         this.data.nodes.update(node);
     }
