@@ -154,7 +154,7 @@ export default class EventsManager {
 
         topContainer.appendChild(networkContainer);
 
-        this.networkManager.addNetwork(key, file, columnLeftContainer)
+        this.networkManager.addNetwork(key, file, columnLeftContainer, columnRightContainer)
 
 
     }

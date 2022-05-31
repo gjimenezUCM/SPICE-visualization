@@ -9,19 +9,23 @@ export default class DrawNetwork {
      * @param {*} jsonInput json with all the necesary data to create the nodes and edges
      * @param {*} container container where the network will be created
      */
-    constructor(jsonInput, container, networkManager, config) {
+    constructor(jsonInput, container, rightContainer, networkManager, config) {
         this.container = container;
+        this.dataContainer = rightContainer;
         this.networkManager = networkManager;
         this.config = config;
+        this.key = config.key;
 
         this.activateEdgeLabels = true;
 
         this.initEdgesParameters();
         this.initNodesParameters();
         this.initBoundingBoxesParameters();
+        this.initDataTableParameters();
 
         this.parseJson(jsonInput);
 
+        this.initNodeDataPanel();
         this.chooseOptions(jsonInput);
 
         this.drawNetwork();
@@ -66,8 +70,6 @@ export default class DrawNetwork {
         }); //Red
 
         this.darkenColor = { background: "rgba(155, 155, 155, 0.3)", border: "rgba(100, 100, 100, 0.3)" };
-
-
     }
 
     /**
@@ -85,6 +87,20 @@ export default class DrawNetwork {
         this.boxGroupColor.push({ color: "rgba(211, 245, 192, 0.6)", border: "rgba(169, 221, 140, 1)" }); //Green
         this.boxGroupColor.push({ color: "rgba(254, 212, 213, 0.6)", border: "rgba(252, 153, 156, 1)" }); //Red
         this.boxGroupColor.push({ color: "rgba(220, 235, 254, 0.6)", border: "rgba(168, 201, 248, 1)" }); //Blue
+    }
+
+    /**
+     * Initialize all parameters related with the dataTable of the selected node
+     */
+    initDataTableParameters() {
+        //Internal/Aux attributes that are not intended to be shown to the user. These tags should be the same as the node keys names
+        this.notShowAttributes = new Array("defaultColor", "borderWidth", "color", "group");
+
+        //Atributes that all nodes have and are important to show. These tags should be the same as the node keys names
+        this.mainShowAttributes = new Array("id", "label", this.groupColor_key, "boxGroup");
+
+        //Array with all dataTable columns. Its used to easily iterate over all of them
+        this.dataPanelContainers = new Array();
     }
 
     /** Parse the JSON object to get the necesary data to create the network
@@ -115,7 +131,6 @@ export default class DrawNetwork {
 
             //Vis uses "group" key to change the color of all nodes with the same key
             node["group"] = "group_" + node[this.groupColor_key];
-            delete node[this.groupColor_key];
 
             //This attribute will be used to know if the node is with the default color. To improve performance
             node["defaultColor"] = true;
@@ -154,6 +169,93 @@ export default class DrawNetwork {
         const edges = new DataSet(json.similarity);
 
         return edges;
+    }
+
+    /**
+     * Initialize an empty DataPanel 
+     */
+    initNodeDataPanel() {
+        const nRow = this.getNrows();
+
+        const dataContainer = document.createElement('div');
+        dataContainer.className = "border border-dark rounded";
+
+        const titleContainer = document.createElement('h5');
+        titleContainer.className = "middle attributes border-bottom border-dark";
+        titleContainer.textContent = "Node Attributes";
+
+        dataContainer.appendChild(titleContainer);
+
+        for (let i = 0; i < nRow; i++) {
+
+            const row = document.createElement('div');
+            row.className = "row dataRow border-bottom border-dark";
+
+            if (i >= this.mainShowAttributes.length - 1)
+                row.className = "row dataRow";
+
+            const colLeft = document.createElement("div");
+            colLeft.className = "col-6 ";
+            colLeft.innerHTML = "";
+
+            if (i < this.mainShowAttributes.length)
+                colLeft.innerHTML = this.mainShowAttributes[i];
+
+            const colRight = document.createElement("div");
+            colRight.className = "col-6 ";
+            colRight.innerHTML = "";
+
+            this.dataPanelContainers.push({ left: colLeft, right: colRight, row: row });
+
+            row.appendChild(colLeft);
+            row.appendChild(colRight);
+            dataContainer.appendChild(row);
+        }
+
+        this.dataContainer.appendChild(dataContainer);
+    }
+
+    /**
+     * Get the number of rows of node attributes
+     * @returns The number of rows
+     */
+    getNrows() {
+
+        let maxLength = 0;
+        let maxNode;
+        this.data.nodes.forEach((node) => {
+            const length = Object.keys(node).length
+            if (length > maxLength) {
+                maxLength = length;
+                maxNode = node;
+            }
+        });
+
+        //Delete all attributes that should not be shown
+        for (let key of Object.keys(maxNode)) {
+            if (this.notShowAttributes.includes(key)) {
+                maxLength--;
+            }
+        }
+
+        return maxLength;
+    }
+
+    /** Returns if a key should be shown in data panel
+     * 
+     * @param {*} key Key to be compared 
+     * @returns Boolean 
+     */
+    canShowKey(key) {
+        switch (key) {
+            case "defaultColor":
+            case 'borderWidth':
+            case 'color':
+            case "label":
+                return false;
+            default:
+                return true;
+        }
     }
 
     /**
@@ -231,13 +333,12 @@ export default class DrawNetwork {
     }
 
     /**
-     * Draw the network with the parsed data and options chosen in the container and initialize the Events of the network
+     * Draw the network and initialize all Events
      */
     drawNetwork() {
-
         this.network = new Network(this.container, this.data, this.options);
-        this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
 
+        this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
         this.network.on("click", (event) => this.clickEventCallback(event.nodes));
 
         this.hideEdgesbelowThreshold(this.edgeValueThreshold);
@@ -277,8 +378,10 @@ export default class DrawNetwork {
      */
     nodeSelected(id) {
         this.network.selectNodes([id], true);
-        this.showPopoverInfo(id);
 
+        this.updateDataPanel(id);
+
+        //Search for the nodes that are connected to the selected Node
         const selectedNodes = new Array();
         selectedNodes.push(id)
 
@@ -295,6 +398,14 @@ export default class DrawNetwork {
             }
         })
 
+        //Move the "camera" to focus on these nodes
+        const fitOptions = {
+            nodes: selectedNodes,
+            animation: true
+        }
+        this.network.fit(fitOptions);
+
+        //Update all nodes color acording to their selected status
         this.data.nodes.forEach((node) => {
             if (selectedNodes.includes(node.id)) {
                 if (!node.defaultColor)
@@ -307,73 +418,90 @@ export default class DrawNetwork {
 
     }
 
-    /** Show a popover with the info of the node
+    /** Update the data panel with the node with the data
      * 
-     * @param {*} id Id of the node
+     * @param {*} id id of the node
      */
-     showPopoverInfo(id) {
-        const title = "<h5> Name: " + id + "</h5>";
-        const content = this.createPopOverContent(id);
-
-        const aux = function(){return "right"};
-
-        const options = {
-            trigger: "manual",
-            title: "Placeholder Title",
-            content: "Placeholder Content",
-            placement: aux,
-            html: true,
-            fallbackPlacements: ["right"],
-        };
-
-        this.popOver = bootstrap.Popover.getOrCreateInstance(this.container, options);
-
-        this.popOver.setContent({
-            '.popover-header': title,
-            '.popover-body': content
-        })
-
-        this.popOver.show();
-    }
-
-    /** Create the content of the popover with the data of the node
-     * 
-     * @param {*} id Id of the nde
-     * @returns a html string with the content ready
-     */
-    createPopOverContent(id) {
+    updateDataPanel(id) {
         const node = this.data.nodes.get(id);
-        let content = "";
+        const keys = Object.keys(node);
 
-        for (const [key, value] of Object.entries(node)) {
-            if (this.canShowKey(key)) {
-                content += "<b>" + key + ": </b> " + value + "<br>";
+        this.clearDataPanel();
+
+        let lastRow;
+        let rowIndex = 0;
+
+        //Add the important attributes in their fixed order
+        for (let i = 0; i < this.mainShowAttributes.length; i++) {
+            const currentKey = this.mainShowAttributes[i];
+
+            this.updateDataPanelRow(i, currentKey, node[currentKey], true);
+
+            lastRow = rowIndex;
+            rowIndex++;
+        }
+
+        //Add unimportant attributes
+        for (let i = 0; i < keys.length; i++) {
+            //If its an available attribute that has not been already included as a main Attribute
+            if (!this.notShowAttributes.includes(keys[i]) && !this.mainShowAttributes.includes(keys[i])) {
+                const currentKey = keys[i];
+
+                this.updateDataPanelRow(i, currentKey, node[currentKey], true);
+
+                lastRow = rowIndex;
+                rowIndex++;
             }
         }
-        return content;
 
+        this.dataPanelContainers[lastRow].row.className = "row dataRow";
     }
-    /** Doesnt show in the content they keys that are not interesting to see
+
+    /** Update a dataPanel row 
      * 
-     * @param {*} key key that is going to be checked
-     * @returns a boolean if it can be shown or not
+     * @param {*} index index of the row to update
+     * @param {*} key new Text in the left column
+     * @param {*} value new Text in the right column
+     * @param {*} bottomBorder Boolean indicating if the row should have bottom Border
      */
-    canShowKey(key) {
-        switch (key) {
-            case "defaultColor":
-            case 'borderWidth':
-            case 'color':
-                return false;
-            default:
-                return true;
+    updateDataPanelRow(index, key, value, bottomBorder) {
+        this.dataPanelContainers[index].left.innerHTML = key;
+        this.dataPanelContainers[index].right.innerHTML = value;
+        this.dataPanelContainers[index].row.className = "row dataRow border-bottom border-dark";
+
+        if (!bottomBorder)
+            this.dataPanelContainers[index].row.className = "row dataRow";
+    }
+
+    /**
+     * Clear all data from DataPanel while mantaining the important keys
+     */
+    clearDataPanel() {
+        for (let i = 0; i < this.dataPanelContainers.length; i++) {
+            let hasBottomBorder = true;
+            let keyName = "";
+
+            if (i >= this.mainShowAttributes.length - 1)
+                hasBottomBorder = false;
+
+            if (i < this.mainShowAttributes.length)
+                keyName = this.mainShowAttributes[i];
+
+            this.updateDataPanelRow(i, keyName, "", hasBottomBorder);
         }
     }
 
     /**
-     * Return all nodes to default color mode
+     * Restore the network to the original deselected state
      */
     nodeDeselected() {
-        if( this.popOver !== undefined) this.popOver.hide();
+        //Return to fit all nodes into the "camera"
+        const fitOptions = {
+            animation: true
+        }
+        this.network.fit(fitOptions);
+
+        this.clearDataPanel();
 
         this.network.unselectAll();
 

@@ -11,19 +11,20 @@ export default class NetworkManager {
      * 
      * @param {*} key Identifier of the new network
      * @param {*} file File with the config of the network
-     * @param {*} container Container where the network will be placed
+     * @param {*} leftContainer Container where the network will be placed
+     * @param {*} rightContainer Container where the network data will be placed
      */
-    addNetwork(key, file, container) {
+    addNetwork(key, file, leftContainer, rightContainer) {
         try {
             const config = {
                 edgeThreshold: document.getElementById("thresholdSlider_" + key).value,
                 variableEdge: document.getElementById("thresholdVariableCheck_" + key).checked,
+                key: key
             };
 
             const jsonFile = JSON.parse(file);
 
-            const network = new DrawNetwork(jsonFile, container, this, config);
-            network.key = key;
+            const network = new DrawNetwork(jsonFile, leftContainer, rightContainer, this, config);
 
             this.activesNetworksMap.set(key, network);
             this.activesNetworksArray.push(network);

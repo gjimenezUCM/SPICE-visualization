@@ -3,7 +3,8 @@
         "id": 0,
         "label": "0",
         "group": 0,
-        "explicit_community": 1
+        "explicit_community": 1,
+        "dummy_attribute": 3
     }, {
         "id": 1,
         "label": "1",
