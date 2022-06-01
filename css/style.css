@@ -45,6 +45,7 @@
   --bs-light-rgb: 248, 249, 250;
   --bs-dark-rgb: 33, 37, 41;
   --bs-white-rgb: 255, 255, 255;
+  --bs-grey-rgb: 150, 150, 150;
   --bs-black-rgb: 0, 0, 0;
   --bs-body-color-rgb: 53, 53, 53;
   --bs-body-bg-rgb: 204, 204, 204;
@@ -8351,6 +8352,11 @@ fieldset:disabled .btn {
 .border-white {
   --bs-border-opacity: 1;
   border-color: rgba(var(--bs-white-rgb), var(--bs-border-opacity)) !important;
+}
+
+.border-grey {
+  --bs-border-opacity: 1;
+  border-color: rgba(var(--bs-grey-rgb), var(--bs-border-opacity)) !important;
 }
 
 .border-1 {

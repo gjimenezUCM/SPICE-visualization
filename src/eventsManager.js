@@ -129,6 +129,8 @@ export default class EventsManager {
         const columnLeftContainer = document.createElement('div');
         const columnRightContainer = document.createElement('div');
         columnLeftContainer.className = "col-sm-8 network";
+        columnLeftContainer.id = "col_" + key;
+
         columnRightContainer.className = "col-sm-4";
 
         rowContainer.appendChild(columnLeftContainer);

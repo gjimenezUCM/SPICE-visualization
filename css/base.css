@@ -57,3 +57,7 @@ canvas {
   position: relative;
   display: inline-block;
 }
+
+.popover {
+  opacity: 0.8;
+}

@@ -1,6 +1,6 @@
 import { DataSet } from "vis-data/peer";
 import { Network } from "vis-network/peer";
-import 'bootstrap'
+import 'bootstrap';
 
 export default class DrawNetwork {
 
@@ -70,6 +70,9 @@ export default class DrawNetwork {
         }); //Red
 
         this.darkenColor = { background: "rgba(155, 155, 155, 0.3)", border: "rgba(100, 100, 100, 0.3)" };
+
+        //Duration of the zoomIn/zoomOut when a node is selected
+        this.zoomDuration = 1000;
     }
 
     /**
@@ -134,7 +137,6 @@ export default class DrawNetwork {
 
             //This attribute will be used to know if the node is with the default color. To improve performance
             node["defaultColor"] = true;
-
         }
         const nodes = new DataSet(json.users);
         return nodes;
@@ -199,7 +201,7 @@ export default class DrawNetwork {
             colLeft.innerHTML = "";
 
             if (i < this.mainShowAttributes.length)
-                colLeft.innerHTML = this.mainShowAttributes[i];
+                colLeft.innerHTML = "<b>" + this.mainShowAttributes[i] + "</b>";
 
             const colRight = document.createElement("div");
             colRight.className = "col-6 ";
@@ -220,7 +222,6 @@ export default class DrawNetwork {
      * @returns The number of rows
      */
     getNrows() {
-
         let maxLength = 0;
         let maxNode;
         this.data.nodes.forEach((node) => {
@@ -328,6 +329,8 @@ export default class DrawNetwork {
             interaction: {
                 zoomView: true,
                 dragView: true,
+                hover: false,
+                hoverConnectedEdges: false,
             }
         };
     }
@@ -338,34 +341,121 @@ export default class DrawNetwork {
     drawNetwork() {
         this.network = new Network(this.container, this.data, this.options);
 
+        this.container.firstChild.id = "topCanvas_" + this.key;
+
         this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
-        this.network.on("click", (event) => this.clickEventCallback(event.nodes));
+        this.network.on("click", (event) => this.clickEventCallback(event));
 
         this.hideEdgesbelowThreshold(this.edgeValueThreshold);
     }
 
     /** Function executed when the user clicks inside the network canvas
      * 
-     * @param {*} nodes Array with the nodes clicked
+     * @param {*} event Click event
      */
-    clickEventCallback(nodes) {
-        if (nodes.length > 0)
-            this.nodeHasBeenClicked(nodes[0]);
-        else {
+    clickEventCallback(event) {
+        if (event.nodes.length > 0) {
+            this.nodeHasBeenClicked(event.nodes[0]);
+        } else {
             this.noNodeIsClicked()
         }
-
     }
 
-    /** When a node is selected, it tells to the network manager to select the same node in all networks
+    /** Function executed only when it was this network the one that was clicked a node
      * 
      * @param {*} id id of the node 
      */
     nodeHasBeenClicked(id) {
         this.networkManager.nodeSelected(id);
+
+        //We only create the tooltip in this networw
+        //We need a timeout to print the tooltip once zoom has ended
+        setTimeout(function () {
+            this.updateTooltip(id);
+        }.bind(this), this.zoomDuration);
     }
 
-    /** When a node is deselected, it tells to the network manager to deselect all nodes;
+    /** Update or create the tooltip of the node id
+     * 
+     * @param {*} id id of the node
+     */
+    updateTooltip(id) {
+        const canvasPosition = this.getElementPosition("topCanvas_" + this.key)
+
+        const nodeCanvasPosition = this.network.getPosition(id);
+        const nodePosition = this.network.canvasToDOM(nodeCanvasPosition);
+
+        //Calculate the real absolute click coordinates
+        const clickX = nodePosition.x + canvasPosition.left + 35;
+        const clickY = nodePosition.y + canvasPosition.top;
+
+        const title = "<h5> " + id + "</h5>";
+        const content = this.getTooltipContent(id);
+
+        if (this.tooltip === undefined) {
+            //Create the popup
+            const options = {
+                trigger: "manual",
+                placement: "right",
+                fallbackPlacements: ["right"],
+                content: " ",
+                offset: [0, 0],
+                html: true,
+            };
+
+            this.popoverContainer = document.createElement("div");
+            document.body.append(this.popoverContainer);
+
+            this.tooltip = new bootstrap.Popover(this.popoverContainer, options);
+        }
+
+        this.popoverContainer.style.top = clickY + "px";
+        this.popoverContainer.style.left = clickX + "px";
+        this.popoverContainer.style.position = "absolute";
+
+        this.tooltip.setContent({
+            '.popover-header': title,
+            '.popover-body': content
+        })
+
+        this.tooltip.show();
+
+        this.networkManager.setTooltip(this.tooltip);
+    }
+
+    /** Returns the tooltip content of a node
+     * 
+     * @param {*} id id of the node
+     * @returns string with the content
+     */
+    getTooltipContent(id) {
+        const node = this.data.nodes.get(id);
+        let content = "";
+
+        content += "<b> Label: </b> " + node["label"] + "<br>";
+        content += "<b> " + this.groupColor_key + ": </b> " + node[this.groupColor_key] + "<br>";
+        content += "<b> Group: </b> " + node["boxGroup"] + "";
+
+        return content;
+    }
+
+    /** Get the element position in the dom
+     * 
+     * @param {*} id id of the element
+     * @returns and object with the top and left position
+     */
+    getElementPosition(id) {
+        const element = document.getElementById(id);
+        const cs = window.getComputedStyle(element);
+        const marginTop = cs.getPropertyValue('margin-top');
+        const marginLeft = cs.getPropertyValue('margin-left');
+
+        const top = element.offsetTop - parseFloat(marginTop);
+        const left = element.offsetLeft - parseFloat(marginLeft);
+
+        return { top: top, left: left };
+    }
+    /** Function executed only when it was this network the one that unselected a node
      * 
      */
     noNodeIsClicked() {
@@ -401,7 +491,9 @@ export default class DrawNetwork {
         //Move the "camera" to focus on these nodes
         const fitOptions = {
             nodes: selectedNodes,
-            animation: true
+            animation: {
+                duration: this.zoomDuration,
+            },
         }
         this.network.fit(fitOptions);
 
@@ -428,33 +520,40 @@ export default class DrawNetwork {
 
         this.clearDataPanel();
 
-        let lastRow;
+        let lastImportantRowIndex;
         let rowIndex = 0;
 
         //Add the important attributes in their fixed order
         for (let i = 0; i < this.mainShowAttributes.length; i++) {
             const currentKey = this.mainShowAttributes[i];
 
-            this.updateDataPanelRow(rowIndex, currentKey, node[currentKey], true);
+            this.updateDataPanelRow(rowIndex, currentKey, node[currentKey], true, false);
 
-            lastRow = rowIndex;
+            lastImportantRowIndex = rowIndex;
             rowIndex++;
         }
 
+        let lastRowIndex = lastImportantRowIndex;
         //Add unimportant attributes
         for (let i = 0; i < keys.length; i++) {
+
             //If its an available attribute that has not been already included as a main Attribute
             if (!this.notShowAttributes.includes(keys[i]) && !this.mainShowAttributes.includes(keys[i])) {
                 const currentKey = keys[i];
 
-                this.updateDataPanelRow(rowIndex, currentKey, node[currentKey], true);
+                if (lastImportantRowIndex !== null) {
+                    this.dataPanelContainers[lastImportantRowIndex].row.className = "row dataRow border-bottom border-primary";
+                    lastImportantRowIndex = null;
+                }
 
-                lastRow = rowIndex;
+                this.updateDataPanelRow(rowIndex, currentKey, node[currentKey], true, true);
+
+                lastRowIndex = rowIndex;
                 rowIndex++;
             }
         }
 
-        this.dataPanelContainers[lastRow].row.className = "row dataRow";
+        this.dataPanelContainers[lastRowIndex].row.className = "row dataRow";
     }
 
     /** Update a dataPanel row 
@@ -464,13 +563,16 @@ export default class DrawNetwork {
      * @param {*} value new Text in the right column
      * @param {*} bottomBorder Boolean indicating if the row should have bottom Border
      */
-    updateDataPanelRow(index, key, value, bottomBorder) {
-        this.dataPanelContainers[index].left.innerHTML = key;
+    updateDataPanelRow(index, key, value, bottomBorder, greyBorder) {
+        this.dataPanelContainers[index].left.innerHTML = "<b>" + key + "</b>";
         this.dataPanelContainers[index].right.innerHTML = value;
-        this.dataPanelContainers[index].row.className = "row dataRow border-bottom border-dark";
 
-        if (!bottomBorder)
+        if (!bottomBorder) {
             this.dataPanelContainers[index].row.className = "row dataRow";
+        } else if (greyBorder) {
+            this.dataPanelContainers[index].row.className = "row dataRow border-bottom border-grey";
+        } else
+            this.dataPanelContainers[index].row.className = "row dataRow border-bottom border-dark";
     }
 
     /**
@@ -544,6 +646,7 @@ export default class DrawNetwork {
      * @param {*} ctx Context object necesary to draw in the network canvas
      */
     preDrawEvent(ctx) {
+        this.ctx = ctx;
         this.drawBoundingBoxes(ctx);
     }
 
@@ -651,3 +754,63 @@ export default class DrawNetwork {
         });
     }
 }
+
+
+
+/*
+        if (this.popup !== undefined) this.popup.hide();
+
+        const canvasPosition = this.getElementPosition("topCanvas_" + this.key)
+
+        const nodeCanvasPosition = this.network.getPosition(event.nodes[0]);
+        const nodePosition = this.network.canvasToDOM(nodeCanvasPosition);
+
+        const canvasPositionJquery = $("#topCanvas_" + this.key).position();
+
+        //Calculate the real absolute click coordinates
+        let clickX = nodePosition.x + canvasPosition.left;
+        let clickY = nodePosition.y + canvasPosition.top;
+
+
+        if ($('#networkTooltip').length) {
+            $('div#networkTooltip').empty();
+        }
+        else {
+            $('<div id="networkTooltip"></div>').click(function () {
+                //clicking the popup hides it again.
+                $(this).empty().hide();
+            }).css('position', 'absolute').appendTo("body");
+        }
+
+        const popup = document.createElement("div");
+        popup.className = "popover bs-popover-auto fade show";
+
+        const arrow = document.createElement("div");
+        arrow.className = "popover-arrow";
+        arrow.style.position = "absolute";
+        arrow.style.top = "0px";
+
+        const title = document.createElement("h3");
+        title.className = "popover-header";
+        title.innerText = "Titulo";
+
+        const content = document.createElement("div");
+        content.className = "popover-body";
+        content.innerText = "This for how long it will go";
+
+        popup.append(arrow);
+        popup.append(title);
+        popup.append(content);
+
+        $('div#networkTooltip').append(popup)
+
+        //XOffset is always a static number.
+        clickX += 35;
+        //YOffset depends on the height of the popup;
+        clickY -=  popup.offsetHeight/2;
+
+        arrow.style.transform = "translate(0px, 39px)";
+
+        $('div#networkTooltip').css('top', clickY).css('left', clickX)
+        .show();
+        */

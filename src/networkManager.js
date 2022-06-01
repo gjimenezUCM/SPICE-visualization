@@ -53,11 +53,21 @@ export default class NetworkManager {
         networkContainer.removeChild(divToDelete);
     }
 
+    /** Set the current active popup. There is only one across all networks
+     * 
+     * @param {*} newTooltip new bootstrap popover object
+     */
+    setTooltip(newTooltip){
+        this.tooltip = newTooltip;
+    }
+
     /** Broadcast to all networks that node id has been selected
      * 
      * @param {*} id id of the selected node
      */
     nodeSelected(id){
+        if(this.tooltip !== undefined) this.tooltip.hide();
+
         this.activesNetworksArray.forEach( (network) => network.nodeSelected(id) );
     }
 
@@ -65,6 +75,8 @@ export default class NetworkManager {
      * 
      */
     nodeDeselected(){
+        if(this.tooltip !== undefined) this.tooltip.hide();
+
         this.activesNetworksArray.forEach( (network) => network.nodeDeselected() );
     }
 
