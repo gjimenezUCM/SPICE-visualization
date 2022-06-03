@@ -1,19 +1,13 @@
-.title {
-  font-size: 300%;
-}
 
 h1 {
+  font-weight: 200%;
   text-align: center;
-  font-weight: 800;
-}
-
-h2 {
-  font-weight: 800;
 }
 
 body {
   background-color: rgb(204, 204, 204);
   color: rgb(53, 53, 53);
+  overflow-y: scroll;
 }
 
 canvas {
@@ -25,14 +19,45 @@ canvas {
   float: middle;
   text-align: center;
   margin-top: auto;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   margin-right: auto;
   margin-left: auto;
 }
 
-.middle.network {
+.col-sm-8.network{
+  height: 40em;
   border-style: dotted;
+  margin-bottom: 1%;
+}
 
-  width: 60.00%;
-  height: 50em ;
+.container{
+  min-width: 90%;
+}
+
+.dataContainer{
+  border-style: dotted;
+}
+
+.col-6{
+  word-wrap: break-word	;
+}
+
+.dataRow{
+  margin-left: 1px;
+  margin-Right: 1px;
+  
+}
+
+.middle.attributes{
+  margin-bottom: auto;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.popover {
+  opacity: 0.8;
 }
