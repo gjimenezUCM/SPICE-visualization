@@ -9,7 +9,7 @@ export default class EventsManager {
         this.requestManager = new RequestsManager();
         this.networkManager = new NetworkManager();
 
-        this.initialSliderValue = 0.5;
+        this.initialSliderValue = 1.0;
         this.initialVariableWidthValue = false;
 
         this.dropdownInit();

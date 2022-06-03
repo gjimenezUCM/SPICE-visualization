@@ -1,6 +1,8 @@
 import { DataSet } from "vis-data/peer";
 import { Network } from "vis-network/peer";
 import 'bootstrap';
+import CollorPallete from "./ExplCommOptions";
+import ExplCommOptions from "./ExplCommOptions";
 
 export default class DrawNetwork {
 
@@ -16,10 +18,11 @@ export default class DrawNetwork {
         this.config = config;
         this.key = config.key;
 
+        this.explCommOptions = new ExplCommOptions();
         this.activateEdgeLabels = true;
 
-        this.initEdgesParameters();
         this.initNodesParameters();
+        this.initEdgesParameters();
         this.initBoundingBoxesParameters();
         this.initDataTableParameters();
 
@@ -30,6 +33,12 @@ export default class DrawNetwork {
         this.drawNetwork();
     }
 
+    //#region Node 
+
+
+
+    //#endregion
+    
     /**
      * Initialize all parameters related with Edges
      */
@@ -55,22 +64,22 @@ export default class DrawNetwork {
      * Initialize all parameters related with Nodes
      */
     initNodesParameters() {
-        //In case explicit_community key changes, this is what is compared while parsing nodes json
-        this.groupColor_key = "explicit_community";
+        //TODO Los valores de las keys deberian venir de una opcion al usuario
+        this.explicit_filter = new Array();
 
-        this.groupColor = new Array();
-        this.groupColor.push({
-            color: "rgba(110, 143, 254, 1)", border: "rgba(92, 92, 235, 1)",
-            colorSelected: "rgba(184, 202, 255, 1)", borderSelected: "rgba(164, 164, 238, 1)"
-        }); //Blue
-        this.groupColor.push({
-            color: "rgba(255, 130, 132, 1)", border: "rgba(224, 100, 103, 1)",
-            colorSelected: "rgba(238, 193, 174, 1)", borderSelected: "rgba(230, 172, 173, 1)"
-        }); //Red
+        this.explicit_filter.push({ values: new Array(), key: "ageGroup" });
+        this.explicit_filter.push({ values: new Array(), key: "language" });
+
+        //Explicit Community 0
+        this.nodeColors = new Map();
+
+        //Explicit Community 1
+        this.nodeShapes = new Map();
+
+        this.defaultSize = 15;
+        this.selectedSize = 25;
 
         this.darkenColor = { background: "rgba(155, 155, 155, 0.3)", border: "rgba(100, 100, 100, 0.3)" };
-
-        //Duration of the zoomIn/zoomOut when a node is selected
         this.zoomDuration = 1000;
     }
 
@@ -127,21 +136,51 @@ export default class DrawNetwork {
      * @returns 
      */
     parseNodes(json) {
-        for (const node of json.users) {
+        for (let node of json.users) {
 
-            //"BoxGroup" is the key we will use to track what nodes should be inside the same big bounding box
+            //The implicit community will be used for the bounding boxes
             node["Implicit_Comm"] = parseInt(node[this.implicitCommunity_key]);
 
-            //Vis uses "group" key to change the color of all nodes with the same key
-            node["Group"] = node["group"]
-            node["group"] = 0;
-            //group_" + node[this.groupColor_key];
+            //Vis uses "group" key to change the color of all nodes with the same key. We need to remove it
+            delete node["group"];
+
+            //Explicit 0 -> Color of the node
+            const explValue_0 = node.explicit_community[this.explicit_filter[0].key];
+            if (this.explicit_filter[0].values.includes(explValue_0)) {
+
+                node = this.turnNodeColorToDefault(node);
+            } else {
+                this.explicit_filter[0].values.push(explValue_0);
+
+                const key = explValue_0;
+                const color = this.explCommOptions.getColorsForN(this.explicit_filter[0].values.length)
+
+                this.nodeColors.set(key, color);
+
+                node = this.turnNodeColorToDefault(node);
+            }
+            //Explicit 1 -> Shape of the node
+            const explValue_1 = node.explicit_community[this.explicit_filter[1].key];
+            let shape;
+            if (this.explicit_filter[1].values.includes(explValue_1)) {
+
+                shape = this.nodeShapes.get(explValue_1);
+            } else {
+                this.explicit_filter[1].values.push(explValue_1);
+
+                const key = explValue_1;
+                const sh = this.explCommOptions.getShapeForN(this.explicit_filter[1].values.length);
+
+                this.nodeShapes.set(key, sh);
+                shape = sh;
+            }
+            node.shape = shape.shape;
+            node.font = {
+                vadjust: shape.vOffset,
+            };
 
             //This attribute will be used to know if the node is with the default color. To improve performance
             node["defaultColor"] = true;
-
-            //TODO Cambiarlo
-            //node["group"] = 0;
         }
         const nodes = new DataSet(json.users);
         return nodes;
@@ -157,23 +196,32 @@ export default class DrawNetwork {
         const edges = new Array();
         for (const edge of json.similarity) {
             if (edge[this.edgeValue]) {
-                //Update targets to vis format
-                edge["from"] = edge["u1"];
-                edge["to"] = edge["u2"];
+                //Remove auto-edges
+                if (edge["u1"] !== edge["u2"]) {
+                    //Update targets to vis format
+                    edge["from"] = edge["u1"];
+                    edge["to"] = edge["u2"];
 
-                delete edge["u1"];
-                delete edge["u2"];
+                    delete edge["u1"];
+                    delete edge["u2"];
 
-                //Vis use "value" key to change edges width. This way edges with higher similarity will be stronger
-                edge["value"] = edge[this.edgeValue];
-                if (this.edgeValue !== "value")
-                    delete edge[this.edgeValue];
+                    //Vis use "value" key to change edges width. This way edges with higher similarity will be stronger
+                    edge["value"] = edge[this.edgeValue];
+                    if (this.edgeValue !== "value")
+                        delete edge[this.edgeValue];
 
-                //See label testing
-                if (this.key === "noAgglomerativeClusteringGAM") {
-                    edge["label"] = edge["value"].toString();
+                    //See label testing
+                    if (this.key === "noAgglomerativeClusteringGAM") {
+                        edge["label"] = edge["value"].toString();
+                    }
+
+                    if (edge["value"] < this.edgeValueThreshold) {
+                        edge["hidden"] = true;
+                    } else
+                        edge["hidden"] = false;
+
+                    edges.push(edge);
                 }
-                edges.push(edge);
             }
 
         }
@@ -296,6 +344,10 @@ export default class DrawNetwork {
                         enabled: false
                     }
                 },
+                color: {
+                    color: '#848484',
+                    highlight: '#848484'
+                },
                 font: {
                     strokeWidth: 0,
                     size: 20,
@@ -312,9 +364,12 @@ export default class DrawNetwork {
                 shape: 'circle',
                 borderWidth: 3,
                 borderWidthSelected: 4,
+                shape: "diamond",
                 shapeProperties: {
-                    interpolation: false    // 'true' for intensive zooming
+                    interpolation: false
                 },
+                size: this.defaultSize,
+
             },
             groups: {
                 useDefaultGroups: false
@@ -323,7 +378,7 @@ export default class DrawNetwork {
                 enabled: false,
                 barnesHut: {
                     springConstant: 0,
-                    avoidOverlap: 0.2
+                    avoidOverlap: 0.1
                 }
 
             },
@@ -339,6 +394,10 @@ export default class DrawNetwork {
         };
     }
 
+    nodeChosen(values, id, selected, hovering) {
+        if (selected)
+            values.size = this.selectedSize;
+    }
     /**
      * Draw the network and initialize all Events
      */
@@ -348,10 +407,9 @@ export default class DrawNetwork {
         this.network.stabilize();
         this.container.firstChild.id = "topCanvas_" + this.key;
 
-        this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
-        //this.network.on("click", (event) => this.clickEventCallback(event));
+        //this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
+        this.network.on("click", (event) => this.clickEventCallback(event));
 
-        this.hideEdgesbelowThreshold(this.edgeValueThreshold);
     }
 
     /** Function executed when the user clicks inside the network canvas
@@ -375,9 +433,9 @@ export default class DrawNetwork {
 
         //We only create the tooltip in this networw
         //We need a timeout to print the tooltip once zoom has ended
-        setTimeout(function () {
-            this.updateTooltip(id);
-        }.bind(this), this.zoomDuration);
+        // setTimeout(function () {
+        //     this.updateTooltip(id);
+        // }.bind(this), this.zoomDuration);
     }
 
     /** Update or create the tooltip of the node id
@@ -474,7 +532,7 @@ export default class DrawNetwork {
     nodeSelected(id) {
         this.network.selectNodes([id], true);
 
-        this.updateDataPanel(id);
+        //this.updateDataPanel(id);
 
         //Search for the nodes that are connected to the selected Node
         const selectedNodes = new Array();
@@ -485,9 +543,9 @@ export default class DrawNetwork {
 
         clickedEdges.forEach((edge) => {
             if (!edge.hidden) {
-                if (edge.from !== selectedNodes[0]) {
+                if (edge.from !== selectedNodes[0] && edge.to === selectedNodes[0]) {
                     selectedNodes.push(edge.from);
-                } else {
+                } else if (edge.to !== selectedNodes[0] && edge.from === selectedNodes[0]) {
                     selectedNodes.push(edge.to);
                 }
             }
@@ -503,16 +561,19 @@ export default class DrawNetwork {
         this.network.fit(fitOptions);
 
         //Update all nodes color acording to their selected status
+        const newNodes = new Array();
         this.data.nodes.forEach((node) => {
             if (selectedNodes.includes(node.id)) {
-                if (!node.defaultColor)
-                    this.turnNodeColorToDefault(node);
+                if (!node.defaultColor){
+                    newNodes.push(this.turnNodeColorToDefault(node));
+                }
 
-            } else if (node.defaultColor)
-                this.darkenNode(node);
-
+            } else if (node.defaultColor){
+                newNodes.push(this.darkenNode(node));
+            }
         });
 
+        this.data.nodes.update(newNodes);
     }
 
     /** Update the data panel with the node with the data
@@ -608,28 +669,34 @@ export default class DrawNetwork {
         }
         this.network.fit(fitOptions);
 
-        this.clearDataPanel();
+        //this.clearDataPanel();
 
         this.network.unselectAll();
 
+        const newNodes = new Array();
         this.data.nodes.forEach((node) => {
             if (!node.defaultColor)
-                this.turnNodeColorToDefault(node);
+                newNodes.push(this.turnNodeColorToDefault(node));
         });
+
+        this.data.nodes.update(newNodes);
     }
 
-    /** Reset node colors to default
+    /** Turn node colros to default
      * 
-     * @param {*} node 
+     * @param {*} node node that is going to be edited
      */
     turnNodeColorToDefault(node) {
+        const explicit0_value = node.explicit_community[this.explicit_filter[0].key];
+
+        node.color = {
+            background: this.nodeColors.get(explicit0_value),
+            border: this.nodeColors.get(explicit0_value)
+        }
+
         node.defaultColor = true;
 
-        node.borderWidth = this.options.nodes.borderWidth;
-        const color = this.options.groups[node["group"]].color;
-        node["color"] = color;
-
-        this.data.nodes.update(node);
+        return node;
     }
 
     /** Change node colors to grey colors
@@ -638,11 +705,9 @@ export default class DrawNetwork {
      */
     darkenNode(node) {
         node.defaultColor = false;
-
-        node.borderWidth = 1;
         node.color = this.darkenColor;
 
-        this.data.nodes.update(node);
+        return node;
     }
 
 
