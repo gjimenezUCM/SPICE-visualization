@@ -9,6 +9,9 @@ export default class EventsManager {
         this.requestManager = new RequestsManager();
         this.networkManager = new NetworkManager();
 
+        this.initialSliderValue = 0.5;
+        this.initialVariableWidthValue = false;
+
         this.dropdownInit();
     }
 
@@ -41,6 +44,7 @@ export default class EventsManager {
             const newOptionButton = document.createElement('a');
             newOptionButton.className = "dropdown-item";
             newOptionButton.innerHTML = key;
+            newOptionButton.style.userSelect = "none";
             newOptionButton.id = "networkOptionButton_" + key;
             newOptionButton.onclick = () => this.optionClicked(key);
 
@@ -82,6 +86,9 @@ export default class EventsManager {
             option.className = "dropdown-item";
             this.networkManager.removeNetwork(key);
 
+            if(this.networkManager.getNnetworks() === 0){
+                this.removeControlPanel();
+            }
         } else {
             this.requestManager.getNetwork(key + ".json")
                 .then((file) => {
@@ -137,33 +144,27 @@ export default class EventsManager {
         rowContainer.appendChild(columnRightContainer);
         networkContainer.appendChild(rowContainer);
 
-        //Input options
-        const inputTitleContainer = document.createElement('div');
-        inputTitleContainer.className = "middle";
-
-        const inputTitle = document.createElement("h5");
-        inputTitle.innerHTML = "View options: ";
-        inputTitleContainer.appendChild(inputTitle);
-
-        const sliderContainer = this.createThresholdSliderContainer(key);
-        const checkboxContainer = this.createVariableEdgeCheckBoxContainer(key);
-
-        columnRightContainer.appendChild(inputTitleContainer);
-        columnRightContainer.appendChild(sliderContainer);
-        columnRightContainer.appendChild(checkboxContainer);
-
         //Network
 
         topContainer.appendChild(networkContainer);
 
-        this.networkManager.addNetwork(key, file, columnLeftContainer, columnRightContainer)
+        const config = {
+            edgeThreshold: this.initialSliderValue,
+            variableEdge: this.initialVariableWidthValue,
+            key: key
+        };
 
+        this.networkManager.addNetwork(file, columnLeftContainer, columnRightContainer, config)
+
+
+        if(this.networkManager.getNnetworks() === 0){
+            this.addControlPanel(this.networkManager.getExplicitCommunities());
+        }
 
     }
 
     /** Create a container with a slider that controls the minimum similarity Threshold for edges to be visible in the network
      * 
-     * @param {*} key Key of the network
      * @returns Container with the slider
      */
     createThresholdSliderContainer(key) {
@@ -175,16 +176,16 @@ export default class EventsManager {
         slider.min = "0.0";
         slider.max = "1.0";
         slider.step = "0.1";
-        slider.value = "0.5";
-        slider.id = "thresholdSlider_" + key;
+        slider.value = this.initialSliderValue;  
+        slider.id = "thresholdSlider";
 
-        slider.oninput = () => this.thresholdChange(key);
+        slider.oninput = () => this.thresholdChange();
 
         const text = document.createElement('span');
         text.innerHTML = "Minimum Similarity: ";
 
         const value = document.createElement('span');
-        value.id = "thresholdSliderValue_" + key;
+        value.id = "thresholdSliderValue_";
         value.innerHTML = "0.5";
 
         sliderContainer.appendChild(slider);
@@ -196,10 +197,9 @@ export default class EventsManager {
 
     /** Create a container with a checkbox that controls if the network edges width should vary with its similarity
      * 
-     * @param {*} key Key of the network
      * @returns Container with the checkbox
      */
-    createVariableEdgeCheckBoxContainer(key) {
+    createVariableEdgeCheckBoxContainer() {
         const checkboxContainer = document.createElement('div');
         checkboxContainer.className = "middle";
 
@@ -208,10 +208,10 @@ export default class EventsManager {
 
         const checkBox = document.createElement('input');
         checkBox.type = 'checkbox';
-        checkBox.checked = false;
-        checkBox.id = "thresholdVariableCheck_" + key;
+        checkBox.checked = this.initialVariableWidthValue;
+        checkBox.id = "thresholdVariableCheck";
 
-        checkBox.onchange = () => this.variableEdgeChange(key);
+        checkBox.onchange = () => this.variableEdgeChange();
 
         checkboxContainer.appendChild(text2);
         checkboxContainer.appendChild(checkBox);
@@ -219,13 +219,12 @@ export default class EventsManager {
         return checkboxContainer;
     }
 
-    /** Update the network with the new threshold value. Updates the label with the value too
-     * 
-     * @param {*} key Key of the network
+    /** 
+     *  Update all networks with the new threshold value. Updates the label with the value too
      */
-    thresholdChange(key) {
-        const slider = document.getElementById("thresholdSlider_" + key);
-        const value = document.getElementById("thresholdSliderValue_" + key);
+    thresholdChange() {
+        const slider = document.getElementById("thresholdSlider");
+        const value = document.getElementById("thresholdSliderValue");
 
         let newValue = slider.value;
 
@@ -234,17 +233,53 @@ export default class EventsManager {
 
         value.innerHTML = newValue;
 
-        this.networkManager.thresholdChange(key, newValue);
+        this.networkManager.thresholdChangeALL(newValue);
+    }
+
+    /** 
+     *  Update all networks with the new variableEdgeWidth value
+     */
+    variableEdgeChange() {
+        const checkBox = document.getElementById("thresholdVariableCheck");
+
+        this.networkManager.variableEdgeChange(checkBox.checked);
     }
 
 
-    /** UUpdate the network with the new variableEdgeWidth value
-     * 
-     * @param {*} key key of the network
-     */
-    variableEdgeChange(key) {
-        const checkBox = document.getElementById("thresholdVariableCheck_" + key);
+    addControlPanel(Exp_communities){
+        const controlPanel = document.createElement("div");
+        controlPanel.id = "controlPanel";
+        controlPanel.className = "middle";
 
-        this.networkManager.variableEdgeChange(key, checkBox.checked);
+        const inputTitle = document.createElement("h5");
+        inputTitle.innerHTML = "Control Panel";
+        
+        const sliderContainer = this.createThresholdSliderContainer();
+        const checkboxContainer = this.createVariableEdgeCheckBoxContainer();
+        const explicitContainer = this.createExplicitCommunityChooser(Exp_communities);
+
+        controlPanel.appendChild(inputTitle);
+        controlPanel.appendChild(sliderContainer);
+        controlPanel.appendChild(checkboxContainer);
+        controlPanel.appendChild(explicitContainer);
+
+        document.getElementById("controlPanelContainer").appendChild(controlPanel);
+    }
+
+    createExplicitCommunityChooser(Exp_communities){
+
+
+    }
+
+
+    removeControlPanel(){
+        const controlPanel = document.getElementById("controlPanel");
+        document.getElementById("controlPanelContainer").removeChild(controlPanel);
+        
+    }
+
+
+    updateImplicitCommunity(){
+
     }
 }

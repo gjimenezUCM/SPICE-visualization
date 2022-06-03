@@ -100,7 +100,7 @@ export default class DrawNetwork {
         this.notShowAttributes = new Array("defaultColor", "borderWidth", "color", "group");
 
         //Atributes that all nodes have and are important to show. These tags should be the same as the node keys names
-        this.mainShowAttributes = new Array("id", "label", this.groupColor_key, "boxGroup");
+        this.mainShowAttributes = new Array("id", "label", this.groupColor_key, "Implicit_Comm");
 
         //Array with all dataTable columns. Its used to easily iterate over all of them
         this.dataPanelContainers = new Array();
@@ -130,10 +130,10 @@ export default class DrawNetwork {
         for (const node of json.users) {
 
             //"BoxGroup" is the key we will use to track what nodes should be inside the same big bounding box
-            node["boxGroup"] = parseInt(node[this.boxGroup_key]);
+            node["Implicit_Comm"] = parseInt(node[this.boxGroup_key]);
 
             //Vis uses "group" key to change the color of all nodes with the same key
-            node["group"] = "group_" + node[this.groupColor_key];
+            //node["group"] = "group_" + node[this.groupColor_key];
 
             //This attribute will be used to know if the node is with the default color. To improve performance
             node["defaultColor"] = true;
@@ -434,7 +434,7 @@ export default class DrawNetwork {
 
         content += "<b> Label: </b> " + node["label"] + "<br>";
         content += "<b> " + this.groupColor_key + ": </b> " + node[this.groupColor_key] + "<br>";
-        content += "<b> Group: </b> " + node["boxGroup"] + "";
+        content += "<b> Group: </b> " + node["Implicit_Comm"] + "";
 
         return content;
     }
@@ -664,7 +664,7 @@ export default class DrawNetwork {
 
         //Obtain the bounding box of every boxGroup of nodes
         this.data.nodes.forEach((node) => {
-            const group = node["boxGroup"];
+            const group = node["Implicit_Comm"];
 
             let bb = this.network.getBoundingBox(node.id)
             if (bigBoundBoxes[group] === null)
@@ -753,64 +753,10 @@ export default class DrawNetwork {
             this.data.edges.update(edge);
         });
     }
+
+    getExplicitCommunities(){
+    
+    }
 }
 
 
-
-/*
-        if (this.popup !== undefined) this.popup.hide();
-
-        const canvasPosition = this.getElementPosition("topCanvas_" + this.key)
-
-        const nodeCanvasPosition = this.network.getPosition(event.nodes[0]);
-        const nodePosition = this.network.canvasToDOM(nodeCanvasPosition);
-
-        const canvasPositionJquery = $("#topCanvas_" + this.key).position();
-
-        //Calculate the real absolute click coordinates
-        let clickX = nodePosition.x + canvasPosition.left;
-        let clickY = nodePosition.y + canvasPosition.top;
-
-
-        if ($('#networkTooltip').length) {
-            $('div#networkTooltip').empty();
-        }
-        else {
-            $('<div id="networkTooltip"></div>').click(function () {
-                //clicking the popup hides it again.
-                $(this).empty().hide();
-            }).css('position', 'absolute').appendTo("body");
-        }
-
-        const popup = document.createElement("div");
-        popup.className = "popover bs-popover-auto fade show";
-
-        const arrow = document.createElement("div");
-        arrow.className = "popover-arrow";
-        arrow.style.position = "absolute";
-        arrow.style.top = "0px";
-
-        const title = document.createElement("h3");
-        title.className = "popover-header";
-        title.innerText = "Titulo";
-
-        const content = document.createElement("div");
-        content.className = "popover-body";
-        content.innerText = "This for how long it will go";
-
-        popup.append(arrow);
-        popup.append(title);
-        popup.append(content);
-
-        $('div#networkTooltip').append(popup)
-
-        //XOffset is always a static number.
-        clickX += 35;
-        //YOffset depends on the height of the popup;
-        clickY -=  popup.offsetHeight/2;
-
-        arrow.style.transform = "translate(0px, 39px)";
-
-        $('div#networkTooltip').css('top', clickY).css('left', clickX)
-        .show();
-        */
