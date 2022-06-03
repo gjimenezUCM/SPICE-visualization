@@ -1,8 +1,7 @@
 import { DataSet } from "vis-data/peer";
 import { Network } from "vis-network/peer";
 import 'bootstrap';
-import CollorPallete from "./ExplCommOptions";
-import ExplCommOptions from "./ExplCommOptions";
+import Utils from "./Utils";
 
 export default class DrawNetwork {
 
@@ -18,52 +17,67 @@ export default class DrawNetwork {
         this.config = config;
         this.key = config.key;
 
-        this.explCommOptions = new ExplCommOptions();
+        this.data = { nodes: "", edges: "" };
+        this.explCommOptions = new Utils();
         this.activateEdgeLabels = true;
 
-        this.initNodesParameters();
-        this.initEdgesParameters();
-        this.initBoundingBoxesParameters();
-        this.initDataTableParameters();
+        this.initExplicitCommunities(jsonInput);
+        this.initNodes(jsonInput);
+        this.initEdges(jsonInput);
 
-        this.parseJson(jsonInput);
-        //this.initNodeDataPanel();
-        this.chooseOptions(jsonInput);
+        this.initDataTable();
+
+        this.chooseOptions();
 
         this.drawNetwork();
     }
 
-    //#region Node 
+    //#region BOUNDING BOXES && EXPLICIT COMMUNITIES 
 
-
-
-    //#endregion
-    
-    /**
-     * Initialize all parameters related with Edges
+    /** Initialize all explicit communities, bounding boxes and its parameters
+     * 
+     * @param {*} json json with communities data
      */
-    initEdgesParameters() {
-        //Edges with value equal or below to this wont be drawn
-        this.edgeValueThreshold = this.config.edgeThreshold;
-
-        //In case value key changes, this is what is compared while parsing edges json
-        this.edgeValue = "value";
-
-        this.maxEdgeWidth = 10;
-        this.minEdgeWidth = 1;
-
-        //If true, edgesWidth will change based on the value (similarity) between the nodes they link
-        if (this.config.variableEdge) {
-            this.changeMaxEdgeWidth = true;
-        } else {
-            this.changeMaxEdgeWidth = false;
-        }
+    initExplicitCommunities(json) {
+        this.initBoundingBoxesParameters();
+        this.communities = this.parseCommunities(json);
     }
 
     /**
-     * Initialize all parameters related with Nodes
+     * Initialize all parameters related with bounding boxes of node groups
      */
-    initNodesParameters() {
+    initBoundingBoxesParameters() {
+        //In case group key changes, this is what is compared while parsing nodes json
+        this.implicitCommunity_key = "group";
+
+        this.boxBorderWidth = 4;
+
+        this.bbColor = new Array();
+        this.bbColor.push({ color: "rgba(248, 212, 251, 0.6)", border: "rgba(242, 169, 249, 1)" }); //Purple
+        this.bbColor.push({ color: "rgba(255, 255, 170, 0.6)", border: "rgba(255, 222, 120, 1)" }); //Yellow
+        this.bbColor.push({ color: "rgba(211, 245, 192, 0.6)", border: "rgba(169, 221, 140, 1)" }); //Green
+        this.bbColor.push({ color: "rgba(254, 212, 213, 0.6)", border: "rgba(252, 153, 156, 1)" }); //Red
+        this.bbColor.push({ color: "rgba(220, 235, 254, 0.6)", border: "rgba(168, 201, 248, 1)" }); //Blue
+    }
+
+    /** Parse the JSON object to get the communities of the network
+    * 
+    * @param {*} json //JSON object that will be parsed
+    * @returns communities json object
+    */
+    parseCommunities(json) {
+        return json.communities;
+    }
+
+    //#endregion BOUNDING BOXES && EXPLICIT COMMUNITIES 
+
+    //#region NODES SETUP
+
+    /** Initialize all nodes and its parameters
+     * 
+     * @param {*} json json with node data
+     */
+    initNodes(json) {
         //TODO Los valores de las keys deberian venir de una opcion al usuario
         this.explicit_filter = new Array();
 
@@ -76,128 +90,158 @@ export default class DrawNetwork {
         //Explicit Community 1
         this.nodeShapes = new Map();
 
-        this.defaultSize = 15;
-        this.selectedSize = 25;
+        //Default Options
+        this.defaultNodeSize = 15;
+        this.SelectedNodeSize = 25;
 
-        this.darkenColor = { background: "rgba(155, 155, 155, 0.3)", border: "rgba(100, 100, 100, 0.3)" };
+        this.darkNodeColor = { background: "rgba(155, 155, 155, 0.3)", border: "rgba(100, 100, 100, 0.3)" };
+
         this.zoomDuration = 1000;
-    }
 
-    /**
-     * Initialize all parameters related with bounding boxes of node groups
-     */
-    initBoundingBoxesParameters() {
-        //In case group key changes, this is what is compared while parsing nodes json
-        this.implicitCommunity_key = "group";
-
-        this.boxBorderWidth = 4;
-
-        this.ImplCommColor = new Array();
-        this.ImplCommColor.push({ color: "rgba(248, 212, 251, 0.6)", border: "rgba(242, 169, 249, 1)" }); //Purple
-        this.ImplCommColor.push({ color: "rgba(255, 255, 170, 0.6)", border: "rgba(255, 222, 120, 1)" }); //Yellow
-        this.ImplCommColor.push({ color: "rgba(211, 245, 192, 0.6)", border: "rgba(169, 221, 140, 1)" }); //Green
-        this.ImplCommColor.push({ color: "rgba(254, 212, 213, 0.6)", border: "rgba(252, 153, 156, 1)" }); //Red
-        this.ImplCommColor.push({ color: "rgba(220, 235, 254, 0.6)", border: "rgba(168, 201, 248, 1)" }); //Blue
-    }
-
-    /**
-     * Initialize all parameters related with the dataTable of the selected node
-     */
-    initDataTableParameters() {
-        //Internal/Aux attributes that are not intended to be shown to the user. These tags should be the same as the node keys names
-        this.notShowAttributes = new Array("defaultColor", "borderWidth", "color", "group");
-
-        //Atributes that all nodes have and are important to show. These tags should be the same as the node keys names
-        this.mainShowAttributes = new Array("id", "label", this.groupColor_key, "Implicit_Comm");
-
-        //Array with all dataTable columns. Its used to easily iterate over all of them
-        this.dataPanelContainers = new Array();
-    }
-
-    /** Parse the JSON object to get the necesary data to create the network
-     * 
-     * @param {*} json //JSON object that will be parsed to get the necesary data to create the network
-     */
-    parseJson(json) {
-        //Get nodes from json
-        const nodes = this.parseNodes(json);
-        const edges = this.parseEdges(json);
-        this.communities = this.parseCommunities(json);
-
-        this.data = {
-            nodes: nodes,
-            edges: edges
-        };
+        this.data.nodes = this.parseNodes(json);
     }
 
     /** Parse the JSON object to get the nodes of the network
-     * 
-     * @param {*} json //JSON object that will be parsed to get its nodes
-     * @returns 
-     */
+    * 
+    * @param {*} json //JSON object that will be parsed to get its nodes
+    * @returns nodes dataSet
+    */
     parseNodes(json) {
         for (let node of json.users) {
 
             //The implicit community will be used for the bounding boxes
-            node["Implicit_Comm"] = parseInt(node[this.implicitCommunity_key]);
+            node["implicit_Comm"] = parseInt(node[this.implicitCommunity_key]);
 
             //Vis uses "group" key to change the color of all nodes with the same key. We need to remove it
             delete node["group"];
 
             //Explicit 0 -> Color of the node
-            const explValue_0 = node.explicit_community[this.explicit_filter[0].key];
-            if (this.explicit_filter[0].values.includes(explValue_0)) {
+            node = this.checkExplicitCommunity_0(node);
 
-                node = this.turnNodeColorToDefault(node);
-            } else {
-                this.explicit_filter[0].values.push(explValue_0);
-
-                const key = explValue_0;
-                const color = this.explCommOptions.getColorsForN(this.explicit_filter[0].values.length)
-
-                this.nodeColors.set(key, color);
-
-                node = this.turnNodeColorToDefault(node);
-            }
             //Explicit 1 -> Shape of the node
-            const explValue_1 = node.explicit_community[this.explicit_filter[1].key];
-            let shape;
-            if (this.explicit_filter[1].values.includes(explValue_1)) {
-
-                shape = this.nodeShapes.get(explValue_1);
-            } else {
-                this.explicit_filter[1].values.push(explValue_1);
-
-                const key = explValue_1;
-                const sh = this.explCommOptions.getShapeForN(this.explicit_filter[1].values.length);
-
-                this.nodeShapes.set(key, sh);
-                shape = sh;
-            }
-            node.shape = shape.shape;
-            node.font = {
-                vadjust: shape.vOffset,
-            };
-
-            //This attribute will be used to know if the node is with the default color. To improve performance
-            node["defaultColor"] = true;
+            node = this.checkExplicitCommunity_1(node);
         }
         const nodes = new DataSet(json.users);
         return nodes;
     }
 
+    /** Change node color based on what filtered explicit community 0 value has.
+     * 
+     * @param {*} node node that is going to be edited
+     * @returns the node edited
+     */
+    checkExplicitCommunity_0(node) {
+        const explValue_0 = node.explicit_community[this.explicit_filter[0].key];
+
+        //If the value is not included yet. Add the value to the array and map
+        if (!this.explicit_filter[0].values.includes(explValue_0)) {
+            this.explicit_filter[0].values.push(explValue_0);
+
+            const key = explValue_0;
+            const color = this.explCommOptions.getColorsForN(this.explicit_filter[0].values.length)
+
+            this.nodeColors.set(key, color);
+        }
+
+        node["defaultColor"] = true;
+        return this.turnNodeColorToDefault(node);
+    }
+
+    /** Change node shape based on what filtered explicit community 1 value has.
+    * 
+    * @param {*} node node that is going to be edited
+    * @returns the node edited
+    */
+    checkExplicitCommunity_1(node) {
+        const explValue_1 = node.explicit_community[this.explicit_filter[1].key];
+
+        let figure;
+        if (this.explicit_filter[1].values.includes(explValue_1)) {
+
+            figure = this.nodeShapes.get(explValue_1);
+        } else {
+            //If the value is not included yet. Add the value to the array and map
+            this.explicit_filter[1].values.push(explValue_1);
+
+            const key = explValue_1;
+            const shape = this.explCommOptions.getShapeForN(this.explicit_filter[1].values.length);
+
+            this.nodeShapes.set(key, shape);
+            figure = shape;
+        }
+
+        node.shape = figure.shape;
+        node.font = {
+            vadjust: figure.vOffset,
+        };
+
+        return node;
+    }
+
+    /** Turn node colors to default
+     * 
+     * @param {*} node node that is going to be edited
+     */
+    turnNodeColorToDefault(node) {
+        const explicit0_value = node.explicit_community[this.explicit_filter[0].key];
+
+        node.color = {
+            background: this.nodeColors.get(explicit0_value),
+            border: this.nodeColors.get(explicit0_value)
+        }
+
+        node.defaultColor = true;
+
+        return node;
+    }
+
+    // #endregion NODES SETUP
+
+    //#region EDGES SETUP
+
+    /** Initialize all edges and its parameters
+     * 
+     * @param {*} json json with edge data
+     */
+    initEdges(json) {
+        //Edges with value equal or below to this will be hidden
+        this.edgeValueThreshold = this.config.edgeThreshold;
+
+        //In case value key changes, this is what is compared while parsing edges json
+        this.edgeValue = "value";
+
+        //If true, edgesWidth will change based on the value (similarity) between the nodes they link
+        if (this.config.variableEdge) {
+            this.changeMaxEdgeWidth = true;
+        } else {
+            this.changeMaxEdgeWidth = false;
+        }
+
+        //Default Options
+        this.maxEdgeWidth = 10;
+        this.minEdgeWidth = 1;
+
+        //TODO Implementar el cambio de colores de aristas
+        this.defaultEdgeColor;
+        this.selectedEdgeColor;
+
+        this.data.edges = this.parseEdges(json)
+    }
+
     /** Parse the JSON object to get the edges of the network
      * 
      * @param {*} json //JSON object that will be parsed to get its nodes
-     * @returns 
+     * @returns edges dataSet
      */
     parseEdges(json) {
         //Get edges from json
         const edges = new Array();
         for (const edge of json.similarity) {
+            //Dont save edges with no similarity
             if (edge[this.edgeValue]) {
-                //Remove auto-edges
+                //Dont save autoedges
                 if (edge["u1"] !== edge["u2"]) {
+
                     //Update targets to vis format
                     edge["from"] = edge["u1"];
                     edge["to"] = edge["u2"];
@@ -205,12 +249,12 @@ export default class DrawNetwork {
                     delete edge["u1"];
                     delete edge["u2"];
 
-                    //Vis use "value" key to change edges width. This way edges with higher similarity will be stronger
+                    //Vis use "value" key to change edges width in case we activate the option.
                     edge["value"] = edge[this.edgeValue];
                     if (this.edgeValue !== "value")
                         delete edge[this.edgeValue];
 
-                    //See label testing
+                    //DEBUG TO CHECK PERFORMANCE WITH LABELS
                     if (this.key === "noAgglomerativeClusteringGAM") {
                         edge["label"] = edge["value"].toString();
                     }
@@ -223,22 +267,35 @@ export default class DrawNetwork {
                     edges.push(edge);
                 }
             }
-
         }
         const output = new DataSet(edges);
-
         return output;
     }
 
-    parseCommunities(json) {
+    // #endregion EDGES SETUP
 
-        return json.communities;
+    //#region DATATABLE SETUP
+
+    /**
+    * Initialize all parameters related with the dataTable of the selected node and create it
+    */
+    initDataTable() {
+        //Internal/Aux attributes that are not intended to be shown to the user. These tags should be the same as the node keys names
+        this.notShowAttributes = new Array("defaultColor", "borderWidth", "color", "group", "shape", "font");
+
+        //Atributes that all nodes have and are important to show. These tags should be the same as the node keys names
+        this.mainShowAttributes = new Array("id", "label", "implicit_Comm");
+
+        //Array with all dataTable columns. Its used to easily iterate over all of them
+        this.dataPanelContainers = new Array();
+
+        this.createEmptyDataTable();
     }
 
     /**
-     * Initialize an empty DataPanel 
+     * Create an empty DataPanel 
      */
-    initNodeDataPanel() {
+    createEmptyDataTable() {
         const nRow = this.getNrows();
 
         const dataContainer = document.createElement('div');
@@ -287,7 +344,10 @@ export default class DrawNetwork {
         let maxLength = 0;
         let maxNode;
         this.data.nodes.forEach((node) => {
-            const length = Object.keys(node).length
+
+            let length = Object.keys(node).length
+            length += Object.keys(node.explicit_community).length;
+
             if (length > maxLength) {
                 maxLength = length;
                 maxNode = node;
@@ -304,26 +364,12 @@ export default class DrawNetwork {
         return maxLength;
     }
 
-    /** Returns if a key should be shown in data panel
-     * 
-     * @param {*} key Key to be compared 
-     * @returns Boolean 
-     */
-    canShowKey(key) {
-        switch (key) {
-            case "defaultColor":
-            case 'borderWidth':
-            case 'color':
-            case "label":
-                return false;
-            default:
-                return true;
-        }
-    }
+
+    //#endregion DATATABLE SETUP
 
     /**
-     * Initialize vis.network options
-     */
+    * Initialize vis.network options
+    */
     chooseOptions() {
         //Edge generic options
         let max;
@@ -368,7 +414,7 @@ export default class DrawNetwork {
                 shapeProperties: {
                     interpolation: false
                 },
-                size: this.defaultSize,
+                size: this.defaultNodeSize,
 
             },
             groups: {
@@ -394,23 +440,86 @@ export default class DrawNetwork {
         };
     }
 
-    nodeChosen(values, id, selected, hovering) {
-        if (selected)
-            values.size = this.selectedSize;
-    }
+
     /**
      * Draw the network and initialize all Events
      */
     drawNetwork() {
         this.network = new Network(this.container, this.data, this.options);
-
         this.network.stabilize();
+
         this.container.firstChild.id = "topCanvas_" + this.key;
 
         //this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
         this.network.on("click", (event) => this.clickEventCallback(event));
-
     }
+
+    //#region PREDRAW EVENT
+
+    /** Function executed when "beforeDrawing" event is launched.
+     * 
+     * @param {*} ctx Context object necesary to draw in the network canvas
+     */
+    preDrawEvent(ctx) {
+        this.ctx = ctx;
+        this.drawBoundingBoxes(ctx);
+    }
+
+    /** Iterate over all nodes getting the bounding box of every "boxGroup", and draw them
+     * 
+     * @param {*} ctx Context object necesary to draw in the network canvas
+     */
+    drawBoundingBoxes(ctx) {
+        const bigBoundBoxes = new Array();
+        bigBoundBoxes.push(null);
+        bigBoundBoxes.push(null);
+        bigBoundBoxes.push(null);
+        bigBoundBoxes.push(null);
+        bigBoundBoxes.push(null);
+
+        //Obtain the bounding box of every boxGroup of nodes
+        this.data.nodes.forEach((node) => {
+            const group = node["implicit_Comm"];
+
+            let bb = this.network.getBoundingBox(node.id)
+            if (bigBoundBoxes[group] === null)
+                bigBoundBoxes[group] = bb;
+            else {
+                if (bb.left < bigBoundBoxes[group].left)
+                    bigBoundBoxes[group].left = bb.left;
+
+                if (bb.top < bigBoundBoxes[group].top)
+                    bigBoundBoxes[group].top = bb.top;
+
+                if (bb.right > bigBoundBoxes[group].right)
+                    bigBoundBoxes[group].right = bb.right;
+
+                if (bb.bottom > bigBoundBoxes[group].bottom)
+                    bigBoundBoxes[group].bottom = bb.bottom;
+            }
+        })
+
+
+        //Draw the bounding box of all groups
+        for (let i = 0; i < bigBoundBoxes.length; i++) {
+            if (bigBoundBoxes[i] !== null) {
+                const bb = bigBoundBoxes[i];
+
+                //Draw Border
+                ctx.lineWidth = this.boxBorderWidth;
+                ctx.strokeStyle = this.bbColor[i].border;
+                ctx.strokeRect(bb.left, bb.top, bb.right - bb.left, bb.bottom - bb.top);
+
+                //Draw Background
+                ctx.lineWidth = 0;
+                ctx.fillStyle = this.bbColor[i].color;
+                ctx.fillRect(bb.left, bb.top, bb.right - bb.left, bb.bottom - bb.top);
+            }
+        }
+    }
+    //#endregion PREDRAW EVENT
+
+    //#region CLICK EVENT
 
     /** Function executed when the user clicks inside the network canvas
      * 
@@ -425,104 +534,17 @@ export default class DrawNetwork {
     }
 
     /** Function executed only when it was this network the one that was clicked a node
-     * 
-     * @param {*} id id of the node 
-     */
+    * 
+    * @param {*} id id of the node 
+    */
     nodeHasBeenClicked(id) {
         this.networkManager.nodeSelected(id);
 
-        //We only create the tooltip in this networw
+        //We only create the tooltip in this network
         //We need a timeout to print the tooltip once zoom has ended
-        // setTimeout(function () {
-        //     this.updateTooltip(id);
-        // }.bind(this), this.zoomDuration);
-    }
-
-    /** Update or create the tooltip of the node id
-     * 
-     * @param {*} id id of the node
-     */
-    updateTooltip(id) {
-        const canvasPosition = this.getElementPosition("topCanvas_" + this.key)
-
-        const nodeCanvasPosition = this.network.getPosition(id);
-        const nodePosition = this.network.canvasToDOM(nodeCanvasPosition);
-
-        //Calculate the real absolute click coordinates
-        const clickX = nodePosition.x + canvasPosition.left + 35;
-        const clickY = nodePosition.y + canvasPosition.top;
-
-        const title = "<h5> " + id + "</h5>";
-        const content = this.getTooltipContent(id);
-
-        if (this.tooltip === undefined) {
-            //Create the popup
-            const options = {
-                trigger: "manual",
-                placement: "right",
-                fallbackPlacements: ["right"],
-                content: " ",
-                offset: [0, 0],
-                html: true,
-            };
-
-            this.popoverContainer = document.createElement("div");
-            document.body.append(this.popoverContainer);
-
-            this.tooltip = new bootstrap.Popover(this.popoverContainer, options);
-        }
-
-        this.popoverContainer.style.top = clickY + "px";
-        this.popoverContainer.style.left = clickX + "px";
-        this.popoverContainer.style.position = "absolute";
-
-        this.tooltip.setContent({
-            '.popover-header': title,
-            '.popover-body': content
-        })
-
-        this.tooltip.show();
-
-        this.networkManager.setTooltip(this.tooltip);
-    }
-
-    /** Returns the tooltip content of a node
-     * 
-     * @param {*} id id of the node
-     * @returns string with the content
-     */
-    getTooltipContent(id) {
-        const node = this.data.nodes.get(id);
-        let content = "";
-
-        content += "<b> Label: </b> " + node["label"] + "<br>";
-        content += "<b> " + this.groupColor_key + ": </b> " + node[this.groupColor_key] + "<br>";
-        content += "<b> Group: </b> " + node["Implicit_Comm"] + "";
-
-        return content;
-    }
-
-    /** Get the element position in the dom
-     * 
-     * @param {*} id id of the element
-     * @returns and object with the top and left position
-     */
-    getElementPosition(id) {
-        const element = document.getElementById(id);
-        const cs = window.getComputedStyle(element);
-        const marginTop = cs.getPropertyValue('margin-top');
-        const marginLeft = cs.getPropertyValue('margin-left');
-
-        const top = element.offsetTop - parseFloat(marginTop);
-        const left = element.offsetLeft - parseFloat(marginLeft);
-
-        return { top: top, left: left };
-    }
-    /** Function executed only when it was this network the one that unselected a node
-     * 
-     */
-    noNodeIsClicked() {
-        this.networkManager.nodeDeselected();
+        setTimeout(function () {
+            this.updateTooltip(id);
+        }.bind(this), this.zoomDuration + 100);
     }
 
     /** Select the node whose id is id parameter and darken all other nodes
@@ -530,9 +552,9 @@ export default class DrawNetwork {
      * @param {*} id //Id of the node
      */
     nodeSelected(id) {
-        this.network.selectNodes([id], true);
+        this.network.selectNodes([id], false);
 
-        //this.updateDataPanel(id);
+        this.updateDataPanel(id);
 
         //Search for the nodes that are connected to the selected Node
         const selectedNodes = new Array();
@@ -564,17 +586,164 @@ export default class DrawNetwork {
         const newNodes = new Array();
         this.data.nodes.forEach((node) => {
             if (selectedNodes.includes(node.id)) {
-                if (!node.defaultColor){
+                if (!node.defaultColor) {
                     newNodes.push(this.turnNodeColorToDefault(node));
                 }
 
-            } else if (node.defaultColor){
-                newNodes.push(this.darkenNode(node));
+            } else if (node.defaultColor) {
+                newNodes.push(this.turnNodeDark(node));
             }
         });
 
         this.data.nodes.update(newNodes);
     }
+
+    /** Change node colors to grey colors
+     * 
+     * @param {*} node edited node
+     */
+    turnNodeDark(node) {
+        node.defaultColor = false;
+        node.color = this.darkNodeColor;
+
+        return node;
+    }
+
+    /** 
+     * Function executed only when it was this network the one that unselected a node
+     */
+    noNodeIsClicked() {
+        this.networkManager.nodeDeselected();
+    }
+
+    /**
+     * Restore the network to the original deselected state
+     */
+    nodeDeselected() {
+        //Return to fit all nodes into the "camera"
+        const fitOptions = {
+            animation: true
+        }
+        this.network.fit(fitOptions);
+
+        this.clearDataPanel();
+
+        this.network.unselectAll();
+
+        const newNodes = new Array();
+        this.data.nodes.forEach((node) => {
+            if (!node.defaultColor)
+                newNodes.push(this.turnNodeColorToDefault(node));
+        });
+
+        this.data.nodes.update(newNodes);
+    }
+
+    /** Function executed when a node is selected
+     * 
+     * @param {*} values parameters of the node
+     * @param {*} id id of the node
+     * @param {*} selected if the node has been selected
+     * @param {*} hovering if the node has been hovered
+     */
+    nodeChosen(values, id, selected, hovering) {
+        if (selected)
+            values.size = this.SelectedNodeSize;
+    }
+
+    //#endregion EVENTS
+
+    //#region TOOLTIP
+    /** Update or create the tooltip of the node id
+     * 
+     * @param {*} id id of the node
+     */
+    updateTooltip(id) {
+        const canvasPosition = this.getElementPosition("topCanvas_" + this.key)
+
+        const nodeCanvasPosition = this.network.getPosition(id);
+        const nodePosition = this.network.canvasToDOM(nodeCanvasPosition);
+
+        //Calculate the real absolute click coordinates
+        const clickX = nodePosition.x + canvasPosition.left + 15;
+        const clickY = nodePosition.y + canvasPosition.top;
+
+        const title = "<h5> " + id + "</h5>";
+        const content = this.getTooltipContent(id);
+
+        if (this.tooltip === undefined) {
+            //Create the popover
+            const options = {
+                trigger: "manual",
+                placement: "right",
+                fallbackPlacements: ["right"],
+                content: " ",
+                offset: [0, 0],
+                html: true,
+            };
+
+            this.popoverContainer = document.createElement("div");
+            document.body.append(this.popoverContainer);
+
+            this.tooltip = new bootstrap.Popover(this.popoverContainer, options);
+        }
+
+        this.popoverContainer.style.top = clickY + "px";
+        this.popoverContainer.style.left = clickX + "px";
+        this.popoverContainer.style.position = "absolute";
+
+        this.tooltip.setContent({
+            '.popover-header': title,
+            '.popover-body': content
+        })
+
+        this.tooltip.show();
+
+        this.networkManager.setTooltip(this.tooltip);
+    }
+
+    /** Get the element position in the dom
+     * 
+     * @param {*} id id of the element
+     * @returns and object with the top and left position
+     */
+    getElementPosition(id) {
+        const element = document.getElementById(id);
+        const cs = window.getComputedStyle(element);
+        const marginTop = cs.getPropertyValue('margin-top');
+        const marginLeft = cs.getPropertyValue('margin-left');
+
+        const top = element.offsetTop - parseFloat(marginTop);
+        const left = element.offsetLeft - parseFloat(marginLeft);
+
+        return { top: top, left: left };
+    }
+
+
+    /** Returns the tooltip content of a node
+     * 
+     * @param {*} id id of the node
+     * @returns string with the content
+     */
+    getTooltipContent(id) {
+        const node = this.data.nodes.get(id);
+        let content = "";
+
+        content += "<b> label: </b> " + node["label"] + "<br>";
+        content += "<b> group: </b> " + node["implicit_Comm"] + "<br>";
+
+        const keys = Object.keys( node.explicit_community);
+        for(let i = 0; i < keys.length; i++){
+            content += "<b>"+keys[i]+"</b> "+ node.explicit_community[keys[i]] + "<br>";
+
+        }
+        
+        return content;
+    }
+
+    //#endregion TOOLTIP
+
+    //#region DATATABLE
 
     /** Update the data panel with the node with the data
      * 
@@ -582,7 +751,6 @@ export default class DrawNetwork {
      */
     updateDataPanel(id) {
         const node = this.data.nodes.get(id);
-        const keys = Object.keys(node);
 
         this.clearDataPanel();
 
@@ -600,45 +768,26 @@ export default class DrawNetwork {
         }
 
         let lastRowIndex = lastImportantRowIndex;
-        //Add unimportant attributes
+
+        const keys = Object.keys(node.explicit_community);
+        //We only want to show explicit community info from the unimportant attributes
         for (let i = 0; i < keys.length; i++) {
+            const currentKey = keys[i];
 
-            //If its an available attribute that has not been already included as a main Attribute
-            if (!this.notShowAttributes.includes(keys[i]) && !this.mainShowAttributes.includes(keys[i])) {
-                const currentKey = keys[i];
+            console.log(currentKey);
 
-                if (lastImportantRowIndex !== null) {
-                    this.dataPanelContainers[lastImportantRowIndex].row.className = "row dataRow border-bottom border-primary";
-                    lastImportantRowIndex = null;
-                }
-
-                this.updateDataPanelRow(rowIndex, currentKey, node[currentKey], true, true);
-
-                lastRowIndex = rowIndex;
-                rowIndex++;
+            if (lastImportantRowIndex !== null) {
+                this.dataPanelContainers[lastImportantRowIndex].row.className = "row dataRow border-bottom border-primary";
+                lastImportantRowIndex = null;
             }
+
+            this.updateDataPanelRow(rowIndex, currentKey, node.explicit_community[currentKey], true, true);
+
+            lastRowIndex = rowIndex;
+            rowIndex++;
         }
 
         this.dataPanelContainers[lastRowIndex].row.className = "row dataRow";
-    }
-
-    /** Update a dataPanel row 
-     * 
-     * @param {*} index index of the row to update
-     * @param {*} key new Text in the left column
-     * @param {*} value new Text in the right column
-     * @param {*} bottomBorder Boolean indicating if the row should have bottom Border
-     */
-    updateDataPanelRow(index, key, value, bottomBorder, greyBorder) {
-        this.dataPanelContainers[index].left.innerHTML = "<b>" + key + "</b>";
-        this.dataPanelContainers[index].right.innerHTML = value;
-
-        if (!bottomBorder) {
-            this.dataPanelContainers[index].row.className = "row dataRow";
-        } else if (greyBorder) {
-            this.dataPanelContainers[index].row.className = "row dataRow border-bottom border-grey";
-        } else
-            this.dataPanelContainers[index].row.className = "row dataRow border-bottom border-dark";
     }
 
     /**
@@ -659,119 +808,25 @@ export default class DrawNetwork {
         }
     }
 
-    /**
-     * Restore the network to the original deselected state
-     */
-    nodeDeselected() {
-        //Return to fit all nodes into the "camera"
-        const fitOptions = {
-            animation: true
-        }
-        this.network.fit(fitOptions);
-
-        //this.clearDataPanel();
-
-        this.network.unselectAll();
-
-        const newNodes = new Array();
-        this.data.nodes.forEach((node) => {
-            if (!node.defaultColor)
-                newNodes.push(this.turnNodeColorToDefault(node));
-        });
-
-        this.data.nodes.update(newNodes);
-    }
-
-    /** Turn node colros to default
+    /** Update a dataPanel row 
      * 
-     * @param {*} node node that is going to be edited
+     * @param {*} index index of the row to update
+     * @param {*} key new Text in the left column
+     * @param {*} value new Text in the right column
+     * @param {*} bottomBorder Boolean indicating if the row should have bottom Border
      */
-    turnNodeColorToDefault(node) {
-        const explicit0_value = node.explicit_community[this.explicit_filter[0].key];
+    updateDataPanelRow(index, key, value, bottomBorder, greyBorder) {
+        this.dataPanelContainers[index].left.innerHTML = "<b>" + key + "</b>";
+        this.dataPanelContainers[index].right.innerHTML = value;
 
-        node.color = {
-            background: this.nodeColors.get(explicit0_value),
-            border: this.nodeColors.get(explicit0_value)
-        }
-
-        node.defaultColor = true;
-
-        return node;
+        if (!bottomBorder) {
+            this.dataPanelContainers[index].row.className = "row dataRow";
+        } else if (greyBorder) {
+            this.dataPanelContainers[index].row.className = "row dataRow border-bottom border-grey";
+        } else
+            this.dataPanelContainers[index].row.className = "row dataRow border-bottom border-dark";
     }
-
-    /** Change node colors to grey colors
-     * 
-     * @param {*} node 
-     */
-    darkenNode(node) {
-        node.defaultColor = false;
-        node.color = this.darkenColor;
-
-        return node;
-    }
-
-
-    /** Function executed when "beforeDrawing" event is launched.
-     * 
-     * @param {*} ctx Context object necesary to draw in the network canvas
-     */
-    preDrawEvent(ctx) {
-        this.ctx = ctx;
-        this.drawBoundingBoxes(ctx);
-    }
-
-    /** Iterate over all nodes getting the bounding box of every "boxGroup", and draw them
-     * 
-     * @param {*} ctx Context object necesary to draw in the network canvas
-     */
-    drawBoundingBoxes(ctx) {
-        const bigBoundBoxes = new Array();
-        bigBoundBoxes.push(null);
-        bigBoundBoxes.push(null);
-        bigBoundBoxes.push(null);
-        bigBoundBoxes.push(null);
-        bigBoundBoxes.push(null);
-
-        //Obtain the bounding box of every boxGroup of nodes
-        this.data.nodes.forEach((node) => {
-            const group = node["Implicit_Comm"];
-
-            let bb = this.network.getBoundingBox(node.id)
-            if (bigBoundBoxes[group] === null)
-                bigBoundBoxes[group] = bb;
-            else {
-                if (bb.left < bigBoundBoxes[group].left)
-                    bigBoundBoxes[group].left = bb.left;
-
-                if (bb.top < bigBoundBoxes[group].top)
-                    bigBoundBoxes[group].top = bb.top;
-
-                if (bb.right > bigBoundBoxes[group].right)
-                    bigBoundBoxes[group].right = bb.right;
-
-                if (bb.bottom > bigBoundBoxes[group].bottom)
-                    bigBoundBoxes[group].bottom = bb.bottom;
-            }
-        })
-
-
-        //Draw the bounding box of all groups
-        for (let i = 0; i < bigBoundBoxes.length; i++) {
-            if (bigBoundBoxes[i] !== null) {
-                const bb = bigBoundBoxes[i];
-
-                //Draw Border
-                ctx.lineWidth = this.boxBorderWidth;
-                ctx.strokeStyle = this.ImplCommColor[i].border;
-                ctx.strokeRect(bb.left, bb.top, bb.right - bb.left, bb.bottom - bb.top);
-
-                //Draw Background
-                ctx.lineWidth = 0;
-                ctx.fillStyle = this.ImplCommColor[i].color;
-                ctx.fillRect(bb.left, bb.top, bb.right - bb.left, bb.bottom - bb.top);
-            }
-        }
-    }
+    //#endregion DATATABLE
 
     /**
      * Hide all edges below a set threshold

@@ -1,5 +1,5 @@
 
-export default class ExplCommOptions {
+export default class Utils {
 
     constructor() {
 
@@ -35,9 +35,9 @@ export default class ExplCommOptions {
             case 4:
                 return {shape: "triangle", vOffset: -25, selOffset: -35};
             case 5:
-                return {shape: "hexagon", vOffset: -31, selOffset: -40};
-            case 0:
                 return {shape: "triangleDown", vOffset: -35, selOffset: -45};
+            case 0:
+                return {shape: "hexagon", vOffset: -31, selOffset: -40};
         }
     }
 
