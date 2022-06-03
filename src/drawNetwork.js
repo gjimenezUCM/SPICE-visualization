@@ -35,14 +35,13 @@ export default class DrawNetwork {
      */
     initEdgesParameters() {
         //Edges with value equal or below to this wont be drawn
-        console.log(this.config);
         this.edgeValueThreshold = this.config.edgeThreshold;
 
         //In case value key changes, this is what is compared while parsing edges json
         this.edgeValue = "value";
 
-        this.maxEdgeWidth = 13;
-        this.minEdgeWidth = 3;
+        this.maxEdgeWidth = 10;
+        this.minEdgeWidth = 1;
 
         //If true, edgesWidth will change based on the value (similarity) between the nodes they link
         if (this.config.variableEdge) {
@@ -114,7 +113,7 @@ export default class DrawNetwork {
         //Get nodes from json
         const nodes = this.parseNodes(json);
         const edges = this.parseEdges(json);
-        //this.communities = this.parseCommunities();
+        this.communities = this.parseCommunities(json);
 
         this.data = {
             nodes: nodes,
@@ -144,7 +143,6 @@ export default class DrawNetwork {
             //TODO Cambiarlo
             //node["group"] = 0;
         }
-        console.log(json.users);
         const nodes = new DataSet(json.users);
         return nodes;
     }
@@ -171,11 +169,6 @@ export default class DrawNetwork {
                 if (this.edgeValue !== "value")
                     delete edge[this.edgeValue];
 
-                if (edge["value"] < this.edgeValueThreshold)
-                    edge["hidden"] = true;
-                else
-                    edge["hidden"] = false;
-
                 //See label testing
                 if (this.key === "noAgglomerativeClusteringGAM") {
                     edge["label"] = edge["value"].toString();
@@ -187,6 +180,11 @@ export default class DrawNetwork {
         const output = new DataSet(edges);
 
         return output;
+    }
+
+    parseCommunities(json) {
+
+        return json.communities;
     }
 
     /**
@@ -322,6 +320,7 @@ export default class DrawNetwork {
                 useDefaultGroups: false
             },
             physics: {
+                enabled: false,
                 barnesHut: {
                     springConstant: 0,
                     avoidOverlap: 0.2
@@ -335,7 +334,7 @@ export default class DrawNetwork {
                 hoverConnectedEdges: false,
             },
             layout: {
-                improvedLayout: true,
+                improvedLayout: false,
             }
         };
     }
@@ -344,16 +343,15 @@ export default class DrawNetwork {
      * Draw the network and initialize all Events
      */
     drawNetwork() {
-        console.log("drawNetwork Start " + new Date().toLocaleTimeString());
         this.network = new Network(this.container, this.data, this.options);
-        console.log("drawNetwork Ends " + new Date().toLocaleTimeString());
+
         this.network.stabilize();
         this.container.firstChild.id = "topCanvas_" + this.key;
 
-        //this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
-        this.network.on("click", (event) => this.clickEventCallback(event));
+        this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
+        //this.network.on("click", (event) => this.clickEventCallback(event));
 
-        //this.hideEdgesbelowThreshold(this.edgeValueThreshold);
+        this.hideEdgesbelowThreshold(this.edgeValueThreshold);
     }
 
     /** Function executed when the user clicks inside the network canvas
@@ -716,11 +714,7 @@ export default class DrawNetwork {
     hideEdgesbelowThreshold(newThreshold) {
         this.edgeValueThreshold = newThreshold;
 
-
-        console.log("preEdge Threshold Change " + new Date().toLocaleTimeString());
-
         const newEdges = new Array();
-        
         this.data.edges.forEach((edge) => {
             if (edge["value"] < this.edgeValueThreshold) {
                 if (!edge["hidden"]) {
@@ -736,8 +730,6 @@ export default class DrawNetwork {
         })
 
         this.data.edges.update(newEdges);
-
-        console.log("postEdge Threshold Change " + new Date().toLocaleTimeString());
     }
 
     /**
@@ -765,7 +757,6 @@ export default class DrawNetwork {
 
         //Update all edges with the new options
         this.data.edges.update(this.data.edges);
-
     }
 
     getExplicitCommunities() {
