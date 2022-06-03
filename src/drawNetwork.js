@@ -24,8 +24,7 @@ export default class DrawNetwork {
         this.initDataTableParameters();
 
         this.parseJson(jsonInput);
-
-        this.initNodeDataPanel();
+        //this.initNodeDataPanel();
         this.chooseOptions(jsonInput);
 
         this.drawNetwork();
@@ -36,6 +35,7 @@ export default class DrawNetwork {
      */
     initEdgesParameters() {
         //Edges with value equal or below to this wont be drawn
+        console.log(this.config);
         this.edgeValueThreshold = this.config.edgeThreshold;
 
         //In case value key changes, this is what is compared while parsing edges json
@@ -80,16 +80,16 @@ export default class DrawNetwork {
      */
     initBoundingBoxesParameters() {
         //In case group key changes, this is what is compared while parsing nodes json
-        this.boxGroup_key = "group";
+        this.implicitCommunity_key = "group";
 
         this.boxBorderWidth = 4;
 
-        this.boxGroupColor = new Array();
-        this.boxGroupColor.push({ color: "rgba(248, 212, 251, 0.6)", border: "rgba(242, 169, 249, 1)" }); //Purple
-        this.boxGroupColor.push({ color: "rgba(255, 255, 170, 0.6)", border: "rgba(255, 222, 120, 1)" }); //Yellow
-        this.boxGroupColor.push({ color: "rgba(211, 245, 192, 0.6)", border: "rgba(169, 221, 140, 1)" }); //Green
-        this.boxGroupColor.push({ color: "rgba(254, 212, 213, 0.6)", border: "rgba(252, 153, 156, 1)" }); //Red
-        this.boxGroupColor.push({ color: "rgba(220, 235, 254, 0.6)", border: "rgba(168, 201, 248, 1)" }); //Blue
+        this.ImplCommColor = new Array();
+        this.ImplCommColor.push({ color: "rgba(248, 212, 251, 0.6)", border: "rgba(242, 169, 249, 1)" }); //Purple
+        this.ImplCommColor.push({ color: "rgba(255, 255, 170, 0.6)", border: "rgba(255, 222, 120, 1)" }); //Yellow
+        this.ImplCommColor.push({ color: "rgba(211, 245, 192, 0.6)", border: "rgba(169, 221, 140, 1)" }); //Green
+        this.ImplCommColor.push({ color: "rgba(254, 212, 213, 0.6)", border: "rgba(252, 153, 156, 1)" }); //Red
+        this.ImplCommColor.push({ color: "rgba(220, 235, 254, 0.6)", border: "rgba(168, 201, 248, 1)" }); //Blue
     }
 
     /**
@@ -114,6 +114,7 @@ export default class DrawNetwork {
         //Get nodes from json
         const nodes = this.parseNodes(json);
         const edges = this.parseEdges(json);
+        //this.communities = this.parseCommunities();
 
         this.data = {
             nodes: nodes,
@@ -130,14 +131,20 @@ export default class DrawNetwork {
         for (const node of json.users) {
 
             //"BoxGroup" is the key we will use to track what nodes should be inside the same big bounding box
-            node["Implicit_Comm"] = parseInt(node[this.boxGroup_key]);
+            node["Implicit_Comm"] = parseInt(node[this.implicitCommunity_key]);
 
             //Vis uses "group" key to change the color of all nodes with the same key
-            //node["group"] = "group_" + node[this.groupColor_key];
+            node["Group"] = node["group"]
+            node["group"] = 0;
+            //group_" + node[this.groupColor_key];
 
             //This attribute will be used to know if the node is with the default color. To improve performance
             node["defaultColor"] = true;
+
+            //TODO Cambiarlo
+            //node["group"] = 0;
         }
+        console.log(json.users);
         const nodes = new DataSet(json.users);
         return nodes;
     }
@@ -149,28 +156,37 @@ export default class DrawNetwork {
      */
     parseEdges(json) {
         //Get edges from json
+        const edges = new Array();
         for (const edge of json.similarity) {
-            //Update targets to vis format
-            edge["from"] = edge["u1"];
-            edge["to"] = edge["u2"];
+            if (edge[this.edgeValue]) {
+                //Update targets to vis format
+                edge["from"] = edge["u1"];
+                edge["to"] = edge["u2"];
 
-            delete edge["u1"];
-            delete edge["u2"];
+                delete edge["u1"];
+                delete edge["u2"];
 
-            //Vis use "value" key to change edges width. This way edges with higher similarity will be stronger
-            edge["value"] = edge[this.edgeValue];
-            if (this.edgeValue !== "value")
-                delete edge[this.edgeValue];
+                //Vis use "value" key to change edges width. This way edges with higher similarity will be stronger
+                edge["value"] = edge[this.edgeValue];
+                if (this.edgeValue !== "value")
+                    delete edge[this.edgeValue];
 
-            //Vis use "label" key to show text above each edge. We can use it to see the similarity of each edge
-            if (this.activateEdgeLabels)
-                edge["label"] = edge["value"].toString();
+                if (edge["value"] < this.edgeValueThreshold)
+                    edge["hidden"] = true;
+                else
+                    edge["hidden"] = false;
 
-            edge["hidden"] = false;
+                //See label testing
+                if (this.key === "noAgglomerativeClusteringGAM") {
+                    edge["label"] = edge["value"].toString();
+                }
+                edges.push(edge);
+            }
+
         }
-        const edges = new DataSet(json.similarity);
+        const output = new DataSet(edges);
 
-        return edges;
+        return output;
     }
 
     /**
@@ -289,48 +305,37 @@ export default class DrawNetwork {
                     align: "top",
                     vadjust: -7
                 },
-                smooth: false
+                smooth: {
+                    enabled: false,
+                }
 
             },
             nodes: {
                 shape: 'circle',
                 borderWidth: 3,
                 borderWidthSelected: 4,
-                widthConstraint: 30,
-                font: {
-                    size: 20
+                shapeProperties: {
+                    interpolation: false    // 'true' for intensive zooming
                 },
             },
             groups: {
-                group_0: {
-                    color: {
-                        background: this.groupColor[0].color,
-                        border: this.groupColor[0].border,
-                        highlight: {
-                            background: this.groupColor[0].colorSelected,
-                            border: this.groupColor[0].borderSelected,
-                        }
-                    }
-                },
-                group_1: {
-                    color: {
-                        background: this.groupColor[1].color,
-                        border: this.groupColor[1].border,
-                        highlight: {
-                            background: this.groupColor[1].colorSelected,
-                            border: this.groupColor[1].borderSelected,
-                        }
-                    }
-                }
+                useDefaultGroups: false
             },
             physics: {
-                enabled: false
+                barnesHut: {
+                    springConstant: 0,
+                    avoidOverlap: 0.2
+                }
+
             },
             interaction: {
                 zoomView: true,
                 dragView: true,
                 hover: false,
                 hoverConnectedEdges: false,
+            },
+            layout: {
+                improvedLayout: true,
             }
         };
     }
@@ -339,14 +344,16 @@ export default class DrawNetwork {
      * Draw the network and initialize all Events
      */
     drawNetwork() {
+        console.log("drawNetwork Start " + new Date().toLocaleTimeString());
         this.network = new Network(this.container, this.data, this.options);
-
+        console.log("drawNetwork Ends " + new Date().toLocaleTimeString());
+        this.network.stabilize();
         this.container.firstChild.id = "topCanvas_" + this.key;
 
-        this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
+        //this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
         this.network.on("click", (event) => this.clickEventCallback(event));
 
-        this.hideEdgesbelowThreshold(this.edgeValueThreshold);
+        //this.hideEdgesbelowThreshold(this.edgeValueThreshold);
     }
 
     /** Function executed when the user clicks inside the network canvas
@@ -692,12 +699,12 @@ export default class DrawNetwork {
 
                 //Draw Border
                 ctx.lineWidth = this.boxBorderWidth;
-                ctx.strokeStyle = this.boxGroupColor[i].border;
+                ctx.strokeStyle = this.ImplCommColor[i].border;
                 ctx.strokeRect(bb.left, bb.top, bb.right - bb.left, bb.bottom - bb.top);
 
                 //Draw Background
                 ctx.lineWidth = 0;
-                ctx.fillStyle = this.boxGroupColor[i].color;
+                ctx.fillStyle = this.ImplCommColor[i].color;
                 ctx.fillRect(bb.left, bb.top, bb.right - bb.left, bb.bottom - bb.top);
             }
         }
@@ -709,20 +716,28 @@ export default class DrawNetwork {
     hideEdgesbelowThreshold(newThreshold) {
         this.edgeValueThreshold = newThreshold;
 
-        this.data.edges.forEach((edge) => {
 
+        console.log("preEdge Threshold Change " + new Date().toLocaleTimeString());
+
+        const newEdges = new Array();
+        
+        this.data.edges.forEach((edge) => {
             if (edge["value"] < this.edgeValueThreshold) {
                 if (!edge["hidden"]) {
                     edge["hidden"] = true;
-                    this.data.edges.update(edge);
                 }
             } else {
                 if (edge["hidden"]) {
                     edge["hidden"] = false;
-                    this.data.edges.update(edge);
                 }
             }
+
+            newEdges.push(edge);
         })
+
+        this.data.edges.update(newEdges);
+
+        console.log("postEdge Threshold Change " + new Date().toLocaleTimeString());
     }
 
     /**
@@ -749,13 +764,12 @@ export default class DrawNetwork {
         this.network.setOptions(this.options);
 
         //Update all edges with the new options
-        this.data.edges.forEach((edge) => {
-            this.data.edges.update(edge);
-        });
+        this.data.edges.update(this.data.edges);
+
     }
 
-    getExplicitCommunities(){
-    
+    getExplicitCommunities() {
+
     }
 }
 

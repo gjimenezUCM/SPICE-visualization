@@ -17,11 +17,10 @@ export default class NetworkManager {
     addNetwork(file, leftContainer, rightContainer, config) {
         try {
             const jsonFile = JSON.parse(file);
-            console.log(jsonFile);
-            //const network = new DrawNetwork(jsonFile, leftContainer, rightContainer, this, config);
+            const network = new DrawNetwork(jsonFile, leftContainer, rightContainer, this, config);
 
-            //this.activesNetworksMap.set(config.key, network);
-            //this.activesNetworksArray.push(network);
+            this.activesNetworksMap.set(config.key, network);
+            this.activesNetworksArray.push(network);
 
         } catch (e) {
             console.log(e);
@@ -98,14 +97,14 @@ export default class NetworkManager {
 
     thresholdChangeALL(newValue) {
         this.activesNetworksArray.forEach((network) => {
-            thresholdChange(network.key, newValue);
+            this.thresholdChange(network.key, newValue);
         });
     }
 
 
-    variableEdgeChange(newBool) {
+    variableEdgeChangeALL(newBool) {
         this.activesNetworksArray.forEach((network) => {
-            thresholdChange(network.key, newBool);
+            this.variableEdgeChange(network.key, newBool);
         });
     }
 
@@ -115,6 +114,7 @@ export default class NetworkManager {
     }
 
     getExplicitCommunities(){
-        return this.activesNetworksArray[0].getExplicitCommunities();
+        return "";
+        //return this.activesNetworksArray[0].getExplicitCommunities();
     }
 }

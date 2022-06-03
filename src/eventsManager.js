@@ -157,7 +157,7 @@ export default class EventsManager {
         this.networkManager.addNetwork(file, columnLeftContainer, columnRightContainer, config)
 
 
-        if(this.networkManager.getNnetworks() === 0){
+        if(this.networkManager.getNnetworks() === 1){
             this.addControlPanel(this.networkManager.getExplicitCommunities());
         }
 
@@ -179,13 +179,14 @@ export default class EventsManager {
         slider.value = this.initialSliderValue;  
         slider.id = "thresholdSlider";
 
-        slider.oninput = () => this.thresholdChange();
+        slider.onchange = () => this.thresholdChange();
+        slider.oninput = () => this.updateSliderText();
 
         const text = document.createElement('span');
         text.innerHTML = "Minimum Similarity: ";
 
         const value = document.createElement('span');
-        value.id = "thresholdSliderValue_";
+        value.id = "thresholdSliderValue";
         value.innerHTML = "0.5";
 
         sliderContainer.appendChild(slider);
@@ -224,6 +225,13 @@ export default class EventsManager {
      */
     thresholdChange() {
         const slider = document.getElementById("thresholdSlider");
+        let newValue = slider.value;
+
+        this.networkManager.thresholdChangeALL(newValue);
+    }
+
+    updateSliderText(){
+        const slider = document.getElementById("thresholdSlider");
         const value = document.getElementById("thresholdSliderValue");
 
         let newValue = slider.value;
@@ -232,17 +240,14 @@ export default class EventsManager {
         if (newValue === "1") newValue = "1.0";
 
         value.innerHTML = newValue;
-
-        this.networkManager.thresholdChangeALL(newValue);
     }
-
     /** 
      *  Update all networks with the new variableEdgeWidth value
      */
     variableEdgeChange() {
         const checkBox = document.getElementById("thresholdVariableCheck");
 
-        this.networkManager.variableEdgeChange(checkBox.checked);
+        this.networkManager.variableEdgeChangeALL(checkBox.checked);
     }
 
 
@@ -256,12 +261,12 @@ export default class EventsManager {
         
         const sliderContainer = this.createThresholdSliderContainer();
         const checkboxContainer = this.createVariableEdgeCheckBoxContainer();
-        const explicitContainer = this.createExplicitCommunityChooser(Exp_communities);
+        //const explicitContainer = this.createExplicitCommunityChooser(Exp_communities);
 
         controlPanel.appendChild(inputTitle);
         controlPanel.appendChild(sliderContainer);
         controlPanel.appendChild(checkboxContainer);
-        controlPanel.appendChild(explicitContainer);
+        //controlPanel.appendChild(explicitContainer);
 
         document.getElementById("controlPanelContainer").appendChild(controlPanel);
     }
