@@ -95,6 +95,12 @@ export default class NetworkManager {
         network.updateVariableEdge(newBool);
     }
 
+    highlightCommunity(key, selectedCommunities){
+        const network = this.activesNetworksMap.get(key);
+
+        network.highlightCommunity(selectedCommunities);
+    }
+
     thresholdChangeALL(newValue) {
         this.activesNetworksArray.forEach((network) => {
             this.thresholdChange(network.key, newValue);
@@ -108,13 +114,17 @@ export default class NetworkManager {
         });
     }
 
+    highlightCommunityALL(selectedCommunities){
+        this.activesNetworksArray.forEach((network) => {
+            this.highlightCommunity(network.key, selectedCommunities);
+        });
+    }
 
     getNnetworks(){
         return this.activesNetworksArray.length;
     }
 
     getExplicitCommunities(){
-        return "";
-        //return this.activesNetworksArray[0].getExplicitCommunities();
+        return this.activesNetworksArray[0].getExplicitCommunities();
     }
 }

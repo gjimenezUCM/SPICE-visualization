@@ -1,7 +1,8 @@
 import { DataSet } from "vis-data/peer";
 import { Network } from "vis-network/peer";
-import 'bootstrap';
+import { Popover } from 'bootstrap';
 import Utils from "./Utils";
+import Explicit_community from "./explicitCommunity";
 
 export default class DrawNetwork {
 
@@ -79,10 +80,11 @@ export default class DrawNetwork {
      */
     initNodes(json) {
         //TODO Los valores de las keys deberian venir de una opcion al usuario
-        this.explicit_filter = new Array();
+        this.explicitCommunities = new Array();
 
-        this.explicit_filter.push({ values: new Array(), key: "ageGroup" });
-        this.explicit_filter.push({ values: new Array(), key: "language" });
+
+        this.explicitCommunities.push(new Explicit_community("ageGroup"));
+        this.explicitCommunities.push(new Explicit_community("language"));
 
         //Explicit Community 0
         this.nodeColors = new Map();
@@ -131,14 +133,14 @@ export default class DrawNetwork {
      * @returns the node edited
      */
     checkExplicitCommunity_0(node) {
-        const explValue_0 = node.explicit_community[this.explicit_filter[0].key];
+        const explValue_0 = node.explicit_community[this.explicitCommunities[0].key];
 
         //If the value is not included yet. Add the value to the array and map
-        if (!this.explicit_filter[0].values.includes(explValue_0)) {
-            this.explicit_filter[0].values.push(explValue_0);
+        if (!this.explicitCommunities[0].values.includes(explValue_0)) {
+            this.explicitCommunities[0].values.push(explValue_0);
 
             const key = explValue_0;
-            const color = this.explCommOptions.getColorsForN(this.explicit_filter[0].values.length)
+            const color = this.explCommOptions.getColorsForN(this.explicitCommunities[0].values.length)
 
             this.nodeColors.set(key, color);
         }
@@ -153,18 +155,18 @@ export default class DrawNetwork {
     * @returns the node edited
     */
     checkExplicitCommunity_1(node) {
-        const explValue_1 = node.explicit_community[this.explicit_filter[1].key];
+        const explValue_1 = node.explicit_community[this.explicitCommunities[1].key];
 
         let figure;
-        if (this.explicit_filter[1].values.includes(explValue_1)) {
+        if (this.explicitCommunities[1].values.includes(explValue_1)) {
 
             figure = this.nodeShapes.get(explValue_1);
         } else {
             //If the value is not included yet. Add the value to the array and map
-            this.explicit_filter[1].values.push(explValue_1);
+            this.explicitCommunities[1].values.push(explValue_1);
 
             const key = explValue_1;
-            const shape = this.explCommOptions.getShapeForN(this.explicit_filter[1].values.length);
+            const shape = this.explCommOptions.getShapeForN(this.explicitCommunities[1].values.length);
 
             this.nodeShapes.set(key, shape);
             figure = shape;
@@ -183,7 +185,7 @@ export default class DrawNetwork {
      * @param {*} node node that is going to be edited
      */
     turnNodeColorToDefault(node) {
-        const explicit0_value = node.explicit_community[this.explicit_filter[0].key];
+        const explicit0_value = node.explicit_community[this.explicitCommunities[0].key];
 
         node.color = {
             background: this.nodeColors.get(explicit0_value),
@@ -255,7 +257,7 @@ export default class DrawNetwork {
                         delete edge[this.edgeValue];
 
                     //DEBUG TO CHECK PERFORMANCE WITH LABELS
-                    if (this.key === "noAgglomerativeClusteringGAM") {
+                    if (this.key === "agglomerativeClusteringGAM&Labels") {
                         edge["label"] = edge["value"].toString();
                     }
 
@@ -685,7 +687,7 @@ export default class DrawNetwork {
             this.popoverContainer = document.createElement("div");
             document.body.append(this.popoverContainer);
 
-            this.tooltip = new bootstrap.Popover(this.popoverContainer, options);
+            this.tooltip = new Popover(this.popoverContainer, options);
         }
 
         this.popoverContainer.style.top = clickY + "px";
@@ -732,12 +734,12 @@ export default class DrawNetwork {
         content += "<b> label: </b> " + node["label"] + "<br>";
         content += "<b> group: </b> " + node["implicit_Comm"] + "<br>";
 
-        const keys = Object.keys( node.explicit_community);
-        for(let i = 0; i < keys.length; i++){
-            content += "<b>"+keys[i]+"</b> "+ node.explicit_community[keys[i]] + "<br>";
+        const keys = Object.keys(node.explicit_community);
+        for (let i = 0; i < keys.length; i++) {
+            content += "<b>" + keys[i] + "</b> " + node.explicit_community[keys[i]] + "<br>";
 
         }
-        
+
         return content;
     }
 
@@ -773,8 +775,6 @@ export default class DrawNetwork {
         //We only want to show explicit community info from the unimportant attributes
         for (let i = 0; i < keys.length; i++) {
             const currentKey = keys[i];
-
-            console.log(currentKey);
 
             if (lastImportantRowIndex !== null) {
                 this.dataPanelContainers[lastImportantRowIndex].row.className = "row dataRow border-bottom border-primary";
@@ -879,8 +879,44 @@ export default class DrawNetwork {
         this.data.edges.update(this.data.edges);
     }
 
-    getExplicitCommunities() {
+    highlightCommunity(selectedCommunities) {
+        const n = selectedCommunities.length;
 
+        if (n === 0) {
+            this.nodeDeselected();
+        } else {
+            //Update all nodes color acording to their selected status
+            const newNodes = new Array();
+            this.data.nodes.forEach((node) => {
+                let count = 0;
+                for (let i = 0; i < n; i++) {
+                    if (this.nodeHasCommunity(node, selectedCommunities[i].key, selectedCommunities[i].values)) {
+                        count++;
+                    }
+                }
+
+                if (count === n)
+                    newNodes.push(this.turnNodeColorToDefault(node));
+                else
+                    newNodes.push(this.turnNodeDark(node));
+            });
+
+            this.data.nodes.update(newNodes);
+        }
+    }
+
+    nodeHasCommunity(node, key, values) {
+        for (let i = 0; i < values.length; i++) {
+
+            if (node.explicit_community[key] === values[i])
+                return true;
+        }
+
+        return false;
+    }
+
+    getExplicitCommunities() {
+        return this.explicitCommunities;
     }
 }
 

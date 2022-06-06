@@ -1,7 +1,7 @@
-import DrawNetwork from "./drawNetwork";
 import NetworkManager from "./networkManager";
 import RequestsManager from "./requestsManager";
-
+import { Dropdown } from 'bootstrap';
+import Explicit_community from "./explicitCommunity";
 
 export default class EventsManager {
 
@@ -33,8 +33,32 @@ export default class EventsManager {
     createDropdown(headersFile) {
         const n = headersFile.files.length;
 
-        //Fill the dropdown menu with all available data
-        const dropdownContainer = document.getElementById("network_dropdownMenu");
+        const container = document.getElementById("algorithm_dropdown");
+
+        //Create dropdown skeleton
+        const topContainer = document.createElement("div");
+        topContainer.className = "dropdown";
+        container.append(topContainer);
+
+        const mainButton = document.createElement("button");
+        mainButton.id = "dropdownAlgoritmh";
+        mainButton.innerText = "Select Algoritmh";
+        mainButton.className = "btn btn-secondary dropdown-toggle";
+
+        mainButton.setAttribute("data-bs-toggle", "dropdown");
+        mainButton.setAttribute("aria-expanded", "false");
+
+        //Dropdown closes by clicking outside it
+        mainButton.setAttribute("data-bs-auto-close", "outside");
+
+        topContainer.append(mainButton);
+
+        const optionsContainer = document.createElement("ul");
+        optionsContainer.className = "dropdown-menu dropdown-menu-dark";
+        optionsContainer.setAttribute("aria-labelledby", "dropdownAlgoritmh");
+        topContainer.append(optionsContainer);
+
+        //Fill the dropdown with the options
         for (let i = 0; i < n; i++) {
 
             const key = headersFile.files[i].name;
@@ -45,48 +69,32 @@ export default class EventsManager {
             newOptionButton.className = "dropdown-item";
             newOptionButton.innerHTML = key;
             newOptionButton.style.userSelect = "none";
-            newOptionButton.id = "networkOptionButton_" + key;
-            newOptionButton.onclick = () => this.optionClicked(key);
+            newOptionButton.onclick = () => this.optionClicked(newOptionButton, key);
 
             newOptionContainer.appendChild(newOptionButton);
-            dropdownContainer.appendChild(newOptionContainer);
-
+            optionsContainer.appendChild(newOptionContainer);
         }
 
-        //Create the dropdown 
-        const options = {
-            autoClose: 'outside'
-        }
-        const cont = document.getElementById("container");
-        const dropDown = new bootstrap.Dropdown(cont, options);
+        const options = {}
+        const drop = new Dropdown(mainButton, options);
 
-        //This is a bit hacky because boostrap autoClose option is not working properly
-        const button = document.getElementById("dropdownButton");
-        this.menuActive = false;
-
-        button.onclick = () => dropDown.toggle();
-
-        document.addEventListener('click', function (event) {
-            if (!cont.contains(event.target))
-                dropDown.hide();
-        });
-
-
+        //Dropdown opens by clicking on the button
+        mainButton.onclick = () => drop.show();
     }
 
     /** Show/hide the network based on the option clicked
      * 
      * @param {*} key Key of the network 
      */
-    optionClicked(key) {
-        const option = document.getElementById("networkOptionButton_" + key);
+    optionClicked(button, key) {
+        const option = button;
 
         const isActive = option.className.split(" ").pop();
         if (isActive === "active") {
             option.className = "dropdown-item";
             this.networkManager.removeNetwork(key);
 
-            if(this.networkManager.getNnetworks() === 0){
+            if (this.networkManager.getNnetworks() === 0) {
                 this.removeControlPanel();
             }
         } else {
@@ -95,11 +103,9 @@ export default class EventsManager {
                     this.createNetwork(key, file);
 
                 });
-                
+
             option.className = "dropdown-item active";
         }
-
-
     }
 
     /** Create the network and all the user configuration options 
@@ -157,7 +163,7 @@ export default class EventsManager {
         this.networkManager.addNetwork(file, columnLeftContainer, columnRightContainer, config)
 
 
-        if(this.networkManager.getNnetworks() === 1){
+        if (this.networkManager.getNnetworks() === 1) {
             this.addControlPanel(this.networkManager.getExplicitCommunities());
         }
 
@@ -176,7 +182,7 @@ export default class EventsManager {
         slider.min = "0.0";
         slider.max = "1.0";
         slider.step = "0.1";
-        slider.value = this.initialSliderValue;  
+        slider.value = this.initialSliderValue;
         slider.id = "thresholdSlider";
 
         slider.onchange = () => this.thresholdChange();
@@ -187,7 +193,7 @@ export default class EventsManager {
 
         const value = document.createElement('span');
         value.id = "thresholdSliderValue";
-        value.innerHTML = "0.5";
+        value.innerHTML = this.initialSliderValue;
 
         sliderContainer.appendChild(slider);
         sliderContainer.appendChild(text);
@@ -230,7 +236,7 @@ export default class EventsManager {
         this.networkManager.thresholdChangeALL(newValue);
     }
 
-    updateSliderText(){
+    updateSliderText() {
         const slider = document.getElementById("thresholdSlider");
         const value = document.getElementById("thresholdSliderValue");
 
@@ -251,40 +257,188 @@ export default class EventsManager {
     }
 
 
-    addControlPanel(Exp_communities){
+    addControlPanel(exp_communities) {
         const controlPanel = document.createElement("div");
         controlPanel.id = "controlPanel";
         controlPanel.className = "middle";
 
         const inputTitle = document.createElement("h5");
         inputTitle.innerHTML = "Control Panel";
-        
+
         const sliderContainer = this.createThresholdSliderContainer();
         const checkboxContainer = this.createVariableEdgeCheckBoxContainer();
-        //const explicitContainer = this.createExplicitCommunityChooser(Exp_communities);
+        const explicitContainer = this.createExplicitCommunityChooser(exp_communities);
 
         controlPanel.appendChild(inputTitle);
         controlPanel.appendChild(sliderContainer);
         controlPanel.appendChild(checkboxContainer);
-        //controlPanel.appendChild(explicitContainer);
+        controlPanel.appendChild(explicitContainer);
 
         document.getElementById("controlPanelContainer").appendChild(controlPanel);
     }
 
-    createExplicitCommunityChooser(Exp_communities){
+    createExplicitCommunityChooser(exp_communities) {
+        this.selectedCommunities = new Array();
 
+        const n = exp_communities.length;
+        //Create dropdown skeleton
+        const topContainer = document.createElement("div");
+        topContainer.className = "dropdown";
 
+        const mainButton = document.createElement("button");
+        mainButton.id = "dropdownButtonCommunities";
+        mainButton.innerText = "Highlight Community";
+        mainButton.className = "btn btn-secondary dropdown-toggle";
+
+        mainButton.setAttribute("data-bs-toggle", "dropdown");
+        mainButton.setAttribute("aria-expanded", "false");
+        //Dropdown closes by clicking outside it
+        mainButton.setAttribute("data-bs-auto-close", "outside");
+
+        topContainer.append(mainButton);
+
+        const optionsContainer = document.createElement("ul");
+        optionsContainer.className = "dropdown-menu dropdown-menu-dark";
+        optionsContainer.setAttribute("aria-labelledby", "dropdownButtonCommunities");
+        topContainer.append(optionsContainer);
+
+        //Fill the dropdown with the options
+        for (let i = 0; i < n; i++) {
+
+            const key = exp_communities[i].key;
+
+            const newOptionContainer = document.createElement('li');
+            optionsContainer.appendChild(newOptionContainer);
+
+            const newOptionButton = document.createElement('a');
+            newOptionButton.className = "dropdown-item";
+            newOptionButton.innerHTML = key;
+            newOptionButton.style.userSelect = "none";
+            newOptionContainer.appendChild(newOptionButton);
+
+            const dropRight = this.createSecondaryDropRight(newOptionButton, exp_communities[i]);
+
+            newOptionButton.onmouseover = () => this.showCommunities(dropRight.menu);
+
+            newOptionContainer.appendChild(dropRight.container);
+
+        }
+        //Dropdown closes by clicking outside it
+        const options = {};
+
+        const drop = new Dropdown(mainButton, options);
+
+        //Dropdown opens by clicking on the button
+        mainButton.onclick = () => drop.show();
+
+        return topContainer;
     }
 
+    showCommunities(dropdown) {
+        if (this.droprightActive !== undefined)
+            this.droprightActive.hide();
 
-    removeControlPanel(){
+        this.droprightActive = dropdown;
+        this.droprightActive.show();
+    }
+
+    createSecondaryDropRight(mainButton, exp_community) {
+        const n = exp_community.values.length;
+
+        //Create dropdown skeleton
+        const topContainer = document.createElement("div");
+        topContainer.className = "dropend";
+
+        mainButton.id = "dropRight_" + exp_community.key;
+        mainButton.className += " dropdown-toggle";
+
+        mainButton.setAttribute("data-bs-toggle", "dropdown");
+        mainButton.setAttribute("aria-expanded", "false");
+
+        //Dropdown closes by clicking outside it
+        mainButton.setAttribute("data-bs-auto-close", "outside");
+
+        topContainer.append(mainButton);
+
+        const optionsContainer = document.createElement("ul");
+        optionsContainer.className = "dropdown-menu dropdown-menu-dark";
+        optionsContainer.setAttribute("aria-labelledby", "dropRight_" + exp_community.key);
+        topContainer.append(optionsContainer);
+
+        //Fill the dropdown with the options
+        for (let i = 0; i < n; i++) {
+
+            let key = exp_community.values[i];
+            if (key === "") {
+                key = "\"\"";
+            }
+            const newOptionContainer = document.createElement('li');
+
+            const newOptionButton = document.createElement('a');
+            newOptionButton.className = "dropdown-item";
+            newOptionButton.innerHTML = key;
+            newOptionButton.style.userSelect = "none";
+
+            newOptionButton.onclick = () => this.highlightCommunity(newOptionButton, exp_community.key, key);
+
+            newOptionContainer.appendChild(newOptionButton);
+            optionsContainer.appendChild(newOptionContainer);
+        }
+
+        const options = {}
+        const drop = new Dropdown(mainButton, options);
+
+        return { container: topContainer, menu: drop };
+    }
+
+    removeControlPanel() {
         const controlPanel = document.getElementById("controlPanel");
         document.getElementById("controlPanelContainer").removeChild(controlPanel);
-        
-    }
-
-
-    updateImplicitCommunity(){
 
     }
+
+    highlightCommunity(button, key, value) {
+        if (value === "\"\"") {
+            value = "";
+        }
+
+        const isActive = button.className.split(" ").pop() === "active";
+        if (isActive) {
+            button.className = "dropdown-item";
+
+
+            for (let i = 0; i < this.selectedCommunities.length; i++) {
+                if (this.selectedCommunities[i].key === key) {
+
+                    const index = this.selectedCommunities[i].values.indexOf(value);
+                    this.selectedCommunities[i].values.splice(index, 1);
+
+                    if (this.selectedCommunities[i].values.length === 0) {
+                        this.selectedCommunities = this.selectedCommunities.filter(data => data.key !== key);
+                    }
+                }
+            }
+
+
+
+        } else {
+            button.className = "dropdown-item active";
+
+            let newCommunity = true;
+            for (let i = 0; i < this.selectedCommunities.length; i++) {
+                if (this.selectedCommunities[i].key === key) {
+                    this.selectedCommunities[i].values.push(value);
+                    newCommunity = false;
+                }
+            }
+
+            if (newCommunity) {
+                this.selectedCommunities.push(new Explicit_community(key, new Array(value)));
+            }
+
+        }
+
+        this.networkManager.highlightCommunityALL(this.selectedCommunities);
+    }
+
 }
