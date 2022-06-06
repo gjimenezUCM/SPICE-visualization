@@ -2,8 +2,8 @@
 	"files": [{
 		"name": "agglomerativeClusteringGAM"
 	}, {
-		"name": "noAgglomerativeClusteringGAM"
+		"name": "agglomerativeClusteringGAM&Labels"
 	}, {
-		"name": "aBitAgglomerativeClusteringGAM"
+		"name": "agglomerativeClusteringGAM2"
 	}]
 }
