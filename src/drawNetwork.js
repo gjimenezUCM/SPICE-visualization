@@ -256,10 +256,7 @@ export default class DrawNetwork {
                     if (this.edgeValue !== "value")
                         delete edge[this.edgeValue];
 
-                    //DEBUG TO CHECK PERFORMANCE WITH LABELS
-                    if (this.key === "agglomerativeClusteringGAM&Labels") {
-                        edge["label"] = edge["value"].toString();
-                    }
+                    edge["label"] = edge["value"].toString();
 
                     if (edge["value"] < this.edgeValueThreshold) {
                         edge["hidden"] = true;
@@ -394,12 +391,16 @@ export default class DrawNetwork {
                 },
                 color: {
                     color: '#848484',
-                    highlight: '#848484'
+                    highlight: '#D2E5FF'
+                },
+                chosen: {
+                    label: this.labelEdgeChosen.bind(this),
                 },
                 font: {
                     strokeWidth: 0,
-                    size: 20,
-                    color: "#000000",
+                    size: 30,
+                    color: 'transparent',
+                    strokeColor: 'transparent',
                     align: "top",
                     vadjust: -7
                 },
@@ -456,7 +457,7 @@ export default class DrawNetwork {
 
         this.container.firstChild.id = "topCanvas_" + this.key;
 
-        if(this.key === "agglomerativeClusteringGAM&Bounding")
+        if (this.key === "agglomerativeClusteringGAM&Bounding")
             this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
 
         this.network.on("click", (event) => this.clickEventCallback(event));
@@ -553,7 +554,7 @@ export default class DrawNetwork {
         //We need a timeout to print the tooltip once zoom has ended
         setTimeout(function () {
             this.updateTooltip(id);
-        }.bind(this), this.zoomDuration + 100);
+        }.bind(this), this.zoomDuration + 1000);
     }
 
     /** Select the node whose id is id parameter and darken all other nodes
@@ -561,7 +562,7 @@ export default class DrawNetwork {
      * @param {*} id //Id of the node
      */
     nodeSelected(id) {
-        this.network.selectNodes([id], false);
+        this.network.selectNodes([id], true);
 
         this.updateDataPanel(id);
 
@@ -631,7 +632,10 @@ export default class DrawNetwork {
     nodeDeselected() {
         //Return to fit all nodes into the "camera"
         const fitOptions = {
-            animation: true
+            animation: true,
+            animation: {
+                duration: this.zoomDuration,
+            },
         }
         this.network.fit(fitOptions);
 
@@ -656,16 +660,22 @@ export default class DrawNetwork {
      * @param {*} hovering if the node has been hovered
      */
     nodeChosen(values, id, selected, hovering) {
-
         if (selected) {
             values.size = this.SelectedNodeSize;
         }
-
     }
 
     labelChosen(values, id, selected, hovering) {
         if (selected) {
             values.vadjust -= 10;
+        }
+    }
+
+    labelEdgeChosen(values, id, selected, hovering) {
+        if (selected) {
+            values.color = "#000000";
+            values.strokeColor = "#ffffff";
+            values.strokeWidth = 1;
         }
     }
     //#endregion EVENTS
@@ -724,7 +734,7 @@ export default class DrawNetwork {
                 '.popover-body': content
             });
             this.tooltip.show();
-        }else{
+        } else {
             this.tooltip.update();
         }
 
