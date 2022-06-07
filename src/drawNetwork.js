@@ -82,7 +82,6 @@ export default class DrawNetwork {
         //TODO Los valores de las keys deberian venir de una opcion al usuario
         this.explicitCommunities = new Array();
 
-
         this.explicitCommunities.push(new Explicit_community("ageGroup"));
         this.explicitCommunities.push(new Explicit_community("language"));
 
@@ -140,7 +139,8 @@ export default class DrawNetwork {
             this.explicitCommunities[0].values.push(explValue_0);
 
             const key = explValue_0;
-            const color = this.explCommOptions.getColorsForN(this.explicitCommunities[0].values.length)
+            const n = this.explicitCommunities[0].values.length - 1;
+            const color = this.explCommOptions.getCommunityCharacteristic(0, n);
 
             this.nodeColors.set(key, color);
         }
@@ -166,7 +166,8 @@ export default class DrawNetwork {
             this.explicitCommunities[1].values.push(explValue_1);
 
             const key = explValue_1;
-            const shape = this.explCommOptions.getShapeForN(this.explicitCommunities[1].values.length);
+            const n = this.explicitCommunities[1].values.length - 1;
+            const shape = this.explCommOptions.getCommunityCharacteristic(1, n);
 
             this.nodeShapes.set(key, shape);
             figure = shape;
@@ -710,6 +711,7 @@ export default class DrawNetwork {
             const options = {
                 trigger: "manual",
                 placement: "right",
+                template: "<div class=\"popover node\" role=\"tooltip\"><div class=\"popover-arrow\"></div><h3 class=\"popover-header\"></h3><div class=\"popover-body\"></div></div>",
                 fallbackPlacements: ["right"],
                 content: " ",
                 offset: [0, 0],
@@ -725,8 +727,6 @@ export default class DrawNetwork {
         this.popoverContainer.style.top = clickY + "px";
         this.popoverContainer.style.left = clickX + "px";
         this.popoverContainer.style.position = "absolute";
-
-
 
         if (respawn) {
             this.tooltip.setContent({

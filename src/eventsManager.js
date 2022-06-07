@@ -1,7 +1,10 @@
 import NetworkManager from "./networkManager";
 import RequestsManager from "./requestsManager";
 import { Dropdown } from 'bootstrap';
+import { Popover } from 'bootstrap';
+
 import Explicit_community from "./explicitCommunity";
+import Utils from "./Utils";
 
 export default class EventsManager {
 
@@ -126,12 +129,19 @@ export default class EventsManager {
         const separator = document.createElement('hr');
 
         const titleContainer = document.createElement('div');
-        titleContainer.className = "row";
+        titleContainer.className = "row title";
 
         const title = document.createElement("h2");
+        title.className = "col-sm-6";
         title.innerHTML = key;
+
+        const legendButton = document.createElement("button");
+        legendButton.className = "col-sm-2 btn btn-primary";
+        legendButton.innerText = "Legend";
+
         titleContainer.appendChild(separator)
         titleContainer.appendChild(title);
+        titleContainer.appendChild(legendButton);
 
         networkContainer.appendChild(titleContainer);
 
@@ -162,11 +172,90 @@ export default class EventsManager {
 
         this.networkManager.addNetwork(file, columnLeftContainer, columnRightContainer, config)
 
+        const networkCommunities = this.networkManager.getExplicitCommunities();
+
+        this.createLegend(legendButton, networkCommunities);
 
         if (this.networkManager.getNnetworks() === 1) {
-            this.addControlPanel(this.networkManager.getExplicitCommunities());
+            this.addControlPanel(networkCommunities);
         }
 
+    }
+
+    createLegend(button, communities) {
+        const title = "<h5>  Titulo </h5>";
+        const content = this.getLegendContent(communities);
+
+        const options = {
+            trigger: "click",
+            placement: "right",
+            title: title,
+            content: content,
+            template: "<div class=\"popover legend\" role=\"tooltip\"><div class=\"popover-arrow\"></div><h3 class=\"popover-header\"></h3><div class=\"popover-body\"></div></div>",
+            fallbackPlacements: ["right"],
+            offset: [0, 10],
+            html: true,
+        };
+
+        const tooltip = new Popover(button, options);
+        return tooltip;
+    }
+
+    getLegendContent(communities) {
+        let topContainer = document.createElement("div");
+
+        for (let i = 0; i < communities.length; i++) {
+
+            const titleContainer = document.createElement("h6");
+            titleContainer.innerHTML = "<u>" + communities[i].key + "</u>";
+            topContainer.append(titleContainer);
+
+            for (let j = 0; j < communities[i].values.length; j++) {
+                let value = communities[i].values[j];
+                if (value == "") value = "\"\"";
+
+                const rowContainer = document.createElement("div");
+                rowContainer.className = "row align-items-left"
+                topContainer.append(rowContainer);
+
+                const leftContainer = document.createElement("div");
+                leftContainer.className = "col value";
+                leftContainer.innerText = value;
+                rowContainer.append(leftContainer);
+
+                const middleContainer = document.createElement("div");
+                middleContainer.className = "col";
+                middleContainer.innerText = "=>";
+                rowContainer.append(middleContainer);
+
+                const rightContainer = document.createElement("div");
+                rightContainer.className = "col";
+                this.getCommunityValueIndicator(rightContainer, i, j);
+                rowContainer.append(rightContainer);
+
+            }
+        }
+
+        return topContainer;
+    }
+
+    //background-color
+    getCommunityValueIndicator(container, communityn, value) {
+        const utils = new Utils();
+        let output = document.createElement("div");
+
+        switch (communityn) {
+            case 0:
+                output.className = "box";
+                output.style.backgroundColor = utils.getCommunityCharacteristic(communityn, value);
+                break;
+
+            case 1:
+                utils.getShapehtml(output, value);
+                break;
+        }
+
+        container.append(output);
     }
 
     /** Create a container with a slider that controls the minimum similarity Threshold for edges to be visible in the network
