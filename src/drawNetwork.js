@@ -417,6 +417,9 @@ export default class DrawNetwork {
                     interpolation: false
                 },
                 size: this.defaultNodeSize,
+                chosen: {
+                    node: this.nodeChosen.bind(this),
+                },
 
             },
             groups: {
@@ -649,8 +652,11 @@ export default class DrawNetwork {
      * @param {*} hovering if the node has been hovered
      */
     nodeChosen(values, id, selected, hovering) {
-        if (selected)
-            values.size = this.SelectedNodeSize;
+
+        if (selected){
+            values.size = this.SelectedNodeSize;  
+        }
+            
     }
 
     //#endregion EVENTS
@@ -697,7 +703,7 @@ export default class DrawNetwork {
         this.tooltip.setContent({
             '.popover-header': title,
             '.popover-body': content
-        })
+        });
 
         this.tooltip.show();
 

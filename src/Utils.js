@@ -24,7 +24,7 @@ export default class Utils {
     }
 
     getShapeForN(n) {
-        n = n % 6
+        n = n % 7
         switch (n) {
             case 1:
                 return {shape: "dot", vOffset: -31, selOffset: -40};
@@ -35,6 +35,8 @@ export default class Utils {
             case 4:
                 return {shape: "triangle", vOffset: -25, selOffset: -35};
             case 5:
+                return {shape: "square", vOffset: -31, selOffset: -40};
+            case 6:
                 return {shape: "triangleDown", vOffset: -35, selOffset: -45};
             case 0:
                 return {shape: "hexagon", vOffset: -31, selOffset: -40};
