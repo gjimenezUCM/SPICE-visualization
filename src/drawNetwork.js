@@ -456,7 +456,9 @@ export default class DrawNetwork {
 
         this.container.firstChild.id = "topCanvas_" + this.key;
 
-        //this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
+        if(this.key === "agglomerativeClusteringGAM&Bounding")
+            this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
+
         this.network.on("click", (event) => this.clickEventCallback(event));
         this.network.on("zoom", (event) => this.zoomEventCallback(event));
     }
