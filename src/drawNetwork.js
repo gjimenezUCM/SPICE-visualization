@@ -419,6 +419,7 @@ export default class DrawNetwork {
                 size: this.defaultNodeSize,
                 chosen: {
                     node: this.nodeChosen.bind(this),
+                    label: this.labelChosen.bind(this),
                 },
 
             },
@@ -457,6 +458,7 @@ export default class DrawNetwork {
 
         //this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
         this.network.on("click", (event) => this.clickEventCallback(event));
+        this.network.on("zoom", (event) => this.zoomEventCallback(event));
     }
 
     //#region PREDRAW EVENT
@@ -653,27 +655,39 @@ export default class DrawNetwork {
      */
     nodeChosen(values, id, selected, hovering) {
 
-        if (selected){
-            values.size = this.SelectedNodeSize;  
+        if (selected) {
+            values.size = this.SelectedNodeSize;
         }
-            
+
     }
 
+    labelChosen(values, id, selected, hovering) {
+        if (selected) {
+            values.vadjust -= 10;
+        }
+    }
     //#endregion EVENTS
 
+    zoomEventCallback(event) {
+        if (this.tooltip !== undefined) {
+            this.updateTooltip(this.selectedNodeId, false);
+        }
+    }
     //#region TOOLTIP
     /** Update or create the tooltip of the node id
      * 
      * @param {*} id id of the node
      */
-    updateTooltip(id) {
+    updateTooltip(id, respawn = true) {
+        this.selectedNodeId = id;
         const canvasPosition = this.getElementPosition("topCanvas_" + this.key)
 
         const nodeCanvasPosition = this.network.getPosition(id);
         const nodePosition = this.network.canvasToDOM(nodeCanvasPosition);
 
+        const xOffset = this.network.getScale() * 50;
         //Calculate the real absolute click coordinates
-        const clickX = nodePosition.x + canvasPosition.left + 15;
+        const clickX = nodePosition.x + canvasPosition.left + xOffset;
         const clickY = nodePosition.y + canvasPosition.top;
 
         const title = "<h5> " + id + "</h5>";
@@ -700,12 +714,17 @@ export default class DrawNetwork {
         this.popoverContainer.style.left = clickX + "px";
         this.popoverContainer.style.position = "absolute";
 
-        this.tooltip.setContent({
-            '.popover-header': title,
-            '.popover-body': content
-        });
 
-        this.tooltip.show();
+
+        if (respawn) {
+            this.tooltip.setContent({
+                '.popover-header': title,
+                '.popover-body': content
+            });
+            this.tooltip.show();
+        }else{
+            this.tooltip.update();
+        }
 
         this.networkManager.setTooltip(this.tooltip);
     }
