@@ -125,6 +125,6 @@ export default class NetworkManager {
     }
 
     getExplicitCommunities(){
-        return this.activesNetworksArray[0].getExplicitCommunities();
+        //return this.activesNetworksArray[0].getExplicitCommunities();
     }
 }

@@ -1,8 +1,17 @@
+//Namespaces
+import { comms } from "./namespaces/communities.js";
+
+//Packages
 import { DataSet } from "vis-data/peer";
 import { Network } from "vis-network/peer";
 import { Popover } from 'bootstrap';
-import Utils from "./Utils";
-import Explicit_community from "./explicitCommunity";
+
+//Aux classes
+import ImplicitCommsMan from "./networkDrawingTools/implicitCommsMan";
+import ExplicitCommsMan from "./networkDrawingTools/explicitCommsMan.js";
+
+
+
 
 export default class DrawNetwork {
 
@@ -18,59 +27,23 @@ export default class DrawNetwork {
         this.config = config;
         this.key = config.key;
 
-        this.data = { nodes: "", edges: "" };
-        this.explCommOptions = new Utils();
-        this.activateEdgeLabels = true;
+        this.implCommMan = new ImplicitCommsMan(jsonInput, rightContainer);
+        this.implCommMan.createCommunityDataTable();
 
-        this.initExplicitCommunities(jsonInput);
+        this.explCommMan = new ExplicitCommsMan(this);
+
+        this.data = { nodes: "", edges: "" };
+
         this.initNodes(jsonInput);
         this.initEdges(jsonInput);
 
-        this.initDataTable();
+        //this.initDataTable();
 
         this.chooseOptions();
 
         this.drawNetwork();
     }
 
-    //#region BOUNDING BOXES && EXPLICIT COMMUNITIES 
-
-    /** Initialize all explicit communities, bounding boxes and its parameters
-     * 
-     * @param {*} json json with communities data
-     */
-    initExplicitCommunities(json) {
-        this.initBoundingBoxesParameters();
-        this.communities = this.parseCommunities(json);
-    }
-
-    /**
-     * Initialize all parameters related with bounding boxes of node groups
-     */
-    initBoundingBoxesParameters() {
-        //In case group key changes, this is what is compared while parsing nodes json
-        this.implicitCommunity_key = "group";
-
-        this.boxBorderWidth = 4;
-
-        this.bbColor = new Array();
-        this.bbColor.push({ color: "rgba(248, 212, 251, 0.6)", border: "rgba(242, 169, 249, 1)" }); //Purple
-        this.bbColor.push({ color: "rgba(255, 255, 170, 0.6)", border: "rgba(255, 222, 120, 1)" }); //Yellow
-        this.bbColor.push({ color: "rgba(211, 245, 192, 0.6)", border: "rgba(169, 221, 140, 1)" }); //Green
-        this.bbColor.push({ color: "rgba(254, 212, 213, 0.6)", border: "rgba(252, 153, 156, 1)" }); //Red
-        this.bbColor.push({ color: "rgba(220, 235, 254, 0.6)", border: "rgba(168, 201, 248, 1)" }); //Blue
-    }
-
-    /** Parse the JSON object to get the communities of the network
-    * 
-    * @param {*} json //JSON object that will be parsed
-    * @returns communities json object
-    */
-    parseCommunities(json) {
-        return json.communities;
-    }
-
-    //#endregion BOUNDING BOXES && EXPLICIT COMMUNITIES 
 
     //#region NODES SETUP
 
@@ -79,25 +52,13 @@ export default class DrawNetwork {
      * @param {*} json json with node data
      */
     initNodes(json) {
-        //TODO Los valores de las keys deberian venir de una opcion al usuario
-        this.explicitCommunities = new Array();
-
-        this.explicitCommunities.push(new Explicit_community("ageGroup"));
-        this.explicitCommunities.push(new Explicit_community("language"));
-
-        //Explicit Community 0
-        this.nodeColors = new Map();
-
-        //Explicit Community 1
-        this.nodeShapes = new Map();
-
         //Default Options
         this.defaultNodeSize = 15;
         this.SelectedNodeSize = 25;
 
         this.darkNodeColor = { background: "rgba(155, 155, 155, 0.3)", border: "rgba(100, 100, 100, 0.3)" };
 
-        this.zoomDuration = 1000;
+        this.zoomDuration = 500;
 
         this.data.nodes = this.parseNodes(json);
     }
@@ -110,92 +71,35 @@ export default class DrawNetwork {
     parseNodes(json) {
         for (let node of json.users) {
 
+            this.explCommMan.lookForExplicitCommunities(node);
+
             //The implicit community will be used for the bounding boxes
-            node["implicit_Comm"] = parseInt(node[this.implicitCommunity_key]);
+            node[comms.ImplUserNewKey] = parseInt(node[comms.ImplUserJsonKey]);
 
             //Vis uses "group" key to change the color of all nodes with the same key. We need to remove it
-            delete node["group"];
+            if (comms.ImplUserJsonKey === "group")
+                delete node["group"];
 
-            //Explicit 0 -> Color of the node
-            node = this.checkExplicitCommunity_0(node);
-
-            //Explicit 1 -> Shape of the node
-            node = this.checkExplicitCommunity_1(node);
         }
         const nodes = new DataSet(json.users);
+
         return nodes;
     }
 
-    /** Change node color based on what filtered explicit community 0 value has.
-     * 
-     * @param {*} node node that is going to be edited
-     * @returns the node edited
-     */
-    checkExplicitCommunity_0(node) {
-        const explValue_0 = node.explicit_community[this.explicitCommunities[0].key];
-
-        //If the value is not included yet. Add the value to the array and map
-        if (!this.explicitCommunities[0].values.includes(explValue_0)) {
-            this.explicitCommunities[0].values.push(explValue_0);
-
-            const key = explValue_0;
-            const n = this.explicitCommunities[0].values.length - 1;
-            const color = this.explCommOptions.getCommunityCharacteristic(0, n);
-
-            this.nodeColors.set(key, color);
-        }
-
-        node["defaultColor"] = true;
-        return this.turnNodeColorToDefault(node);
-    }
-
-    /** Change node shape based on what filtered explicit community 1 value has.
-    * 
-    * @param {*} node node that is going to be edited
-    * @returns the node edited
-    */
-    checkExplicitCommunity_1(node) {
-        const explValue_1 = node.explicit_community[this.explicitCommunities[1].key];
-
-        let figure;
-        if (this.explicitCommunities[1].values.includes(explValue_1)) {
-
-            figure = this.nodeShapes.get(explValue_1);
-        } else {
-            //If the value is not included yet. Add the value to the array and map
-            this.explicitCommunities[1].values.push(explValue_1);
-
-            const key = explValue_1;
-            const n = this.explicitCommunities[1].values.length - 1;
-            const shape = this.explCommOptions.getCommunityCharacteristic(1, n);
-
-            this.nodeShapes.set(key, shape);
-            figure = shape;
-        }
-
-        node.shape = figure.shape;
-        node.font = {
-            vadjust: figure.vOffset,
-        };
-
-        return node;
-    }
 
     /** Turn node colors to default
      * 
      * @param {*} node node that is going to be edited
      */
     turnNodeColorToDefault(node) {
-        const explicit0_value = node.explicit_community[this.explicitCommunities[0].key];
+        const color = this.explCommMan.getNodeBackgroundColor(node);
 
         node.color = {
-            background: this.nodeColors.get(explicit0_value),
-            border: this.nodeColors.get(explicit0_value)
+            background: color,
+            border: color
         }
 
         node.defaultColor = true;
-
-        return node;
     }
 
     // #endregion NODES SETUP
@@ -290,6 +194,8 @@ export default class DrawNetwork {
         this.dataPanelContainers = new Array();
 
         this.createEmptyDataTable();
+
+        this.createCommunityDataTable();
     }
 
     /**
@@ -334,6 +240,8 @@ export default class DrawNetwork {
         }
 
         this.dataContainer.appendChild(dataContainer);
+
+        this.dataContainer.appendChild(document.createElement("hr"));
     }
 
     /**
@@ -364,6 +272,62 @@ export default class DrawNetwork {
         return maxLength;
     }
 
+    createCommunityDataTable() {
+
+        this.unwantedCommunityData = new Array("community-type", "id", "users");
+
+        this.communityDataTableKeys = new Array();
+        for (let i = 0; i < Object.keys(this.communities[0]).length; i++) {
+            const key = Object.keys(this.communities[0])[i];
+            let count = 0;
+            for (let j = 0; j < this.unwantedCommunityData.length; j++) {
+                if (key !== this.unwantedCommunityData[j]) {
+                    count++;
+                }
+            }
+            if (count === this.unwantedCommunityData.length) {
+                this.communityDataTableKeys.push(key);
+            }
+        }
+
+        const nRow = this.communityDataTableKeys.length;
+
+        const dataContainer = document.createElement('div');
+        dataContainer.className = "border border-dark rounded";
+
+        const titleContainer = document.createElement('h5');
+        titleContainer.className = "middle attributes border-bottom border-dark";
+        titleContainer.textContent = "Community Attributes";
+
+        dataContainer.appendChild(titleContainer);
+        this.communityDataPanelContainers = new Array();
+
+        for (let i = 0; i < nRow; i++) {
+            console.log(i);
+            const row = document.createElement('div');
+            row.className = "row dataRow border-bottom border-dark";
+
+            if (i === nRow - 1)
+                row.className = "row dataRow";
+
+            const colLeft = document.createElement("div");
+            colLeft.className = "col-6 ";
+            colLeft.innerHTML = "<b>" + this.communityDataTableKeys[i] + "</b>";
+
+
+            const colRight = document.createElement("div");
+            colRight.className = "col-6 ";
+            colRight.innerHTML = "";
+
+            this.communityDataPanelContainers.push({ left: colLeft, right: colRight, row: row });
+
+            row.appendChild(colLeft);
+            row.appendChild(colRight);
+            dataContainer.appendChild(row);
+        }
+
+        this.dataContainer.appendChild(dataContainer);
+    }
 
     //#endregion DATATABLE SETUP
 
@@ -430,10 +394,11 @@ export default class DrawNetwork {
             },
             physics: {
                 enabled: false,
-                barnesHut: {
+                //Avoid overlap between nodes, but enable physics
+                /* barnesHut: {
                     springConstant: 0,
                     avoidOverlap: 0.1
-                }
+                }*/
 
             },
             interaction: {
@@ -458,77 +423,22 @@ export default class DrawNetwork {
 
         this.container.firstChild.id = "topCanvas_" + this.key;
 
-        if (this.key === "agglomerativeClusteringGAM&Bounding")
-            this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
+        this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
 
         this.network.on("click", (event) => this.clickEventCallback(event));
         this.network.on("zoom", (event) => this.zoomEventCallback(event));
     }
 
-    //#region PREDRAW EVENT
 
     /** Function executed when "beforeDrawing" event is launched.
      * 
-     * @param {*} ctx Context object necesary to draw in the network canvas
+     * @param {CanvasRenderingContext2D} ctx Context object necesary to draw in the network canvas
      */
     preDrawEvent(ctx) {
-        this.ctx = ctx;
-        this.drawBoundingBoxes(ctx);
+        this.implCommMan.drawBoundingBoxes(ctx, this.data.nodes, this.network);
     }
 
-    /** Iterate over all nodes getting the bounding box of every "boxGroup", and draw them
-     * 
-     * @param {*} ctx Context object necesary to draw in the network canvas
-     */
-    drawBoundingBoxes(ctx) {
-        const bigBoundBoxes = new Array();
-        bigBoundBoxes.push(null);
-        bigBoundBoxes.push(null);
-        bigBoundBoxes.push(null);
-        bigBoundBoxes.push(null);
-        bigBoundBoxes.push(null);
 
-        //Obtain the bounding box of every boxGroup of nodes
-        this.data.nodes.forEach((node) => {
-            const group = node["implicit_Comm"];
-
-            let bb = this.network.getBoundingBox(node.id)
-            if (bigBoundBoxes[group] === null)
-                bigBoundBoxes[group] = bb;
-            else {
-                if (bb.left < bigBoundBoxes[group].left)
-                    bigBoundBoxes[group].left = bb.left;
-
-                if (bb.top < bigBoundBoxes[group].top)
-                    bigBoundBoxes[group].top = bb.top;
-
-                if (bb.right > bigBoundBoxes[group].right)
-                    bigBoundBoxes[group].right = bb.right;
-
-                if (bb.bottom > bigBoundBoxes[group].bottom)
-                    bigBoundBoxes[group].bottom = bb.bottom;
-            }
-        })
-
-
-        //Draw the bounding box of all groups
-        for (let i = 0; i < bigBoundBoxes.length; i++) {
-            if (bigBoundBoxes[i] !== null) {
-                const bb = bigBoundBoxes[i];
-
-                //Draw Border
-                ctx.lineWidth = this.boxBorderWidth;
-                ctx.strokeStyle = this.bbColor[i].border;
-                ctx.strokeRect(bb.left, bb.top, bb.right - bb.left, bb.bottom - bb.top);
-
-                //Draw Background
-                ctx.lineWidth = 0;
-                ctx.fillStyle = this.bbColor[i].color;
-                ctx.fillRect(bb.left, bb.top, bb.right - bb.left, bb.bottom - bb.top);
-            }
-        }
-    }
-    //#endregion PREDRAW EVENT
 
     //#region CLICK EVENT
 
@@ -538,9 +448,10 @@ export default class DrawNetwork {
      */
     clickEventCallback(event) {
         if (event.nodes.length > 0) {
-            this.nodeHasBeenClicked(event.nodes[0]);
+            //this.nodeHasBeenClicked(event.nodes[0]);
         } else {
-            this.noNodeIsClicked()
+            //this.noNodeIsClicked()
+            this.implCommMan.checkBoundingBoxClick(event);
         }
     }
 
@@ -653,6 +564,7 @@ export default class DrawNetwork {
         this.data.nodes.update(newNodes);
     }
 
+
     /** Function executed when a node is selected
      * 
      * @param {*} values parameters of the node
@@ -679,6 +591,8 @@ export default class DrawNetwork {
             values.strokeWidth = 1;
         }
     }
+
+
     //#endregion EVENTS
 
     zoomEventCallback(event) {
@@ -953,7 +867,7 @@ export default class DrawNetwork {
     }
 
     getExplicitCommunities() {
-        return this.explicitCommunities;
+        return this.explCommMan.getCommunities();
     }
 }
 

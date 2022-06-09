@@ -172,18 +172,18 @@ export default class EventsManager {
 
         this.networkManager.addNetwork(file, columnLeftContainer, columnRightContainer, config)
 
-        const networkCommunities = this.networkManager.getExplicitCommunities();
+        //const networkCommunities = this.networkManager.getExplicitCommunities();
 
-        this.createLegend(legendButton, networkCommunities);
+        //this.createLegend(legendButton, networkCommunities);
 
         if (this.networkManager.getNnetworks() === 1) {
-            this.addControlPanel(networkCommunities);
+            //this.addControlPanel(networkCommunities);
         }
 
     }
 
     createLegend(button, communities) {
-        const title = "<h5>  Titulo </h5>";
+        const title = "";
         const content = this.getLegendContent(communities);
 
         const options = {
