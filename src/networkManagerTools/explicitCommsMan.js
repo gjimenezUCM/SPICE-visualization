@@ -1,11 +1,24 @@
+//Namespaces
 import { comms } from "../namespaces/communities.js";
 
+/**
+ * @fileoverview This Class Manage everything related to explicit Communities. It reads the array with the keys
+ * and change all nodes atributes based on their value of each of those explicit communities
+ * 
+ * @package This file alone doesnt need any package
+ * @author Marco Expósito Pérez
+ */
 export default class ExplicitCommsMan {
 
+    /**
+     * Constructor of the class
+     * @param {DrawNetwork} network DrawNetwork parent object
+     * @param {Array} communitiesKeys Array with the key values that are going to change how nodes are view
+     */
     constructor(network, communitiesKeys = null) {
-        this.network = network;
+        this.drawNetwork = network;
 
-        //DEBUG
+        //DEBUG. This should be an input from the user
         communitiesKeys = new Array("ageGroup", "language");
 
         /*Tracks the order of CommunityKeys to know what attribute each one changes.
@@ -18,10 +31,8 @@ export default class ExplicitCommsMan {
             (node, val) => this.changeShape(node, val)
         ];
 
-
         this.initNewFilter();
     }
-
 
     /**
      * Init community Arrays for a new iteration of the explicit Community Filtering
@@ -39,12 +50,12 @@ export default class ExplicitCommsMan {
         this.nodeColors = new Map();
         this.nodeShapes = new Map();
     }
+
     /**
      * Look for the Explicit Communities of the node and edit its attributes based on them
      * @param {Object} node node that is going to be edited
      */
     lookForExplicitCommunities(node) {
-
         for (let i = 0; i < this.commOrder.length; i++) {
             const nodeComms = node[comms.ExpUserKsonKey];
             const value = nodeComms[this.commOrder[i]];
@@ -64,12 +75,12 @@ export default class ExplicitCommsMan {
             this.commsValues[0].values.push(value);
 
             const n = this.commsValues[0].values.length - 1;
-            const color = comms.nodeAttr.getColor(n);
+            const color = comms.NodeAttr.getColor(n);
 
             this.nodeColors.set(value, color);
         }
 
-        this.network.turnNodeColorToDefault(node);
+        this.drawNetwork.nodesMan.turnNodeColorToDefault(node);
     }
 
     /**
@@ -82,14 +93,14 @@ export default class ExplicitCommsMan {
             this.commsValues[1].values.push(value);
 
             const n = this.commsValues[1].values.length - 1;
-            const shape = comms.nodeAttr.getShape(n);
+            const shape = comms.NodeAttr.getShape(n);
 
             this.nodeShapes.set(value, shape);
         }
 
         const figure = this.nodeShapes.get(value);
 
-        node.shape = figure.shape;
+        node.shape = figure.Shape;
         node.font = {
             vadjust: figure.vOffset,
         };
@@ -119,8 +130,56 @@ export default class ExplicitCommsMan {
         return this.nodeShapes.get(key);
     }
 
+    /**
+     * Make all nodes that doesnt have the selectedCommunities darker than usual
+     * @param {Object} selectedCommunities Object with the format of {key: (string), values: (String[])}
+     */
+    highlightCommunities(selectedCommunities) {
+        const n = selectedCommunities.length;
 
-    getCommunities(){
+        //Update all nodes color acording to their selected status
+        const newNodes = new Array();
+        this.drawNetwork.data.nodes.forEach((node) => {
+            let count = 0;
+            for (let i = 0; i < n; i++) {
+                if (this.nodeHasCommunity(node, selectedCommunities[i].key, selectedCommunities[i].values)) {
+                    count++;
+                }
+            }
+
+            if (count === n)
+                this.drawNetwork.nodesMan.turnNodeColorToDefault(node)
+            else
+                this.drawNetwork.nodesMan.turnNodeDark(node)
+
+            newNodes.push(node);
+        });
+
+        this.drawNetwork.data.nodes.update(newNodes);
+    }
+
+    /**
+     * Function that check if the node has the community key and any of the values of that community
+     * @param {Object} node node that is being checked
+     * @param {String} key key of the community
+     * @param {String[]} values valid values of the comunity
+     * @returns {Boolean} Returns if it has the community
+     */
+    nodeHasCommunity(node, key, values) {
+        for (let i = 0; i < values.length; i++) {
+
+            if (node[comms.ExpUserKsonKey][key] === values[i])
+                return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns current filtered communities and its values
+     * @returns {Object} Object with the format of {key: (string), values: (String[])}
+     */
+    getCommunities() {
         return this.commsValues;
     }
 }

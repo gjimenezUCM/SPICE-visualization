@@ -1,20 +1,12 @@
+//Namespaces
 import { nodes } from "./nodes";
 
 export const comms = {
 
-    //Explicit Communities
+    //--- Json Keys ---
 
     //Name of the explicit community attribute array of a user
     ExpUserKsonKey: "explicit_community",
-
-    //Node attributes that change based on its explicit Community
-    nodeAttr: {
-        getColor: (n) => getColorOfN(n),
-        getShape: (n) => getShapeOfN(n),
-    },
-
-
-    //Implicit Communities
 
     //Name of the implicit community attribute in the original json
     ImplGlobalJsonKey: "communities",
@@ -23,14 +15,29 @@ export const comms = {
     //Currently the above key is "group". Thats a vis.js attribute and it needs to be changed. This is the new key
     ImplUserNewKey: "implicit_Comm",
 
-    //Array with the keys that will be shown in the Community Data Panel. Color is intended for debug purpouses
+    //--- Explicit Communities ---
+
+    //Node attributes that change based on its explicit Community
+    NodeAttr: {
+        getColor: (n) => getColorOfN(n),
+        getShape: (n) => getShapeOfN(n),
+    },
+
+    //--- DataTable ---
+
+    //Whitelist with the keys that will be shown in the Community Data Panel. Color is intended for debug purpouses
     ImplWantedAttr: ["name", "explanation", "color"],
 
     //html
     //Title of the table with implicit community data
-    ImplTableTitle: "Comms Attributes",
+    ImplTableTitle: "Comunity Attributes",
+    //ClassName of a row without border
+    borderlessHTMLrow: "row dataRow",
+    //ClassName of a row with main attributes
+    borderTMLrow: "row dataRow border-bottom border-dark",
 
-    //Bounding boxes
+    //--- Bounding boxes ---
+
     Bb: {
         //width of the border of the bounding boxes
         BoderWidth: 4,
@@ -51,15 +58,24 @@ export const comms = {
 
 }
 
-
+/**
+ * Returns a color for a node background
+ * @param {Integer} n index of the returned color
+ * @returns {String} Returns aa string similar to "rgb(255, 0, 0, 1)"
+ */
 const getColorOfN = function (n) {
-    n = n % nodes.backgroundColors.length;
+    n = n % nodes.BackgroundColors.length;
 
-    return nodes.backgroundColors[n];
+    return nodes.BackgroundColors[n];
 };
 
+/**
+ * Returns a shape and label offset for a node shape
+ * @param {Integer} n index of the returned shape
+ * @returns {Object} Returns an object in the format of { Shape: "dot", vOffset: -31, selOffset: -40 }
+ */
 const getShapeOfN = function (n) {
-    n = n % nodes.availableShapes.length;
+    n = n % nodes.AvailableShapes.length;
 
-    return nodes.availableShapes[n];
+    return nodes.AvailableShapes[n];
 }

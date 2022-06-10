@@ -1,25 +1,29 @@
+//Namespaces
 import { comms } from "../namespaces/communities.js";
+
+//packages
+import { Popover } from 'bootstrap';
 
 /**
  * @fileoverview This Class Manage everything related to implicit Communities. It reads the json, draw the 
  * bounding boxes behind the network that surround nodes of the same community and shows the info of the clicked
- * community in a table.
+ * community in a table and in a tooltip.
  * 
- * about its dependencies.
- * @package This file alone doesnt need any package
+ * @package It requires bootstrap to be able to draw popovers.
  * @author Marco Expósito Pérez
  */
 export default class ImplicitCommsMan {
 
     /**
      * Constructor of the class
-     * @param {*} communityJson Json with the implicit community data
-     * @param {*} container Container where the dataTable is going to be placed
+     * @param {JSON} communityJson Json with the implicit community data
+     * @param {HTMLElement} container Container where the dataTable is going to be placed
      */
     constructor(communityJson, container) {
+        //Data of all implicit communities
         this.implComms = communityJson[comms.ImplGlobalJsonKey];
-        this.tableContainer = container;
 
+        this.tableContainer = container;
     }
 
     /**
@@ -52,10 +56,10 @@ export default class ImplicitCommsMan {
      */
     addTableRow(i, nRow, tableContainer) {
         const row = document.createElement('div');
-        row.className = "row dataRow border-bottom border-dark";
+        row.className = comms.borderTMLrow;
 
         if (i === nRow - 1)
-            row.className = "row dataRow";
+            row.className = comms.borderlessHTMLrow;
 
         const colLeft = document.createElement("div");
         colLeft.className = "col-6 ";
@@ -89,12 +93,11 @@ export default class ImplicitCommsMan {
             boundingBoxes.push(null);
         }
 
-        //DEBUG
+        //DEBUG TO SEE THE BB COLOR IN THE TABLE
         let bb_count = 0;
 
         //Obtain the bounding box of every Implicit Community of nodes
         data.forEach((node) => {
-
             const group = node[comms.ImplUserNewKey];
             const node_bb = network.getBoundingBox(node.id)
 
@@ -102,7 +105,7 @@ export default class ImplicitCommsMan {
                 boundingBoxes[group] = node_bb;
                 this.bbOrder.push(group);
 
-                //DEBUG
+                //DEBUG TO SEE THE BB COLOR IN THE TABLE
                 this.implComms[group].color = this.getCommunityBBcolor(bb_count);
                 bb_count++;
 
@@ -170,7 +173,7 @@ export default class ImplicitCommsMan {
      * @param {BoundingBox} bb bounding box
      * @param {Integer} x x pointer's coordinate in canvas measurement
      * @param {Integer} y y pointer's coordinate in canvas measurement
-     * @returns 
+     * @returns {Boolean} Boolean if its inside or not
      */
     clickInsideBox(bb, x, y) {
         return x > bb.left && x < bb.right && y > bb.top && y < bb.bottom;
@@ -178,7 +181,7 @@ export default class ImplicitCommsMan {
 
     /**
      * Update the Table with the data of a community
-     * @param {*} i index of the bounding box clicked
+     * @param {Integer} i index of the bounding box clicked
      */
     updateCommunityInfo(i) {
         const newComm = this.implComms[this.bbOrder[i]];
@@ -195,10 +198,6 @@ export default class ImplicitCommsMan {
             this.tableHtmlRows[i].right.innerText = "";
         }
     }
-
-
-
-
 
 
     //This is intended for debug purpouses
