@@ -14,19 +14,12 @@ export default class NetworkManager {
      * @param {*} leftContainer Container where the network will be placed
      * @param {*} rightContainer Container where the network data will be placed
      */
-    addNetwork(key, file, leftContainer, rightContainer) {
+    addNetwork(file, leftContainer, rightContainer, config) {
         try {
-            const config = {
-                edgeThreshold: document.getElementById("thresholdSlider_" + key).value,
-                variableEdge: document.getElementById("thresholdVariableCheck_" + key).checked,
-                key: key
-            };
-
             const jsonFile = JSON.parse(file);
-
             const network = new DrawNetwork(jsonFile, leftContainer, rightContainer, this, config);
 
-            this.activesNetworksMap.set(key, network);
+            this.activesNetworksMap.set(config.key, network);
             this.activesNetworksArray.push(network);
 
         } catch (e) {
@@ -42,8 +35,8 @@ export default class NetworkManager {
      */
     removeNetwork(key) {
         const network = this.activesNetworksMap.get(key);
-        
-        this.activesNetworksArray = this.activesNetworksArray.filter( data => data.key != key);
+
+        this.activesNetworksArray = this.activesNetworksArray.filter(data => data.key != key);
 
         network.clearNetwork();
 
@@ -57,7 +50,7 @@ export default class NetworkManager {
      * 
      * @param {*} newTooltip new bootstrap popover object
      */
-    setTooltip(newTooltip){
+    setTooltip(newTooltip) {
         this.tooltip = newTooltip;
     }
 
@@ -65,19 +58,19 @@ export default class NetworkManager {
      * 
      * @param {*} id id of the selected node
      */
-    nodeSelected(id){
-        if(this.tooltip !== undefined) this.tooltip.hide();
+    nodeSelected(id) {
+        if (this.tooltip !== undefined) this.tooltip.hide();
 
-        this.activesNetworksArray.forEach( (network) => network.nodeSelected(id) );
+        this.activesNetworksArray.forEach((network) => network.nodeSelected(id));
     }
 
     /** Broadcast to all networks that there is not a node selected
      * 
      */
-    nodeDeselected(){
-        if(this.tooltip !== undefined) this.tooltip.hide();
+    nodeDeselected() {
+        if (this.tooltip !== undefined) this.tooltip.hide();
 
-        this.activesNetworksArray.forEach( (network) => network.nodeDeselected() );
+        this.activesNetworksArray.forEach((network) => network.nodeDeselected());
     }
 
     /** Change the network threshold value
@@ -85,9 +78,9 @@ export default class NetworkManager {
      * @param {*} key Key of the network
      * @param {*} newValue New value of the threshold
      */
-    thresholdChange(key, newValue){
+    thresholdChange(key, newValue) {
         const network = this.activesNetworksMap.get(key);
-        
+
         network.hideEdgesbelowThreshold(newValue);
     }
 
@@ -96,9 +89,42 @@ export default class NetworkManager {
      * @param {*} key Key of the network
      * @param {*} newBool New variableEdge value
      */
-    variableEdgeChange(key, newBool){
+    variableEdgeChange(key, newBool) {
         const network = this.activesNetworksMap.get(key);
-        
+
         network.updateVariableEdge(newBool);
+    }
+
+    highlightCommunity(key, selectedCommunities){
+        const network = this.activesNetworksMap.get(key);
+
+        network.highlightCommunity(selectedCommunities);
+    }
+
+    thresholdChangeALL(newValue) {
+        this.activesNetworksArray.forEach((network) => {
+            this.thresholdChange(network.key, newValue);
+        });
+    }
+
+
+    variableEdgeChangeALL(newBool) {
+        this.activesNetworksArray.forEach((network) => {
+            this.variableEdgeChange(network.key, newBool);
+        });
+    }
+
+    highlightCommunityALL(selectedCommunities){
+        this.activesNetworksArray.forEach((network) => {
+            this.highlightCommunity(network.key, selectedCommunities);
+        });
+    }
+
+    getNnetworks(){
+        return this.activesNetworksArray.length;
+    }
+
+    getExplicitCommunities(){
+        return this.activesNetworksArray[0].getExplicitCommunities();
     }
 }

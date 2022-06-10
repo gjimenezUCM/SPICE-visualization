@@ -1,13 +1,19 @@
-import DrawNetwork from "./drawNetwork";
 import NetworkManager from "./networkManager";
 import RequestsManager from "./requestsManager";
+import { Dropdown } from 'bootstrap';
+import { Popover } from 'bootstrap';
 
+import Explicit_community from "./explicitCommunity";
+import Utils from "./Utils";
 
 export default class EventsManager {
 
     constructor() {
         this.requestManager = new RequestsManager();
         this.networkManager = new NetworkManager();
+
+        this.initialSliderValue = 1.0;
+        this.initialVariableWidthValue = false;
 
         this.dropdownInit();
     }
@@ -30,8 +36,32 @@ export default class EventsManager {
     createDropdown(headersFile) {
         const n = headersFile.files.length;
 
-        //Fill the dropdown menu with all available data
-        const dropdownContainer = document.getElementById("network_dropdownMenu");
+        const container = document.getElementById("algorithm_dropdown");
+
+        //Create dropdown skeleton
+        const topContainer = document.createElement("div");
+        topContainer.className = "dropdown";
+        container.append(topContainer);
+
+        const mainButton = document.createElement("button");
+        mainButton.id = "dropdownAlgoritmh";
+        mainButton.innerText = "Select Algoritmh";
+        mainButton.className = "btn btn-secondary dropdown-toggle";
+
+        mainButton.setAttribute("data-bs-toggle", "dropdown");
+        mainButton.setAttribute("aria-expanded", "false");
+
+        //Dropdown closes by clicking outside it
+        mainButton.setAttribute("data-bs-auto-close", "outside");
+
+        topContainer.append(mainButton);
+
+        const optionsContainer = document.createElement("ul");
+        optionsContainer.className = "dropdown-menu dropdown-menu-dark";
+        optionsContainer.setAttribute("aria-labelledby", "dropdownAlgoritmh");
+        topContainer.append(optionsContainer);
+
+        //Fill the dropdown with the options
         for (let i = 0; i < n; i++) {
 
             const key = headersFile.files[i].name;
@@ -41,58 +71,44 @@ export default class EventsManager {
             const newOptionButton = document.createElement('a');
             newOptionButton.className = "dropdown-item";
             newOptionButton.innerHTML = key;
-            newOptionButton.id = "networkOptionButton_" + key;
-            newOptionButton.onclick = () => this.optionClicked(key);
+            newOptionButton.style.userSelect = "none";
+            newOptionButton.onclick = () => this.optionClicked(newOptionButton, key);
 
             newOptionContainer.appendChild(newOptionButton);
-            dropdownContainer.appendChild(newOptionContainer);
-
+            optionsContainer.appendChild(newOptionContainer);
         }
 
-        //Create the dropdown 
-        const options = {
-            autoClose: 'outside'
-        }
-        const cont = document.getElementById("container");
-        const dropDown = new bootstrap.Dropdown(cont, options);
+        const options = {}
+        const drop = new Dropdown(mainButton, options);
 
-        //This is a bit hacky because boostrap autoClose option is not working properly
-        const button = document.getElementById("dropdownButton");
-        this.menuActive = false;
-
-        button.onclick = () => dropDown.toggle();
-
-        document.addEventListener('click', function (event) {
-            if (!cont.contains(event.target))
-                dropDown.hide();
-        });
-
-
+        //Dropdown opens by clicking on the button
+        mainButton.onclick = () => drop.show();
     }
 
     /** Show/hide the network based on the option clicked
      * 
      * @param {*} key Key of the network 
      */
-    optionClicked(key) {
-        const option = document.getElementById("networkOptionButton_" + key);
+    optionClicked(button, key) {
+        const option = button;
 
         const isActive = option.className.split(" ").pop();
         if (isActive === "active") {
             option.className = "dropdown-item";
             this.networkManager.removeNetwork(key);
 
+            if (this.networkManager.getNnetworks() === 0) {
+                this.removeControlPanel();
+            }
         } else {
             this.requestManager.getNetwork(key + ".json")
                 .then((file) => {
                     this.createNetwork(key, file);
 
                 });
-                
+
             option.className = "dropdown-item active";
         }
-
-
     }
 
     /** Create the network and all the user configuration options 
@@ -113,12 +129,19 @@ export default class EventsManager {
         const separator = document.createElement('hr');
 
         const titleContainer = document.createElement('div');
-        titleContainer.className = "row";
+        titleContainer.className = "row title";
 
         const title = document.createElement("h2");
+        title.className = "col-sm-6";
         title.innerHTML = key;
+
+        const legendButton = document.createElement("button");
+        legendButton.className = "col-sm-2 btn btn-primary";
+        legendButton.innerText = "Legend";
+
         titleContainer.appendChild(separator)
         titleContainer.appendChild(title);
+        titleContainer.appendChild(legendButton);
 
         networkContainer.appendChild(titleContainer);
 
@@ -137,33 +160,106 @@ export default class EventsManager {
         rowContainer.appendChild(columnRightContainer);
         networkContainer.appendChild(rowContainer);
 
-        //Input options
-        const inputTitleContainer = document.createElement('div');
-        inputTitleContainer.className = "middle";
-
-        const inputTitle = document.createElement("h5");
-        inputTitle.innerHTML = "View options: ";
-        inputTitleContainer.appendChild(inputTitle);
-
-        const sliderContainer = this.createThresholdSliderContainer(key);
-        const checkboxContainer = this.createVariableEdgeCheckBoxContainer(key);
-
-        columnRightContainer.appendChild(inputTitleContainer);
-        columnRightContainer.appendChild(sliderContainer);
-        columnRightContainer.appendChild(checkboxContainer);
-
         //Network
 
         topContainer.appendChild(networkContainer);
 
-        this.networkManager.addNetwork(key, file, columnLeftContainer, columnRightContainer)
+        const config = {
+            edgeThreshold: this.initialSliderValue,
+            variableEdge: this.initialVariableWidthValue,
+            key: key
+        };
 
+        this.networkManager.addNetwork(file, columnLeftContainer, columnRightContainer, config)
 
+        const networkCommunities = this.networkManager.getExplicitCommunities();
+
+        this.createLegend(legendButton, networkCommunities);
+
+        if (this.networkManager.getNnetworks() === 1) {
+            this.addControlPanel(networkCommunities);
+        }
+
+    }
+
+    createLegend(button, communities) {
+        const title = "<h5>  Titulo </h5>";
+        const content = this.getLegendContent(communities);
+
+        const options = {
+            trigger: "click",
+            placement: "right",
+            title: title,
+            content: content,
+            template: "<div class=\"popover legend\" role=\"tooltip\"><div class=\"popover-arrow\"></div><h3 class=\"popover-header\"></h3><div class=\"popover-body\"></div></div>",
+            fallbackPlacements: ["right"],
+            offset: [0, 10],
+            html: true,
+        };
+
+        const tooltip = new Popover(button, options);
+        return tooltip;
+    }
+
+    getLegendContent(communities) {
+        let topContainer = document.createElement("div");
+
+        for (let i = 0; i < communities.length; i++) {
+
+            const titleContainer = document.createElement("h6");
+            titleContainer.innerHTML = "<u>" + communities[i].key + "</u>";
+            topContainer.append(titleContainer);
+
+            for (let j = 0; j < communities[i].values.length; j++) {
+                let value = communities[i].values[j];
+                if (value == "") value = "\"\"";
+
+                const rowContainer = document.createElement("div");
+                rowContainer.className = "row align-items-left"
+                topContainer.append(rowContainer);
+
+                const leftContainer = document.createElement("div");
+                leftContainer.className = "col value";
+                leftContainer.innerText = value;
+                rowContainer.append(leftContainer);
+
+                const middleContainer = document.createElement("div");
+                middleContainer.className = "col";
+                middleContainer.innerText = "=>";
+                rowContainer.append(middleContainer);
+
+                const rightContainer = document.createElement("div");
+                rightContainer.className = "col";
+                this.getCommunityValueIndicator(rightContainer, i, j);
+                rowContainer.append(rightContainer);
+
+            }
+        }
+
+        return topContainer;
+    }
+
+    //background-color
+    getCommunityValueIndicator(container, communityn, value) {
+        const utils = new Utils();
+        let output = document.createElement("div");
+
+        switch (communityn) {
+            case 0:
+                output.className = "box";
+                output.style.backgroundColor = utils.getCommunityCharacteristic(communityn, value);
+                break;
+
+            case 1:
+                utils.getShapehtml(output, value);
+                break;
+        }
+
+        container.append(output);
     }
 
     /** Create a container with a slider that controls the minimum similarity Threshold for edges to be visible in the network
      * 
-     * @param {*} key Key of the network
      * @returns Container with the slider
      */
     createThresholdSliderContainer(key) {
@@ -175,17 +271,18 @@ export default class EventsManager {
         slider.min = "0.0";
         slider.max = "1.0";
         slider.step = "0.1";
-        slider.value = "0.5";
-        slider.id = "thresholdSlider_" + key;
+        slider.value = this.initialSliderValue;
+        slider.id = "thresholdSlider";
 
-        slider.oninput = () => this.thresholdChange(key);
+        slider.onchange = () => this.thresholdChange();
+        slider.oninput = () => this.updateSliderText();
 
         const text = document.createElement('span');
         text.innerHTML = "Minimum Similarity: ";
 
         const value = document.createElement('span');
-        value.id = "thresholdSliderValue_" + key;
-        value.innerHTML = "0.5";
+        value.id = "thresholdSliderValue";
+        value.innerHTML = this.initialSliderValue;
 
         sliderContainer.appendChild(slider);
         sliderContainer.appendChild(text);
@@ -196,10 +293,9 @@ export default class EventsManager {
 
     /** Create a container with a checkbox that controls if the network edges width should vary with its similarity
      * 
-     * @param {*} key Key of the network
      * @returns Container with the checkbox
      */
-    createVariableEdgeCheckBoxContainer(key) {
+    createVariableEdgeCheckBoxContainer() {
         const checkboxContainer = document.createElement('div');
         checkboxContainer.className = "middle";
 
@@ -208,10 +304,10 @@ export default class EventsManager {
 
         const checkBox = document.createElement('input');
         checkBox.type = 'checkbox';
-        checkBox.checked = false;
-        checkBox.id = "thresholdVariableCheck_" + key;
+        checkBox.checked = this.initialVariableWidthValue;
+        checkBox.id = "thresholdVariableCheck";
 
-        checkBox.onchange = () => this.variableEdgeChange(key);
+        checkBox.onchange = () => this.variableEdgeChange();
 
         checkboxContainer.appendChild(text2);
         checkboxContainer.appendChild(checkBox);
@@ -219,13 +315,19 @@ export default class EventsManager {
         return checkboxContainer;
     }
 
-    /** Update the network with the new threshold value. Updates the label with the value too
-     * 
-     * @param {*} key Key of the network
+    /** 
+     *  Update all networks with the new threshold value. Updates the label with the value too
      */
-    thresholdChange(key) {
-        const slider = document.getElementById("thresholdSlider_" + key);
-        const value = document.getElementById("thresholdSliderValue_" + key);
+    thresholdChange() {
+        const slider = document.getElementById("thresholdSlider");
+        let newValue = slider.value;
+
+        this.networkManager.thresholdChangeALL(newValue);
+    }
+
+    updateSliderText() {
+        const slider = document.getElementById("thresholdSlider");
+        const value = document.getElementById("thresholdSliderValue");
 
         let newValue = slider.value;
 
@@ -233,18 +335,199 @@ export default class EventsManager {
         if (newValue === "1") newValue = "1.0";
 
         value.innerHTML = newValue;
-
-        this.networkManager.thresholdChange(key, newValue);
     }
-
-
-    /** UUpdate the network with the new variableEdgeWidth value
-     * 
-     * @param {*} key key of the network
+    /** 
+     *  Update all networks with the new variableEdgeWidth value
      */
-    variableEdgeChange(key) {
-        const checkBox = document.getElementById("thresholdVariableCheck_" + key);
+    variableEdgeChange() {
+        const checkBox = document.getElementById("thresholdVariableCheck");
 
-        this.networkManager.variableEdgeChange(key, checkBox.checked);
+        this.networkManager.variableEdgeChangeALL(checkBox.checked);
     }
+
+
+    addControlPanel(exp_communities) {
+        const controlPanel = document.createElement("div");
+        controlPanel.id = "controlPanel";
+        controlPanel.className = "middle";
+
+        const inputTitle = document.createElement("h5");
+        inputTitle.innerHTML = "Control Panel";
+
+        const sliderContainer = this.createThresholdSliderContainer();
+        const checkboxContainer = this.createVariableEdgeCheckBoxContainer();
+        const explicitContainer = this.createExplicitCommunityChooser(exp_communities);
+
+        controlPanel.appendChild(inputTitle);
+        controlPanel.appendChild(sliderContainer);
+        controlPanel.appendChild(checkboxContainer);
+        controlPanel.appendChild(explicitContainer);
+
+        document.getElementById("controlPanelContainer").appendChild(controlPanel);
+    }
+
+    createExplicitCommunityChooser(exp_communities) {
+        this.selectedCommunities = new Array();
+
+        const n = exp_communities.length;
+        //Create dropdown skeleton
+        const topContainer = document.createElement("div");
+        topContainer.className = "dropdown";
+
+        const mainButton = document.createElement("button");
+        mainButton.id = "dropdownButtonCommunities";
+        mainButton.innerText = "Highlight Community";
+        mainButton.className = "btn btn-secondary dropdown-toggle";
+
+        mainButton.setAttribute("data-bs-toggle", "dropdown");
+        mainButton.setAttribute("aria-expanded", "false");
+        //Dropdown closes by clicking outside it
+        mainButton.setAttribute("data-bs-auto-close", "outside");
+
+        topContainer.append(mainButton);
+
+        const optionsContainer = document.createElement("ul");
+        optionsContainer.className = "dropdown-menu dropdown-menu-dark";
+        optionsContainer.setAttribute("aria-labelledby", "dropdownButtonCommunities");
+        topContainer.append(optionsContainer);
+
+        //Fill the dropdown with the options
+        for (let i = 0; i < n; i++) {
+
+            const key = exp_communities[i].key;
+
+            const newOptionContainer = document.createElement('li');
+            optionsContainer.appendChild(newOptionContainer);
+
+            const newOptionButton = document.createElement('a');
+            newOptionButton.className = "dropdown-item";
+            newOptionButton.innerHTML = key;
+            newOptionButton.style.userSelect = "none";
+            newOptionContainer.appendChild(newOptionButton);
+
+            const dropRight = this.createSecondaryDropRight(newOptionButton, exp_communities[i]);
+
+            newOptionButton.onmouseover = () => this.showCommunities(dropRight.menu);
+
+            newOptionContainer.appendChild(dropRight.container);
+
+        }
+        //Dropdown closes by clicking outside it
+        const options = {};
+
+        const drop = new Dropdown(mainButton, options);
+
+        //Dropdown opens by clicking on the button
+        mainButton.onclick = () => drop.show();
+
+        return topContainer;
+    }
+
+    showCommunities(dropdown) {
+        if (this.droprightActive !== undefined)
+            this.droprightActive.hide();
+
+        this.droprightActive = dropdown;
+        this.droprightActive.show();
+    }
+
+    createSecondaryDropRight(mainButton, exp_community) {
+        const n = exp_community.values.length;
+
+        //Create dropdown skeleton
+        const topContainer = document.createElement("div");
+        topContainer.className = "dropend";
+
+        mainButton.id = "dropRight_" + exp_community.key;
+        mainButton.className += " dropdown-toggle";
+
+        mainButton.setAttribute("data-bs-toggle", "dropdown");
+        mainButton.setAttribute("aria-expanded", "false");
+
+        //Dropdown closes by clicking outside it
+        mainButton.setAttribute("data-bs-auto-close", "outside");
+
+        topContainer.append(mainButton);
+
+        const optionsContainer = document.createElement("ul");
+        optionsContainer.className = "dropdown-menu dropdown-menu-dark";
+        optionsContainer.setAttribute("aria-labelledby", "dropRight_" + exp_community.key);
+        topContainer.append(optionsContainer);
+
+        //Fill the dropdown with the options
+        for (let i = 0; i < n; i++) {
+
+            let key = exp_community.values[i];
+            if (key === "") {
+                key = "\"\"";
+            }
+            const newOptionContainer = document.createElement('li');
+
+            const newOptionButton = document.createElement('a');
+            newOptionButton.className = "dropdown-item";
+            newOptionButton.innerHTML = key;
+            newOptionButton.style.userSelect = "none";
+
+            newOptionButton.onclick = () => this.highlightCommunity(newOptionButton, exp_community.key, key);
+
+            newOptionContainer.appendChild(newOptionButton);
+            optionsContainer.appendChild(newOptionContainer);
+        }
+
+        const options = {}
+        const drop = new Dropdown(mainButton, options);
+
+        return { container: topContainer, menu: drop };
+    }
+
+    removeControlPanel() {
+        const controlPanel = document.getElementById("controlPanel");
+        document.getElementById("controlPanelContainer").removeChild(controlPanel);
+
+    }
+
+    highlightCommunity(button, key, value) {
+        if (value === "\"\"") {
+            value = "";
+        }
+
+        const isActive = button.className.split(" ").pop() === "active";
+        if (isActive) {
+            button.className = "dropdown-item";
+
+
+            for (let i = 0; i < this.selectedCommunities.length; i++) {
+                if (this.selectedCommunities[i].key === key) {
+
+                    const index = this.selectedCommunities[i].values.indexOf(value);
+                    this.selectedCommunities[i].values.splice(index, 1);
+
+                    if (this.selectedCommunities[i].values.length === 0) {
+                        this.selectedCommunities = this.selectedCommunities.filter(data => data.key !== key);
+                    }
+                }
+            }
+
+
+
+        } else {
+            button.className = "dropdown-item active";
+
+            let newCommunity = true;
+            for (let i = 0; i < this.selectedCommunities.length; i++) {
+                if (this.selectedCommunities[i].key === key) {
+                    this.selectedCommunities[i].values.push(value);
+                    newCommunity = false;
+                }
+            }
+
+            if (newCommunity) {
+                this.selectedCommunities.push(new Explicit_community(key, new Array(value)));
+            }
+
+        }
+
+        this.networkManager.highlightCommunityALL(this.selectedCommunities);
+    }
+
 }
