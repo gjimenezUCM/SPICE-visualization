@@ -1,5 +1,10 @@
+/**
+ * @fileoverview This File contains a namespace about Explicit and implicit communities constants.
+ * @author Marco Expósito Pérez
+ */
+
 //Namespaces
-import { nodes } from "./nodes";
+import { nodes } from "./nodes.js";
 
 export const comms = {
 

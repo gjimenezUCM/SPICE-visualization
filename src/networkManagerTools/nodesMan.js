@@ -1,20 +1,19 @@
-//Namespaces
-import { nodes } from "../namespaces/nodes";
-import { comms } from "../namespaces/communities";
+/**
+ * @fileoverview This Class Manage most things related to nodes. It reads the json and parse the data, 
+ * create/update the table and tooltip that will show clicked node info.
+ * @package It requires vis-data package to be able to use vis-network datasets. 
+ * @package It requires bootstrap to be able to draw popovers.
+ * @author Marco Expósito Pérez
+ */
 
+//Namespaces
+import { nodes } from "../namespaces/nodes.js";
+import { comms } from "../namespaces/communities.js";
+import { networkHTML } from "../namespaces/networkHTML.js";
 //Packages
 import { DataSet } from "vis-data/peer";
 import { Popover } from 'bootstrap';
 
-/**
- * @fileoverview This Class Manage most things related to nodes. It reads the json and parse the data, 
- * create/update the table and tooltip that will show clicked node info.
- * 
- * @package It requires vis-data package to be able to use vis-network datasets. 
- * It requires bootstrap to be able to draw popovers
- * 
- * @author Marco Expósito Pérez
- */
 export default class NodesMan {
 
     /**
@@ -25,6 +24,8 @@ export default class NodesMan {
     constructor(explicitMan, container) {
         this.explCommMan = explicitMan;
         this.container = container;
+
+        this.tooltip = null;
     }
 
     /**
@@ -201,7 +202,7 @@ export default class NodesMan {
         const content = this.getTooltipContent(id);
 
         //Create the popover
-        if (this.tooltip === undefined) {
+        if (this.tooltip === null) {
 
             const options = {
                 trigger: "manual",
@@ -280,6 +281,7 @@ export default class NodesMan {
      * @param {DrawNetwork} drawNetwork drawNetwork with the tooltip
      */
     updateZoomTooltip(drawNetwork) {
+        if(this.tooltip !== null)
         this.updateTooltip(this.currentTooltiId, drawNetwork, false)
     }
 

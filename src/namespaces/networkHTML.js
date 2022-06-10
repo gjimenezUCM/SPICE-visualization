@@ -1,7 +1,34 @@
+/**
+ * @fileoverview This File contains a namespace about networks HTMLElements constants.
+ * @author Marco Expósito Pérez
+ */
 
 export const networkHTML = {
-    //Id of the top container with the canvas of a network. Next to this id, the key of the network will be added
-    topCanvasContainer: "topCanvas_",
 
+
+
+    //ID of the container with the Select Algoritmh dropdown
+    algorithmDropdownContainer: "algorithm_Dropdown",
+    //Id of the container with the control Panel.
+    controlPanelParentContainer: "controlPanelContainer",
+    //Id of the container with all the networks active in the html
+    networksParentContainer: "networksContainer",
+
+
+    //--- Next to all these Id, the network's key will be added in the code ---
+
+    //Id of the top container with the canvas of a network. 
+    topCanvasContainer: "topCanvas_",
+    //Id of the container that holds all the elements of a single network.
+    topNetworkContainer: "network_",
+
+    //--- Input Options ---
+
+    sliderThresholdInitialValue: 0.5,
+    variableEdgeInitialValue: false,
 }
+
+
+
+
 

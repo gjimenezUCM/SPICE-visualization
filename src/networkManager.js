@@ -1,18 +1,32 @@
+/**
+ * @fileoverview This Class works as a controler between user input and all active networks.It also works
+ * to broadcast events between diferent networks. 
+ * @author Marco Expósito Pérez
+ */
+
+//Namespace
+import { networkHTML } from "./namespaces/networkHTML.js";
+//Local classes
 import DrawNetwork from "./drawNetwork";
 
 export default class NetworkManager {
 
+    /**
+     * Constructor of the class
+     */
     constructor() {
         this.activesNetworksMap = new Map();
         this.activesNetworksArray = new Array();
+
+        this.tooltip = null;
     }
 
-    /** Create and add a network to the web
-     * 
-     * @param {*} key Identifier of the new network
-     * @param {*} file File with the config of the network
-     * @param {*} leftContainer Container where the network will be placed
-     * @param {*} rightContainer Container where the network data will be placed
+    /** 
+     * Create and add a network to the web
+     * @param {String} key Identifier of the new network
+     * @param {File} file File with the config of the network
+     * @param {HTMLElement} leftContainer Container where the network will be placed
+     * @param {HTMLElement} rightContainer Container where the network data will be placed
      */
     addNetwork(file, leftContainer, rightContainer, config) {
         try {
@@ -24,14 +38,13 @@ export default class NetworkManager {
 
         } catch (e) {
             console.log(e);
-
             alert("The file is not a valid json file");
         }
     }
 
-    /** Remove the network and the html div related
-     * 
-     * @param {*} key //Key of the network
+    /** 
+     * Remove the network and the html div related
+     * @param {String} key //Key of the network
      */
     removeNetwork(key) {
         const network = this.activesNetworksMap.get(key);
@@ -40,91 +53,116 @@ export default class NetworkManager {
 
         network.clearNetwork();
 
-        const networkContainer = document.getElementById("networksContainer");
-        const divToDelete = document.getElementById("network_" + key);
+        const networkContainer = document.getElementById(networkHTML.networksParentContainer);
+        const divToDelete = document.getElementById(networkHTML.topNetworkContainer + key);
 
         networkContainer.removeChild(divToDelete);
     }
 
-    /** Set the current active popup. There is only one across all networks
-     * 
-     * @param {*} newTooltip new bootstrap popover object
+    /** 
+     * Set the current active popup. There is only one across all networks
+     * @param {Popover} newTooltip new bootstrap popover object
      */
     setTooltip(newTooltip) {
         this.tooltip = newTooltip;
     }
 
-    /** Broadcast to all networks that node id has been selected
-     * 
-     * @param {*} id id of the selected node
+    /** 
+     * Broadcast to all networks that node id has been selected
+     * @param {Integer} id id of the selected node
      */
     nodeSelected(id) {
-        if (this.tooltip !== undefined) this.tooltip.hide();
+        if (this.tooltip !== null) this.tooltip.hide();
 
         this.activesNetworksArray.forEach((network) => network.nodeSelected(id));
     }
 
-    /** Broadcast to all networks that there is not a node selected
-     * 
+    /** 
+     * Broadcast to all networks that no node was selected
      */
     nodeDeselected() {
-        if (this.tooltip !== undefined) this.tooltip.hide();
+        if (this.tooltip !== null) this.tooltip.hide();
 
         this.activesNetworksArray.forEach((network) => network.nodeDeselected());
     }
 
-    /** Change the network threshold value
-     * 
-     * @param {*} key Key of the network
-     * @param {*} newValue New value of the threshold
+
+    /** 
+     * Change the network threshold value
+     * @param {String} key Key of the network
+     * @param {Float} newValue New value of the threshold
      */
     thresholdChange(key, newValue) {
         const network = this.activesNetworksMap.get(key);
 
-        network.hideEdgesbelowThreshold(newValue);
+        network.edgesMan.updateEdgesThreshold(newValue);
     }
 
-    /** Change the key network variableEdge value
-     * 
-     * @param {*} key Key of the network
-     * @param {*} newBool New variableEdge value
+    /**
+     * Broadcast the newThreshold value to all networks
+     * @param {Float} newValue newValue New value of the threshold
      */
-    variableEdgeChange(key, newBool) {
-        const network = this.activesNetworksMap.get(key);
-
-        network.updateVariableEdge(newBool);
-    }
-
-    highlightCommunity(key, selectedCommunities){
-        const network = this.activesNetworksMap.get(key);
-
-        network.highlightCommunity(selectedCommunities);
-    }
-
     thresholdChangeALL(newValue) {
         this.activesNetworksArray.forEach((network) => {
             this.thresholdChange(network.key, newValue);
         });
     }
 
+    /** 
+     * Change the network variable edge value
+     * @param {String} key Key of the network
+     * @param {Boolean} newBool New variableEdge value
+     */
+    variableEdgeChange(key, newBool) {
+        const network = this.activesNetworksMap.get(key);
 
+        network.edgesMan.updateVariableEdge(network, newBool);
+    }
+
+    /**
+     * Broadcast the newVariableEdge value to all networks
+     * @param {Float} newValue New variableEdge value
+     */
     variableEdgeChangeALL(newBool) {
         this.activesNetworksArray.forEach((network) => {
             this.variableEdgeChange(network.key, newBool);
         });
     }
 
-    highlightCommunityALL(selectedCommunities){
+    /**
+     * Highlight all nodes that contains selectedCommunities key and values
+     * @param {String} key Key of the network
+     * @param {Object} selectedCommunities Object with the format of {key: (string), values: (String[])}
+     */
+    highlightCommunity(key, selectedCommunities) {
+        const network = this.activesNetworksMap.get(key);
+
+        network.highlightCommunity(selectedCommunities);
+    }
+
+    /**
+     * Broadcast the highglight a selected community to all networks
+     * @param {Object} selectedCommunities Object with the format of {key: (string), values: (String[])}
+     */
+    highlightCommunityALL(selectedCommunities) {
         this.activesNetworksArray.forEach((network) => {
             this.highlightCommunity(network.key, selectedCommunities);
         });
     }
 
-    getNnetworks(){
+    /**
+     * Returns the current number of active networks
+     * @returns {Integer} Returns the number of active networks
+     */
+    getNnetworks() {
         return this.activesNetworksArray.length;
     }
 
-    getExplicitCommunities(){
-        //return this.activesNetworksArray[0].getExplicitCommunities();
+    /**
+    * Returns the current filtered communities and its values of one network. (All use the same filters after all)
+    * @returns {Object} Object with the format of {key: (string), values: (String[])}
+    */
+    getExplicitCommunities() {
+        return this.activesNetworksArray[0].getExplicitCommunities();
     }
 }

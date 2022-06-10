@@ -1,17 +1,16 @@
-//Namespaces
-import { comms } from "../namespaces/communities.js";
-
-//packages
-import { Popover } from 'bootstrap';
-
 /**
- * @fileoverview This Class Manage everything related to implicit Communities. It reads the json, draw the 
+ * @fileoverview This Class Manages everything related to implicit Communities. It reads the json, draw the 
  * bounding boxes behind the network that surround nodes of the same community and shows the info of the clicked
  * community in a table and in a tooltip.
- * 
  * @package It requires bootstrap to be able to draw popovers.
  * @author Marco Expósito Pérez
  */
+
+//Namespaces
+import { comms } from "../namespaces/communities.js";
+//packages
+import { Popover } from 'bootstrap';
+
 export default class ImplicitCommsMan {
 
     /**

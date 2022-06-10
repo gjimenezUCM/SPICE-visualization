@@ -1,42 +1,80 @@
 import NetworkManager from "./networkManager";
-import RequestsManager from "./requestsManager";
+import RequestManager from "./requestManager";
 import { Dropdown } from 'bootstrap';
 import { Popover } from 'bootstrap';
 
 import Explicit_community from "./explicitCommunity";
 import Utils from "./Utils";
+import { networkHTML } from "./namespaces/networkHTML";
+import ControlPanel from "./controlPanel";
 
 export default class EventsManager {
 
+    /**
+     * Constructor of the class
+     */
     constructor() {
-        this.requestManager = new RequestsManager();
+        //TODO this should be editable
+        const baseURL = "../";
+        this.dataDirectory = "data/";
+
+        this.requestManager = new RequestManager(baseURL);
         this.networkManager = new NetworkManager();
+
+        this.controlPanel = new ControlPanel(this.networkManager);
 
         this.initialSliderValue = 1.0;
         this.initialVariableWidthValue = false;
 
-        this.dropdownInit();
+        this.createHTMLSkeleton();
+        this.getAllAvailableFiles();
     }
 
     /**
+     * Create the basic HTML divs to support all aplication's parts
+     */
+    createHTMLSkeleton(){
+        const dropDown = document.createElement("div");
+        dropDown.className= "middle";
+        dropDown.id= networkHTML.algorithmDropdownContainer;
+        document.body.appendChild(dropDown);
+
+        const controlPanel = document.createElement("div");
+        controlPanel.className= "middle";
+        controlPanel.id= networkHTML.controlPanelParentContainer;
+        document.body.appendChild(controlPanel);
+
+        const networks = document.createElement("div");
+        networks.className= "middle";
+        networks.id= networkHTML.networksParentContainer;
+        document.body.appendChild(networks);
+
+    }
+    /**
      * Get the number of available files from the database
      */
-    dropdownInit() {
-        this.requestManager.getAllFileNames()
+    getAllAvailableFiles() {
+        const name = "dataList.json";
+
+        this.requestManager.getFile(name, this.dataDirectory)
             .then((file) => {
                 file = JSON.parse(file);
                 this.createDropdown(file)
+            })
+            .catch((error) => {
+                console.log(error);
+                alert("Error while reading the file with all file names");
             });
     }
 
-    /** Create an option in a dropdown menu for each file to pen/close every network
-    * 
-    * @param {*} headersFile JSON file with all available files
+    /** 
+    * Create an option in a dropdown menu for each file to interact with every network
+    * @param {JSON} headersFile JSON file with all available files
     */
     createDropdown(headersFile) {
         const n = headersFile.files.length;
 
-        const container = document.getElementById("algorithm_dropdown");
+        const container = document.getElementById(networkHTML.algorithmDropdownContainer);
 
         //Create dropdown skeleton
         const topContainer = document.createElement("div");
@@ -44,85 +82,84 @@ export default class EventsManager {
         container.append(topContainer);
 
         const mainButton = document.createElement("button");
-        mainButton.id = "dropdownAlgoritmh";
         mainButton.innerText = "Select Algoritmh";
         mainButton.className = "btn btn-secondary dropdown-toggle";
 
         mainButton.setAttribute("data-bs-toggle", "dropdown");
         mainButton.setAttribute("aria-expanded", "false");
-
         //Dropdown closes by clicking outside it
         mainButton.setAttribute("data-bs-auto-close", "outside");
-
         topContainer.append(mainButton);
 
         const optionsContainer = document.createElement("ul");
         optionsContainer.className = "dropdown-menu dropdown-menu-dark";
-        optionsContainer.setAttribute("aria-labelledby", "dropdownAlgoritmh");
+
         topContainer.append(optionsContainer);
 
-        //Fill the dropdown with the options
+        //Fill the dropdown with the files
         for (let i = 0; i < n; i++) {
 
             const key = headersFile.files[i].name;
+            const newFileContainer = document.createElement('li');
 
-            const newOptionContainer = document.createElement('li');
+            const newFileButton = document.createElement('a');
+            newFileButton.className = "dropdown-item";
+            newFileButton.innerHTML = key;
+            newFileButton.style.userSelect = "none";
+            newFileButton.onclick = () => this.optionClicked(newFileButton, key);
 
-            const newOptionButton = document.createElement('a');
-            newOptionButton.className = "dropdown-item";
-            newOptionButton.innerHTML = key;
-            newOptionButton.style.userSelect = "none";
-            newOptionButton.onclick = () => this.optionClicked(newOptionButton, key);
-
-            newOptionContainer.appendChild(newOptionButton);
-            optionsContainer.appendChild(newOptionContainer);
+            newFileContainer.appendChild(newFileButton);
+            optionsContainer.appendChild(newFileContainer);
         }
 
         const options = {}
-        const drop = new Dropdown(mainButton, options);
-
-        //Dropdown opens by clicking on the button
-        mainButton.onclick = () => drop.show();
+        new Dropdown(mainButton, options);
     }
 
-    /** Show/hide the network based on the option clicked
-     * 
-     * @param {*} key Key of the network 
+    /**
+     * Open/Closes the network based on the state of the option
+     * @param {Object} option option with active or inactive state
+     * @param {String} key key of the network
      */
-    optionClicked(button, key) {
-        const option = button;
-
+    optionClicked(option, key) {
         const isActive = option.className.split(" ").pop();
+
         if (isActive === "active") {
+            //Turn the className into the Inactive class name
             option.className = "dropdown-item";
             this.networkManager.removeNetwork(key);
 
             if (this.networkManager.getNnetworks() === 0) {
-                this.removeControlPanel();
+                this.controlPanel.removeControlpanel();
             }
         } else {
-            this.requestManager.getNetwork(key + ".json")
-                .then((file) => {
-                    this.createNetwork(key, file);
+            const name = key + ".json";
 
-                });
-
-            option.className = "dropdown-item active";
+            this.requestManager.getFile(name, this.dataDirectory)
+            .then((file) => {
+                this.createNetwork(key, file);
+                 //Turn the className into the active class name
+                option.className = "dropdown-item active";
+            })
+            .catch((error) => {
+                console.log(error);
+                alert("Error while reading the selected file");
+            });   
         }
     }
 
-    /** Create the network and all the user configuration options 
-     * 
-     * @param {*} key Key of the netwprk
-     * @param {*} file File with the network config data
+    /** 
+     * Create the network and the control panel if it doesnt exist 
+     * @param {String} key Key of the netwprk
+     * @param {JSON} file File with the network config data
      */
     createNetwork(key, file) {
         //Top Container that always exist
-        const topContainer = document.getElementById("networksContainer");
-
+        const topContainer = document.getElementById(networkHTML.networksParentContainer);
+        
         //Container that will be deleted when clearing the network
         const networkContainer = document.createElement("div");
-        networkContainer.id = "network_" + key;
+        networkContainer.id = networkHTML.topNetworkContainer + key;
         networkContainer.className = "container";
 
         //Header with the name of the network
@@ -161,25 +198,21 @@ export default class EventsManager {
         networkContainer.appendChild(rowContainer);
 
         //Network
-
         topContainer.appendChild(networkContainer);
 
         const config = {
-            edgeThreshold: this.initialSliderValue,
-            variableEdge: this.initialVariableWidthValue,
+            edgeThreshold: networkHTML.sliderThresholdInitialValue,
+            variableEdge: networkHTML.variableEdgeInitialValue,
             key: key
         };
 
         this.networkManager.addNetwork(file, columnLeftContainer, columnRightContainer, config)
 
-        //const networkCommunities = this.networkManager.getExplicitCommunities();
-
+        const networkCommunities = this.networkManager.getExplicitCommunities();
+        
         //this.createLegend(legendButton, networkCommunities);
 
-        if (this.networkManager.getNnetworks() === 1) {
-            //this.addControlPanel(networkCommunities);
-        }
-
+        this.controlPanel.createControlPanel(networkCommunities)
     }
 
     createLegend(button, communities) {
@@ -258,113 +291,10 @@ export default class EventsManager {
         container.append(output);
     }
 
-    /** Create a container with a slider that controls the minimum similarity Threshold for edges to be visible in the network
-     * 
-     * @returns Container with the slider
-     */
-    createThresholdSliderContainer(key) {
-        const sliderContainer = document.createElement('div');
-        sliderContainer.className = "middle";
+    
 
-        const slider = document.createElement('input');
-        slider.type = 'range';
-        slider.min = "0.0";
-        slider.max = "1.0";
-        slider.step = "0.1";
-        slider.value = this.initialSliderValue;
-        slider.id = "thresholdSlider";
+   
 
-        slider.onchange = () => this.thresholdChange();
-        slider.oninput = () => this.updateSliderText();
-
-        const text = document.createElement('span');
-        text.innerHTML = "Minimum Similarity: ";
-
-        const value = document.createElement('span');
-        value.id = "thresholdSliderValue";
-        value.innerHTML = this.initialSliderValue;
-
-        sliderContainer.appendChild(slider);
-        sliderContainer.appendChild(text);
-        sliderContainer.appendChild(value);
-
-        return sliderContainer;
-    }
-
-    /** Create a container with a checkbox that controls if the network edges width should vary with its similarity
-     * 
-     * @returns Container with the checkbox
-     */
-    createVariableEdgeCheckBoxContainer() {
-        const checkboxContainer = document.createElement('div');
-        checkboxContainer.className = "middle";
-
-        const text2 = document.createElement('span');
-        text2.innerHTML = "Variable edge width: ";
-
-        const checkBox = document.createElement('input');
-        checkBox.type = 'checkbox';
-        checkBox.checked = this.initialVariableWidthValue;
-        checkBox.id = "thresholdVariableCheck";
-
-        checkBox.onchange = () => this.variableEdgeChange();
-
-        checkboxContainer.appendChild(text2);
-        checkboxContainer.appendChild(checkBox);
-
-        return checkboxContainer;
-    }
-
-    /** 
-     *  Update all networks with the new threshold value. Updates the label with the value too
-     */
-    thresholdChange() {
-        const slider = document.getElementById("thresholdSlider");
-        let newValue = slider.value;
-
-        this.networkManager.thresholdChangeALL(newValue);
-    }
-
-    updateSliderText() {
-        const slider = document.getElementById("thresholdSlider");
-        const value = document.getElementById("thresholdSliderValue");
-
-        let newValue = slider.value;
-
-        if (newValue === "0") newValue = "0.0";
-        if (newValue === "1") newValue = "1.0";
-
-        value.innerHTML = newValue;
-    }
-    /** 
-     *  Update all networks with the new variableEdgeWidth value
-     */
-    variableEdgeChange() {
-        const checkBox = document.getElementById("thresholdVariableCheck");
-
-        this.networkManager.variableEdgeChangeALL(checkBox.checked);
-    }
-
-
-    addControlPanel(exp_communities) {
-        const controlPanel = document.createElement("div");
-        controlPanel.id = "controlPanel";
-        controlPanel.className = "middle";
-
-        const inputTitle = document.createElement("h5");
-        inputTitle.innerHTML = "Control Panel";
-
-        const sliderContainer = this.createThresholdSliderContainer();
-        const checkboxContainer = this.createVariableEdgeCheckBoxContainer();
-        const explicitContainer = this.createExplicitCommunityChooser(exp_communities);
-
-        controlPanel.appendChild(inputTitle);
-        controlPanel.appendChild(sliderContainer);
-        controlPanel.appendChild(checkboxContainer);
-        controlPanel.appendChild(explicitContainer);
-
-        document.getElementById("controlPanelContainer").appendChild(controlPanel);
-    }
 
     createExplicitCommunityChooser(exp_communities) {
         this.selectedCommunities = new Array();
@@ -478,12 +408,6 @@ export default class EventsManager {
         const drop = new Dropdown(mainButton, options);
 
         return { container: topContainer, menu: drop };
-    }
-
-    removeControlPanel() {
-        const controlPanel = document.getElementById("controlPanel");
-        document.getElementById("controlPanelContainer").removeChild(controlPanel);
-
     }
 
     highlightCommunity(button, key, value) {

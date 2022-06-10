@@ -1,17 +1,16 @@
+/**
+ * @fileoverview This File Manages most things related to edges. It reads the json and parse the data, 
+ * and changes edges atributes based on the control panel inputs.
+ * @package Requires vis-data package to be able to use vis-network datasets. 
+ * @author Marco Expósito Pérez
+ */
+
 //Namespaces
 import { edges } from "../namespaces/edges.js";
-
 //Packages
 import { DataSet } from "vis-data/peer";
 
-/**
- * @fileoverview This Class Manage most things related to edges. It reads the json and parse the data, 
- * and changes edges atributes based on the control panel inputs.
- * 
- * @package It requires vis-data package to be able to use vis-network datasets. 
- * 
- * @author Marco Expósito Pérez
- */
+
 export default class EdgesMan {
 
     /**
@@ -96,7 +95,7 @@ export default class EdgesMan {
 
     /**
      * Update the edge Threshold value to hide edges below that value
-     * @param {Integer} newThreshold new value
+     * @param {Float} newThreshold new value
      */
     updateEdgesThreshold(newThreshold) {
         this.edgeValueThreshold = newThreshold;
@@ -122,17 +121,17 @@ export default class EdgesMan {
     /**
      * Update the variable that says if the edge should vary with the similarity value and update
      * all edges acordingly
+     * @param {DrawNetwork} drawNetwork parent drawnetwork object
      * @param {Boolean} newBool new value
      */
-    updateVariableEdge(newBool) {
-        this.changeMaxEdgeWidth = newBool;
-
+    updateVariableEdge(drawNetwork, newBool) {
+        this.variableEdge = newBool;
         let max = this.getMaxWidth();
 
-        this.options.edges.scaling.max = max;
-        this.network.setOptions(this.options);
+        drawNetwork.options.edges.scaling.max = max;
+        drawNetwork.network.setOptions(drawNetwork.options);
 
         //Update all edges with the new options
-        this.data.edges.update(this.data.edges);
+        this.edges.update(this.edges);
     }
 }

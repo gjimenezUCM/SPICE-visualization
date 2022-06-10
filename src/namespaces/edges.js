@@ -1,3 +1,7 @@
+/**
+ * @fileoverview This File contains a namespace with edges constants.
+ * @author Marco Expósito Pérez
+ */
 
 export const edges = {
 

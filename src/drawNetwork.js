@@ -1,25 +1,22 @@
+/**
+ * @fileoverview This Class draw the network based on the inputJson, manages all network-related events and
+ * edit the network or the shown info based on the user inputs.
+ * @package It requires vis-Network package to be able to use the Network Class. 
+ * @author Marco Expósito Pérez
+ */
+
 //Namespaces
 import { edges } from "./namespaces/edges.js";
 import { nodes } from "./namespaces/nodes.js";
 import { networkHTML } from "./namespaces/networkHTML.js";
-
 //Packages
 import { Network } from "vis-network/peer";
-
-//Aux classes
+//Local classes
 import ImplicitCommsMan from "./networkManagerTools/implicitCommsMan.js";
 import ExplicitCommsMan from "./networkManagerTools/explicitCommsMan.js";
 import NodesMan from "./networkManagerTools/nodesMan.js";
 import EdgesMan from "./networkManagerTools/edgesMan.js";
 
-/**
- * @fileoverview This Class draw the network based on the inputJson, manages all network-related events and
- * edit the network or the shown info based on the user inputs.
- * 
- * @package It requires vis-Network package to be able to use the Network Class. 
- * 
- * @author Marco Expósito Pérez
- */
 export default class DrawNetwork {
 
     /**
@@ -120,7 +117,7 @@ export default class DrawNetwork {
                 hoverConnectedEdges: false,
             },
             layout: {
-                improvedLayout: false,
+                improvedLayout: true,
             }
         };
     }
@@ -130,7 +127,7 @@ export default class DrawNetwork {
      */
     drawNetwork() {
         this.network = new Network(this.container, this.data, this.options);
-        this.network.stabilize();   //In case physics are active, we stop them just in case nodes start to "boing"
+        //this.network.stabilize();   //In case physics are active, we stop them just in case nodes start to "boing"
 
         this.container.firstChild.id = networkHTML.topCanvasContainer + this.key;
 
@@ -138,7 +135,6 @@ export default class DrawNetwork {
         this.network.on("click", (event) => this.clickEvent(event));
         this.network.on("zoom", (event) => this.zoomEvent(event));
     }
-
 
     /** 
      * Function executed when "beforeDrawing" event is launched. Happens before drawing the network

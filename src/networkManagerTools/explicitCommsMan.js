@@ -1,13 +1,12 @@
+/**
+ * @fileoverview This Class Manages everything related to explicit Communities. It reads the array with the keys
+ * and change all nodes atributes based on their value of each of those explicit communities
+ * @author Marco Expósito Pérez
+ */
+
 //Namespaces
 import { comms } from "../namespaces/communities.js";
 
-/**
- * @fileoverview This Class Manage everything related to explicit Communities. It reads the array with the keys
- * and change all nodes atributes based on their value of each of those explicit communities
- * 
- * @package This file alone doesnt need any package
- * @author Marco Expósito Pérez
- */
 export default class ExplicitCommsMan {
 
     /**

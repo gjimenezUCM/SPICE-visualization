@@ -1,3 +1,7 @@
+/**
+ * @fileoverview This File contains a namespace about nodes constants.
+ * @author Marco Expósito Pérez
+ */
 
 export const nodes = {
 
