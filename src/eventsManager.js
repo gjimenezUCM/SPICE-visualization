@@ -166,19 +166,19 @@ export default class EventsManager {
         const separator = document.createElement('hr');
 
         const titleContainer = document.createElement('div');
-        titleContainer.className = "row title";
+        titleContainer.className = "title";
 
         const title = document.createElement("h2");
-        title.className = "col-sm-6";
+        title.className = "col-sm-1";
         title.innerHTML = key;
 
-        const legendButton = document.createElement("button");
-        legendButton.className = "col-sm-2 btn btn-primary";
-        legendButton.innerText = "Legend";
+        // const legendButton = document.createElement("button");
+        // legendButton.className = "col-sm-2 btn btn-primary";
+        // legendButton.innerText = "Legend";
 
         titleContainer.appendChild(separator)
         titleContainer.appendChild(title);
-        titleContainer.appendChild(legendButton);
+        // titleContainer.appendChild(legendButton);
 
         networkContainer.appendChild(titleContainer);
 
@@ -211,247 +211,247 @@ export default class EventsManager {
         const networkCommunities = this.networkManager.getExplicitCommunities();
         
         //this.createLegend(legendButton, networkCommunities);
-
+        
         this.controlPanel.createControlPanel(networkCommunities)
     }
 
-    createLegend(button, communities) {
-        const title = "";
-        const content = this.getLegendContent(communities);
+    // createLegend(button, communities) {
+    //     const title = "";
+    //     const content = this.getLegendContent(communities);
 
-        const options = {
-            trigger: "click",
-            placement: "right",
-            title: title,
-            content: content,
-            template: "<div class=\"popover legend\" role=\"tooltip\"><div class=\"popover-arrow\"></div><h3 class=\"popover-header\"></h3><div class=\"popover-body\"></div></div>",
-            fallbackPlacements: ["right"],
-            offset: [0, 10],
-            html: true,
-        };
+    //     const options = {
+    //         trigger: "click",
+    //         placement: "right",
+    //         title: title,
+    //         content: content,
+    //         template: "<div class=\"popover legend\" role=\"tooltip\"><div class=\"popover-arrow\"></div><h3 class=\"popover-header\"></h3><div class=\"popover-body\"></div></div>",
+    //         fallbackPlacements: ["right"],
+    //         offset: [0, 10],
+    //         html: true,
+    //     };
 
-        const tooltip = new Popover(button, options);
-        return tooltip;
-    }
+    //     const tooltip = new Popover(button, options);
+    //     return tooltip;
+    // }
 
-    getLegendContent(communities) {
-        let topContainer = document.createElement("div");
+    // getLegendContent(communities) {
+    //     let topContainer = document.createElement("div");
 
-        for (let i = 0; i < communities.length; i++) {
+    //     for (let i = 0; i < communities.length; i++) {
 
-            const titleContainer = document.createElement("h6");
-            titleContainer.innerHTML = "<u>" + communities[i].key + "</u>";
-            topContainer.append(titleContainer);
+    //         const titleContainer = document.createElement("h6");
+    //         titleContainer.innerHTML = "<u>" + communities[i].key + "</u>";
+    //         topContainer.append(titleContainer);
 
-            for (let j = 0; j < communities[i].values.length; j++) {
-                let value = communities[i].values[j];
-                if (value == "") value = "\"\"";
+    //         for (let j = 0; j < communities[i].values.length; j++) {
+    //             let value = communities[i].values[j];
+    //             if (value == "") value = "\"\"";
 
-                const rowContainer = document.createElement("div");
-                rowContainer.className = "row align-items-left"
-                topContainer.append(rowContainer);
+    //             const rowContainer = document.createElement("div");
+    //             rowContainer.className = "row align-items-left"
+    //             topContainer.append(rowContainer);
 
-                const leftContainer = document.createElement("div");
-                leftContainer.className = "col value";
-                leftContainer.innerText = value;
-                rowContainer.append(leftContainer);
+    //             const leftContainer = document.createElement("div");
+    //             leftContainer.className = "col value";
+    //             leftContainer.innerText = value;
+    //             rowContainer.append(leftContainer);
 
-                const middleContainer = document.createElement("div");
-                middleContainer.className = "col";
-                middleContainer.innerText = "=>";
-                rowContainer.append(middleContainer);
+    //             const middleContainer = document.createElement("div");
+    //             middleContainer.className = "col";
+    //             middleContainer.innerText = "=>";
+    //             rowContainer.append(middleContainer);
 
-                const rightContainer = document.createElement("div");
-                rightContainer.className = "col";
-                this.getCommunityValueIndicator(rightContainer, i, j);
-                rowContainer.append(rightContainer);
+    //             const rightContainer = document.createElement("div");
+    //             rightContainer.className = "col";
+    //             this.getCommunityValueIndicator(rightContainer, i, j);
+    //             rowContainer.append(rightContainer);
 
-            }
-        }
+    //         }
+    //     }
 
-        return topContainer;
-    }
+    //     return topContainer;
+    // }
 
-    //background-color
-    getCommunityValueIndicator(container, communityn, value) {
-        const utils = new Utils();
-        let output = document.createElement("div");
+    // //background-color
+    // getCommunityValueIndicator(container, communityn, value) {
+    //     const utils = new Utils();
+    //     let output = document.createElement("div");
 
-        switch (communityn) {
-            case 0:
-                output.className = "box";
-                output.style.backgroundColor = utils.getCommunityCharacteristic(communityn, value);
-                break;
+    //     switch (communityn) {
+    //         case 0:
+    //             output.className = "box";
+    //             output.style.backgroundColor = utils.getCommunityCharacteristic(communityn, value);
+    //             break;
 
-            case 1:
-                utils.getShapehtml(output, value);
-                break;
-        }
+    //         case 1:
+    //             utils.getShapehtml(output, value);
+    //             break;
+    //     }
 
-        container.append(output);
-    }
+    //     container.append(output);
+    // }
 
     
 
    
 
 
-    createExplicitCommunityChooser(exp_communities) {
-        this.selectedCommunities = new Array();
+    // createExplicitCommunityChooser(exp_communities) {
+    //     this.selectedCommunities = new Array();
 
-        const n = exp_communities.length;
-        //Create dropdown skeleton
-        const topContainer = document.createElement("div");
-        topContainer.className = "dropdown";
+    //     const n = exp_communities.length;
+    //     //Create dropdown skeleton
+    //     const topContainer = document.createElement("div");
+    //     topContainer.className = "dropdown";
 
-        const mainButton = document.createElement("button");
-        mainButton.id = "dropdownButtonCommunities";
-        mainButton.innerText = "Highlight Community";
-        mainButton.className = "btn btn-secondary dropdown-toggle";
+    //     const mainButton = document.createElement("button");
+    //     mainButton.id = "dropdownButtonCommunities";
+    //     mainButton.innerText = "Highlight Community";
+    //     mainButton.className = "btn btn-secondary dropdown-toggle";
 
-        mainButton.setAttribute("data-bs-toggle", "dropdown");
-        mainButton.setAttribute("aria-expanded", "false");
-        //Dropdown closes by clicking outside it
-        mainButton.setAttribute("data-bs-auto-close", "outside");
+    //     mainButton.setAttribute("data-bs-toggle", "dropdown");
+    //     mainButton.setAttribute("aria-expanded", "false");
+    //     //Dropdown closes by clicking outside it
+    //     mainButton.setAttribute("data-bs-auto-close", "outside");
 
-        topContainer.append(mainButton);
+    //     topContainer.append(mainButton);
 
-        const optionsContainer = document.createElement("ul");
-        optionsContainer.className = "dropdown-menu dropdown-menu-dark";
-        optionsContainer.setAttribute("aria-labelledby", "dropdownButtonCommunities");
-        topContainer.append(optionsContainer);
+    //     const optionsContainer = document.createElement("ul");
+    //     optionsContainer.className = "dropdown-menu dropdown-menu-dark";
+    //     optionsContainer.setAttribute("aria-labelledby", "dropdownButtonCommunities");
+    //     topContainer.append(optionsContainer);
 
-        //Fill the dropdown with the options
-        for (let i = 0; i < n; i++) {
+    //     //Fill the dropdown with the options
+    //     for (let i = 0; i < n; i++) {
 
-            const key = exp_communities[i].key;
+    //         const key = exp_communities[i].key;
 
-            const newOptionContainer = document.createElement('li');
-            optionsContainer.appendChild(newOptionContainer);
+    //         const newOptionContainer = document.createElement('li');
+    //         optionsContainer.appendChild(newOptionContainer);
 
-            const newOptionButton = document.createElement('a');
-            newOptionButton.className = "dropdown-item";
-            newOptionButton.innerHTML = key;
-            newOptionButton.style.userSelect = "none";
-            newOptionContainer.appendChild(newOptionButton);
+    //         const newOptionButton = document.createElement('a');
+    //         newOptionButton.className = "dropdown-item";
+    //         newOptionButton.innerHTML = key;
+    //         newOptionButton.style.userSelect = "none";
+    //         newOptionContainer.appendChild(newOptionButton);
 
-            const dropRight = this.createSecondaryDropRight(newOptionButton, exp_communities[i]);
+    //         const dropRight = this.createSecondaryDropRight(newOptionButton, exp_communities[i]);
 
-            newOptionButton.onmouseover = () => this.showCommunities(dropRight.menu);
+    //         newOptionButton.onmouseover = () => this.showCommunities(dropRight.menu);
 
-            newOptionContainer.appendChild(dropRight.container);
+    //         newOptionContainer.appendChild(dropRight.container);
 
-        }
-        //Dropdown closes by clicking outside it
-        const options = {};
+    //     }
+    //     //Dropdown closes by clicking outside it
+    //     const options = {};
 
-        const drop = new Dropdown(mainButton, options);
+    //     const drop = new Dropdown(mainButton, options);
 
-        //Dropdown opens by clicking on the button
-        mainButton.onclick = () => drop.show();
+    //     //Dropdown opens by clicking on the button
+    //     mainButton.onclick = () => drop.show();
 
-        return topContainer;
-    }
+    //     return topContainer;
+    // }
 
-    showCommunities(dropdown) {
-        if (this.droprightActive !== undefined)
-            this.droprightActive.hide();
+    // showCommunities(dropdown) {
+    //     if (this.droprightActive !== undefined)
+    //         this.droprightActive.hide();
 
-        this.droprightActive = dropdown;
-        this.droprightActive.show();
-    }
+    //     this.droprightActive = dropdown;
+    //     this.droprightActive.show();
+    // }
 
-    createSecondaryDropRight(mainButton, exp_community) {
-        const n = exp_community.values.length;
+    // createSecondaryDropRight(mainButton, exp_community) {
+    //     const n = exp_community.values.length;
 
-        //Create dropdown skeleton
-        const topContainer = document.createElement("div");
-        topContainer.className = "dropend";
+    //     //Create dropdown skeleton
+    //     const topContainer = document.createElement("div");
+    //     topContainer.className = "dropend";
 
-        mainButton.id = "dropRight_" + exp_community.key;
-        mainButton.className += " dropdown-toggle";
+    //     mainButton.id = "dropRight_" + exp_community.key;
+    //     mainButton.className += " dropdown-toggle";
 
-        mainButton.setAttribute("data-bs-toggle", "dropdown");
-        mainButton.setAttribute("aria-expanded", "false");
+    //     mainButton.setAttribute("data-bs-toggle", "dropdown");
+    //     mainButton.setAttribute("aria-expanded", "false");
 
-        //Dropdown closes by clicking outside it
-        mainButton.setAttribute("data-bs-auto-close", "outside");
+    //     //Dropdown closes by clicking outside it
+    //     mainButton.setAttribute("data-bs-auto-close", "outside");
 
-        topContainer.append(mainButton);
+    //     topContainer.append(mainButton);
 
-        const optionsContainer = document.createElement("ul");
-        optionsContainer.className = "dropdown-menu dropdown-menu-dark";
-        optionsContainer.setAttribute("aria-labelledby", "dropRight_" + exp_community.key);
-        topContainer.append(optionsContainer);
+    //     const optionsContainer = document.createElement("ul");
+    //     optionsContainer.className = "dropdown-menu dropdown-menu-dark";
+    //     optionsContainer.setAttribute("aria-labelledby", "dropRight_" + exp_community.key);
+    //     topContainer.append(optionsContainer);
 
-        //Fill the dropdown with the options
-        for (let i = 0; i < n; i++) {
+    //     //Fill the dropdown with the options
+    //     for (let i = 0; i < n; i++) {
 
-            let key = exp_community.values[i];
-            if (key === "") {
-                key = "\"\"";
-            }
-            const newOptionContainer = document.createElement('li');
+    //         let key = exp_community.values[i];
+    //         if (key === "") {
+    //             key = "\"\"";
+    //         }
+    //         const newOptionContainer = document.createElement('li');
 
-            const newOptionButton = document.createElement('a');
-            newOptionButton.className = "dropdown-item";
-            newOptionButton.innerHTML = key;
-            newOptionButton.style.userSelect = "none";
+    //         const newOptionButton = document.createElement('a');
+    //         newOptionButton.className = "dropdown-item";
+    //         newOptionButton.innerHTML = key;
+    //         newOptionButton.style.userSelect = "none";
 
-            newOptionButton.onclick = () => this.highlightCommunity(newOptionButton, exp_community.key, key);
+    //         newOptionButton.onclick = () => this.highlightCommunity(newOptionButton, exp_community.key, key);
 
-            newOptionContainer.appendChild(newOptionButton);
-            optionsContainer.appendChild(newOptionContainer);
-        }
+    //         newOptionContainer.appendChild(newOptionButton);
+    //         optionsContainer.appendChild(newOptionContainer);
+    //     }
 
-        const options = {}
-        const drop = new Dropdown(mainButton, options);
+    //     const options = {}
+    //     const drop = new Dropdown(mainButton, options);
 
-        return { container: topContainer, menu: drop };
-    }
+    //     return { container: topContainer, menu: drop };
+    // }
 
-    highlightCommunity(button, key, value) {
-        if (value === "\"\"") {
-            value = "";
-        }
+    // highlightCommunity(button, key, value) {
+    //     if (value === "\"\"") {
+    //         value = "";
+    //     }
 
-        const isActive = button.className.split(" ").pop() === "active";
-        if (isActive) {
-            button.className = "dropdown-item";
-
-
-            for (let i = 0; i < this.selectedCommunities.length; i++) {
-                if (this.selectedCommunities[i].key === key) {
-
-                    const index = this.selectedCommunities[i].values.indexOf(value);
-                    this.selectedCommunities[i].values.splice(index, 1);
-
-                    if (this.selectedCommunities[i].values.length === 0) {
-                        this.selectedCommunities = this.selectedCommunities.filter(data => data.key !== key);
-                    }
-                }
-            }
+    //     const isActive = button.className.split(" ").pop() === "active";
+    //     if (isActive) {
+    //         button.className = "dropdown-item";
 
 
+    //         for (let i = 0; i < this.selectedCommunities.length; i++) {
+    //             if (this.selectedCommunities[i].key === key) {
 
-        } else {
-            button.className = "dropdown-item active";
+    //                 const index = this.selectedCommunities[i].values.indexOf(value);
+    //                 this.selectedCommunities[i].values.splice(index, 1);
 
-            let newCommunity = true;
-            for (let i = 0; i < this.selectedCommunities.length; i++) {
-                if (this.selectedCommunities[i].key === key) {
-                    this.selectedCommunities[i].values.push(value);
-                    newCommunity = false;
-                }
-            }
+    //                 if (this.selectedCommunities[i].values.length === 0) {
+    //                     this.selectedCommunities = this.selectedCommunities.filter(data => data.key !== key);
+    //                 }
+    //             }
+    //         }
 
-            if (newCommunity) {
-                this.selectedCommunities.push(new Explicit_community(key, new Array(value)));
-            }
 
-        }
 
-        this.networkManager.highlightCommunityALL(this.selectedCommunities);
-    }
+    //     } else {
+    //         button.className = "dropdown-item active";
+
+    //         let newCommunity = true;
+    //         for (let i = 0; i < this.selectedCommunities.length; i++) {
+    //             if (this.selectedCommunities[i].key === key) {
+    //                 this.selectedCommunities[i].values.push(value);
+    //                 newCommunity = false;
+    //             }
+    //         }
+
+    //         if (newCommunity) {
+    //             this.selectedCommunities.push(new Explicit_community(key, new Array(value)));
+    //         }
+
+    //     }
+
+    //     this.networkManager.highlightCommunityALL(this.selectedCommunities);
+    // }
 
 }

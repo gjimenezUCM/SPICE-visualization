@@ -220,6 +220,7 @@ export default class NetworkMan {
         }
         this.network.fit(fitOptions);
 
+        console.log(selectedNodes);
         //Update all nodes color acording to their selected status
         const newNodes = new Array();
         this.data.nodes.forEach((node) => {
@@ -294,12 +295,14 @@ export default class NetworkMan {
     }
 
     /**
-    * Returns current filtered communities and its values
-    * @returns {Object} Object with the format of {key: (string), values: (String[])}
-    */
+     * Returns all detected Explicit Communities and the max size of our filter
+     * @returns {Object} Object with the format of {data: {key: (string), values: (String[])}, filterSize: (int)}
+     */
     getExplicitCommunities() {
-        return this.explCommMan.getCommunities();
+        return this.explCommMan.getCommunitiesData();
     }
+
+
 }
 
 

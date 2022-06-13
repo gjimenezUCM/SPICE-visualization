@@ -19,6 +19,7 @@ export default class NetworkGroupMan {
         this.activesNetworksArray = new Array();
 
         this.tooltip = null;
+        this.tooltipContainer = null;
     }
 
     /** 
@@ -57,16 +58,6 @@ export default class NetworkGroupMan {
         const divToDelete = document.getElementById(networkHTML.topNetworkContainer + key);
 
         networkContainer.removeChild(divToDelete);
-    }
-
-    /** 
-     * Set the current active popup. There is only one across all networks
-     * @param {Popover} newTooltip new bootstrap popover object
-     */
-    setTooltip(newTooltip) {
-        this.hidePopover();
-
-        this.tooltip = newTooltip;
     }
 
     /** 
@@ -159,9 +150,10 @@ export default class NetworkGroupMan {
     }
 
     /**
-    * Returns the current filtered communities and its values of one network. (All use the same filters after all)
-    * @returns {Object} Object with the format of {key: (string), values: (String[])}
-    */
+     * Returns all detected Explicit Communities and the max size of our filter of the first network
+     * (All networks should have the same)
+     * @returns {Object} Object with the format of {data: {key: (string), values: (String[])}, filterSize: (int)}
+     */
     getExplicitCommunities() {
         return this.activesNetworksArray[0].getExplicitCommunities();
     }
@@ -170,6 +162,7 @@ export default class NetworkGroupMan {
      * Hide the current active popover
      */
     hidePopover() {
-        if (this.tooltip !== null) { this.tooltip.remove(); this.tooltip = null; }
+        if (this.tooltip !== null) { this.tooltip.hide();}
     }
+
 }

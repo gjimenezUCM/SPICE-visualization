@@ -24,9 +24,11 @@ export const nodes = {
     //When zoom ends, tooltip will spawn when this ms have pased
     TooltipSpawnTimer: 500,
 
+    //Default value for a background color when the explicit community doesnt change it
+    NodeColor: "#D2E5FF",
     //Default value for a node shape when the explicit community doesnt change it
     NodeShape: "circle",
-    
+
     NodeBorderWidth: 2,
     NodeBorderWidthSelected: 4,
 
@@ -49,7 +51,7 @@ export const nodes = {
     borderSeparatorHTMLrow: "row dataRow border-bottom border-primary",
 
     //--- Explicit Communities Variable Attributes ---
-    
+
     //Characteristics that change based on the explicit communities
     BackgroundColors: [
         "rgb(255, 0, 0, 1)", //Red

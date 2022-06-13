@@ -9,6 +9,7 @@
 //Namespaces
 import { comms } from "../namespaces/communities.js";
 import { networkHTML } from "../namespaces/networkHTML.js";
+import { nodes } from "../namespaces/nodes.js";
 //packages
 import { Popover } from 'bootstrap';
 
@@ -197,7 +198,7 @@ export default class ImplicitCommsMan {
 
         setTimeout(function () {
             this.updateTooltip(newComm, this.bb[i]);
-        }.bind(this), 100);
+        }.bind(this), nodes.ZoomDuration + nodes.TooltipSpawnTimer / 2);
     }
 
     /**
@@ -216,6 +217,18 @@ export default class ImplicitCommsMan {
      * @param {Boolean} respawn 
      */
     updateTooltip(community, bb, respawn = true) {
+        let tooltip = this.networkMan.groupManager.tooltip;
+        let container = this.networkMan.groupManager.tooltipContainer;
+        
+        if (respawn) {
+            if (tooltip !== null) {
+                tooltip.hide();
+            }
+            tooltip = null;
+            if (container !== null)
+                container.remove();
+        }
+
         const canvasPosition = this.getElementPosition(networkHTML.topCanvasContainer + this.networkMan.key)
 
         const bbLeft = this.networkMan.network.canvasToDOM({ x: bb.left, y: bb.top });
@@ -227,7 +240,7 @@ export default class ImplicitCommsMan {
         const title = "<h5> " + community.id + "</h5>";
         const content = this.getTooltipContent(community);
 
-        if (this.tooltip === null) {
+        if (tooltip === null) {
 
             //Create the popover
             const options = {
@@ -240,31 +253,31 @@ export default class ImplicitCommsMan {
                 html: true,
             };
 
-            this.popoverContainer = document.createElement("div");
-            document.body.append(this.popoverContainer);
+            container = document.createElement("div");
+            document.body.append(container);
 
 
-            this.tooltip = new Popover(this.popoverContainer, options);
+            tooltip = new Popover(container, options);
 
-            this.tooltip.zoomUpdate = () => this.updateTooltip(community, bb, false);
-            this.tooltip.remove = () => this.removeTooltip();
+            tooltip.zoomUpdate = () => this.updateTooltip(community, bb, false);
         }
 
-        this.popoverContainer.style.top = clickY + "px";
-        this.popoverContainer.style.left = clickX + "px";
-        this.popoverContainer.style.position = "absolute";
+        container.style.top = clickY + "px";
+        container.style.left = clickX + "px";
+        container.style.position = "absolute";
 
         if (respawn) {
-            this.tooltip.setContent({
+            tooltip.setContent({
                 '.popover-header': title,
                 '.popover-body': content
             });
-            this.tooltip.show();
+            tooltip.show();
         } else {
-            this.tooltip.update();
+            tooltip.update();
         }
 
-        this.networkMan.groupManager.setTooltip(this.tooltip);
+        this.networkMan.groupManager.tooltip = tooltip;
+        this.networkMan.groupManager.tooltipContainer = container;
     }
 
     /** 

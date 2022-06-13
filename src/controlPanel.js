@@ -33,6 +33,8 @@ export default class ControlPanel {
         //this.container.appendChild(explicitContainer);
 
         document.getElementById(networkHTML.controlPanelParentContainer).appendChild(this.container);
+
+        //TODO. User should be able to choose what communities want to represent visualy
     }
 
     /** 
@@ -125,6 +127,9 @@ export default class ControlPanel {
         this.networkManager.variableEdgeChangeALL(checkBox.checked);
     }
 
+    /**
+     * Remove the controlPanel if its active
+     */
     removeControlpanel() {
         if (!this.isActive)
             return;

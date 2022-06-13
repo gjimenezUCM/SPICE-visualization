@@ -35,7 +35,7 @@ export default class NodesMan {
      */
     parseNodes(json) {
         for (let node of json[nodes.UsersGlobalJsonKey]) {
-            this.explCommMan.lookForExplicitCommunities(node);
+            this.explCommMan.findExplicitCommunities(node);
 
             //The implicit community will be used for the bounding boxes
             node[comms.ImplUserNewKey] = parseInt(node[comms.ImplUserJsonKey]);
@@ -44,6 +44,7 @@ export default class NodesMan {
             if (comms.ImplUserJsonKey === "group")
                 delete node["group"];
 
+            node["defaultColor"] = true;
         }
         this.nodes = new DataSet(json.users);
 
@@ -186,6 +187,18 @@ export default class NodesMan {
      * @param {Boolean} respawn Boolean saying if the tooltip should do the "spawn" animation
      */
     updateTooltip(id, networkMan, respawn = true) {
+        let tooltip = networkMan.groupManager.tooltip;
+        let container = networkMan.groupManager.tooltipContainer;
+
+        if (respawn) {
+            if (tooltip !== null) {
+                tooltip.hide();
+            }
+            tooltip = null;
+            if (container !== null)
+                container.remove();
+        }
+
         const canvasPosition = this.getElementPosition(networkHTML.topCanvasContainer + networkMan.key)
 
         const nodeCanvasPosition = networkMan.network.getPosition(id);
@@ -201,7 +214,7 @@ export default class NodesMan {
         const content = this.getTooltipContent(id);
 
         //Create the popover
-        if (this.tooltip === null) {
+        if (tooltip === null) {
 
             const options = {
                 trigger: "manual",
@@ -213,30 +226,30 @@ export default class NodesMan {
                 html: true,
             };
 
-            this.popoverContainer = document.createElement("div");
-            document.body.append(this.popoverContainer);
+            container = document.createElement("div");
+            document.body.append(container);
 
-            this.tooltip = new Popover(this.popoverContainer, options);
+            tooltip = new Popover(container, options);
 
-            this.tooltip.zoomUpdate = () => this.updateTooltip(id, networkMan, false);
-            this.tooltip.remove = () => this.removeTooltip();
+            tooltip.zoomUpdate = () => this.updateTooltip(id, networkMan, false);
         }
 
-        this.popoverContainer.style.top = clickY + "px";
-        this.popoverContainer.style.left = clickX + "px";
-        this.popoverContainer.style.position = "absolute";
+        container.style.top = clickY + "px";
+        container.style.left = clickX + "px";
+        container.style.position = "absolute";
 
         if (respawn) {
-            this.tooltip.setContent({
+            tooltip.setContent({
                 '.popover-header': title,
                 '.popover-body': content
             });
-            this.tooltip.show();
+            tooltip.show();
         } else {
-            this.tooltip.update();
+            tooltip.update();
         }
 
-        networkMan.groupManager.setTooltip(this.tooltip);
+        networkMan.groupManager.tooltip = tooltip;
+        networkMan.groupManager.tooltipContainer = container;
     }
 
     /** 
@@ -278,19 +291,12 @@ export default class NodesMan {
         return content;
     }
 
-    /**
-     * Remove the current tooltip
-     */
-    removeTooltip() {
-        this.tooltip.hide();
-        this.tooltip = null;
-    }
-
     /** 
     * Turn node colors to default
     * @param {Object} node node that is going to be edited
     */
     turnNodeColorToDefault(node) {
+        console.log(node);
         const color = this.explCommMan.getNodeBackgroundColor(node);
 
         node.color = {
@@ -298,6 +304,7 @@ export default class NodesMan {
             border: color
         }
         node.defaultColor = true;
+        console.log(node);
     }
 
     /** 
@@ -306,10 +313,12 @@ export default class NodesMan {
      */
     turnNodeDark(node) {
         node.defaultColor = false;
-        node.color.background = nodes.NoFocusColor.Background;
-        node.color.border = nodes.NoFocusColor.Border;
-    }
 
+        node["color"] = {
+            background: nodes.NoFocusColor.Background,
+            border: nodes.NoFocusColor.Border
+        };
+    }
     /** 
      * Function executed when a node is selected
      * @param {Object} values parameters of the node

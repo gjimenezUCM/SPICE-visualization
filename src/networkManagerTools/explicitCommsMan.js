@@ -6,23 +6,27 @@
 
 //Namespaces
 import { comms } from "../namespaces/communities.js";
+import { nodes } from "../namespaces/nodes.js";
 
 export default class ExplicitCommsMan {
 
     /**
      * Constructor of the class
      * @param {NetworkMan} network networkManager parent object
-     * @param {Array} communitiesKeys Array with the key values that are going to change how nodes are view
      */
-    constructor(network, communitiesKeys = null) {
+    constructor(network) {
         this.networkMan = network;
 
         //DEBUG. This should be an input from the user
-        communitiesKeys = new Array("ageGroup", "language");
+        //communitiesKeys = new Array("ageGroup", "language");
+        
+
+        //Contains all explicit Communities with its values
+        this.communitiesData = new Array();
 
         /*Tracks the order of CommunityKeys to know what attribute each one changes.
         the order of this array determines what function of this.commChecker is used with the attribute*/
-        this.commOrder = communitiesKeys;
+        this.commOrder = new Array();
 
         //Array with the functions that change node attributes based on the community value
         this.commChecker = [
@@ -30,9 +34,33 @@ export default class ExplicitCommsMan {
             (node, val) => this.changeShape(node, val)
         ];
 
-        this.initNewFilter();
+        //this.initNewFilter();
     }
 
+    /** 
+     * Execute while parsing nodes. It finds all explicit Community and all its values
+     * @param {Object} node node with the explicit Community
+     */
+    findExplicitCommunities(node) {
+        const explicitData = node[comms.ExpUserKsonKey];
+        const keys = Object.keys(explicitData);
+
+        keys.forEach((key) => {
+            if (this.communitiesData.length === 0) {
+                this.communitiesData.push({ key: key, values: new Array(explicitData[key]) });
+            } else {
+                let community = this.communitiesData.find(element => element.key === key);
+
+                if (community === undefined) {
+                    this.communitiesData.push({ key: key, values: new Array(explicitData[key]) });
+                } else {
+                    if (!community.values.includes(explicitData[key])) {
+                        community.values.push(explicitData[key]);
+                    }
+                }
+            }
+        });
+    }
     /**
      * Init community Arrays for a new iteration of the explicit Community Filtering
      */
@@ -54,7 +82,7 @@ export default class ExplicitCommsMan {
      * Look for the Explicit Communities of the node and edit its attributes based on them
      * @param {Object} node node that is going to be edited
      */
-    lookForExplicitCommunities(node) {
+    filterExplicitCommunities(node) {
         for (let i = 0; i < this.commOrder.length; i++) {
             const nodeComms = node[comms.ExpUserKsonKey];
             const value = nodeComms[this.commOrder[i]];
@@ -111,10 +139,15 @@ export default class ExplicitCommsMan {
      * @returns {String} Returns a string in the format of "rbg(255,255,255, 1)""
      */
     getNodeBackgroundColor(node) {
-        const nodeComms = node[comms.ExpUserKsonKey];
-        const key = nodeComms[this.commOrder[0]];
+        if (this.commOrder.length >= 1) {
+            console.log("A");
+            const nodeComms = node[comms.ExpUserKsonKey];
+            const key = nodeComms[this.commOrder[0]];
 
-        return this.nodeColors.get(key);
+            return this.nodeColors.get(key);
+        } else {
+            return {Color: nodes.NodeColor, Border: nodes.NodeColor};
+        }
     }
 
     /**
@@ -123,10 +156,14 @@ export default class ExplicitCommsMan {
      * @returns {Object} Returns an object with the format: "{shape: (String), vOffset: (integer), selOffset: (integer)} 
      */
     getNodeShape(node) {
-        const nodeComms = node[comms.ExpUserKsonKey];
-        const key = nodeComms[this.commOrder[1]];
+        if (this.commOrder.length >= 2) {
+            const nodeComms = node[comms.ExpUserKsonKey];
+            const key = nodeComms[this.commOrder[1]];
 
-        return this.nodeShapes.get(key);
+            return this.nodeShapes.get(key);
+        } else {
+            return nodes.NodeShape;
+        }
     }
 
     /**
@@ -175,10 +212,10 @@ export default class ExplicitCommsMan {
     }
 
     /**
-     * Returns current filtered communities and its values
-     * @returns {Object} Object with the format of {key: (string), values: (String[])}
+     * Returns all detected Explicit Communities and the max size of our filter
+     * @returns {Object} Object with the format of {data: {key: (string), values: (String[])}, filterSize: (int)}
      */
-    getCommunities() {
-        return this.commsValues;
+    getCommunitiesData() {
+        return { data: this.commsValues, filterSize: this.commChecker.length };
     }
 }
