@@ -150,6 +150,27 @@ export default class NetworkGroupMan {
     }
 
     /**
+     * Init the key's network's nodes visuals and parameters to change node's attributes based on the communities 
+     * @param {String} key key of the network
+     * @param {Object} communities Object with the format of {key: (string), values: (String[])}
+     */
+    initFilter(key, communities) {
+        const network = this.activesNetworksMap.get(key);
+
+        network.initFilter(communities);
+    }
+
+    /**
+     * Init all networks's nodes visuals and parameters to change node's attributes based on the communities 
+     * @param {Object} communities Object with the format of {key: (string), values: (String[])}
+     */
+    initFilterALL(communities) {
+        this.activesNetworksArray.forEach((network) => {
+            this.initFilter(network.key, communities);
+        });
+    }
+
+    /**
      * Returns all detected Explicit Communities and the max size of our filter of the first network
      * (All networks should have the same)
      * @returns {Object} Object with the format of {data: {key: (string), values: (String[])}, filterSize: (int)}
@@ -162,7 +183,7 @@ export default class NetworkGroupMan {
      * Hide the current active popover
      */
     hidePopover() {
-        if (this.tooltip !== null) { this.tooltip.hide();}
+        if (this.tooltip !== null) { this.tooltip.hide(); }
     }
 
 }

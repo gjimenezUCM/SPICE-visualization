@@ -35,6 +35,12 @@ export default class ControlPanel {
         document.getElementById(networkHTML.controlPanelParentContainer).appendChild(this.container);
 
         //TODO. User should be able to choose what communities want to represent visualy
+        this.filteredCommunities = new Array();
+        for(let i = 0; i < communities.filterSize; i++){
+            this.filteredCommunities.push(communities.data[i]);
+        }
+        this.networkManager.initFilterALL(this.filteredCommunities);
+        
     }
 
     /** 

@@ -166,7 +166,7 @@ export default class NetworkMan {
             this.implCommMan.updateCommunityInfoFromClick(event);
         }
 
-        
+
     }
 
     /** 
@@ -305,6 +305,23 @@ export default class NetworkMan {
             this.explCommMan.highlightCommunities(selectedCommunities);
     }
 
+    /**
+     * Init the node visuals and parameters to change node's attributes based on the communities 
+     * @param {Object} communities Object with the format of {key: (string), values: (String[])}
+     */
+    initFilter(communities) {
+        this.explCommMan.initFilter(communities);
+
+        const newNodes = new Array();
+        this.data.nodes.forEach((node) => {
+
+            this.explCommMan.updateNodeVisuals(node);
+            newNodes.push(node);
+
+        });
+        this.data.nodes.update(newNodes);
+    }
+    
     /**
      * Returns all detected Explicit Communities and the max size of our filter
      * @returns {Object} Object with the format of {data: {key: (string), values: (String[])}, filterSize: (int)}
