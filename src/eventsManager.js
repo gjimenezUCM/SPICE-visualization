@@ -1,4 +1,4 @@
-import NetworkManager from "./networkManager";
+import NetworkGroupMan from "./networkGroupMan.js";
 import RequestManager from "./requestManager";
 import { Dropdown } from 'bootstrap';
 import { Popover } from 'bootstrap';
@@ -19,7 +19,7 @@ export default class EventsManager {
         this.dataDirectory = "data/";
 
         this.requestManager = new RequestManager(baseURL);
-        this.networkManager = new NetworkManager();
+        this.networkManager = new NetworkGroupMan();
 
         this.controlPanel = new ControlPanel(this.networkManager);
 

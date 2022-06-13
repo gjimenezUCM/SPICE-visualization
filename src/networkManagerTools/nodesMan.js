@@ -182,18 +182,17 @@ export default class NodesMan {
     /**
      * Update or create the tooltip of a node
      * @param {Integer} id id of the node
-     * @param {DrawNetwork} drawNetwork drawNetwork where this tooltip is going to be drawn
+     * @param {NetworkMan} networkMan networkManager where this tooltip is going to be drawn
      * @param {Boolean} respawn Boolean saying if the tooltip should do the "spawn" animation
      */
-    updateTooltip(id, drawNetwork, respawn = true) {
-        this.currentTooltiId = id;
-        const canvasPosition = this.getElementPosition(networkHTML.topCanvasContainer + drawNetwork.key)
+    updateTooltip(id, networkMan, respawn = true) {
+        const canvasPosition = this.getElementPosition(networkHTML.topCanvasContainer + networkMan.key)
 
-        const nodeCanvasPosition = drawNetwork.network.getPosition(id);
-        const nodePosition = drawNetwork.network.canvasToDOM(nodeCanvasPosition);
+        const nodeCanvasPosition = networkMan.network.getPosition(id);
+        const nodePosition = networkMan.network.canvasToDOM(nodeCanvasPosition);
 
         //Depending on the zoom, we increase the offset
-        const xOffset = drawNetwork.network.getScale() * 40;
+        const xOffset = networkMan.network.getScale() * 40;
         //Calculate the real absolute click coordinates
         const clickX = nodePosition.x + canvasPosition.left + xOffset;
         const clickY = nodePosition.y + canvasPosition.top;
@@ -218,6 +217,9 @@ export default class NodesMan {
             document.body.append(this.popoverContainer);
 
             this.tooltip = new Popover(this.popoverContainer, options);
+
+            this.tooltip.zoomUpdate = () => this.updateTooltip(id, networkMan, false);
+            this.tooltip.remove = () => this.removeTooltip();
         }
 
         this.popoverContainer.style.top = clickY + "px";
@@ -234,7 +236,7 @@ export default class NodesMan {
             this.tooltip.update();
         }
 
-        drawNetwork.networkManager.setTooltip(this.tooltip);
+        networkMan.groupManager.setTooltip(this.tooltip);
     }
 
     /** 
@@ -277,12 +279,11 @@ export default class NodesMan {
     }
 
     /**
-     * Update the tooltip to better align with the zoom
-     * @param {DrawNetwork} drawNetwork drawNetwork with the tooltip
+     * Remove the current tooltip
      */
-    updateZoomTooltip(drawNetwork) {
-        if(this.tooltip !== null)
-        this.updateTooltip(this.currentTooltiId, drawNetwork, false)
+    removeTooltip() {
+        this.tooltip.hide();
+        this.tooltip = null;
     }
 
     /** 

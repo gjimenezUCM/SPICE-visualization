@@ -11,11 +11,11 @@ export default class ExplicitCommsMan {
 
     /**
      * Constructor of the class
-     * @param {DrawNetwork} network DrawNetwork parent object
+     * @param {NetworkMan} network networkManager parent object
      * @param {Array} communitiesKeys Array with the key values that are going to change how nodes are view
      */
     constructor(network, communitiesKeys = null) {
-        this.drawNetwork = network;
+        this.networkMan = network;
 
         //DEBUG. This should be an input from the user
         communitiesKeys = new Array("ageGroup", "language");
@@ -79,7 +79,7 @@ export default class ExplicitCommsMan {
             this.nodeColors.set(value, color);
         }
 
-        this.drawNetwork.nodesMan.turnNodeColorToDefault(node);
+        this.networkMan.nodesMan.turnNodeColorToDefault(node);
     }
 
     /**
@@ -138,7 +138,7 @@ export default class ExplicitCommsMan {
 
         //Update all nodes color acording to their selected status
         const newNodes = new Array();
-        this.drawNetwork.data.nodes.forEach((node) => {
+        this.networkMan.data.nodes.forEach((node) => {
             let count = 0;
             for (let i = 0; i < n; i++) {
                 if (this.nodeHasCommunity(node, selectedCommunities[i].key, selectedCommunities[i].values)) {
@@ -147,14 +147,14 @@ export default class ExplicitCommsMan {
             }
 
             if (count === n)
-                this.drawNetwork.nodesMan.turnNodeColorToDefault(node)
+                this.networkMan.nodesMan.turnNodeColorToDefault(node)
             else
-                this.drawNetwork.nodesMan.turnNodeDark(node)
+                this.networkMan.nodesMan.turnNodeDark(node)
 
             newNodes.push(node);
         });
 
-        this.drawNetwork.data.nodes.update(newNodes);
+        this.networkMan.data.nodes.update(newNodes);
     }
 
     /**

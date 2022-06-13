@@ -121,15 +121,15 @@ export default class EdgesMan {
     /**
      * Update the variable that says if the edge should vary with the similarity value and update
      * all edges acordingly
-     * @param {DrawNetwork} drawNetwork parent drawnetwork object
+     * @param {NetworkMan} networkMan parent networkManager object
      * @param {Boolean} newBool new value
      */
-    updateVariableEdge(drawNetwork, newBool) {
+    updateVariableEdge(networkMan, newBool) {
         this.variableEdge = newBool;
         let max = this.getMaxWidth();
 
-        drawNetwork.options.edges.scaling.max = max;
-        drawNetwork.network.setOptions(drawNetwork.options);
+        networkMan.options.edges.scaling.max = max;
+        networkMan.network.setOptions(networkMan.options);
 
         //Update all edges with the new options
         this.edges.update(this.edges);

@@ -17,22 +17,22 @@ import ExplicitCommsMan from "./networkManagerTools/explicitCommsMan.js";
 import NodesMan from "./networkManagerTools/nodesMan.js";
 import EdgesMan from "./networkManagerTools/edgesMan.js";
 
-export default class DrawNetwork {
+export default class NetworkMan {
 
     /**
      * Constructor of the class
      * @param {Object} jsonInput json input with all the network data
      * @param {HTMLElement} container container of the network
      * @param {HTMLElement} rightContainer container of the dataTables
-     * @param {NetworkManager} networkManager manager of all active networks
+     * @param {NetworkGroupManager} networkManager manager of all active networks
      * @param {Object} config config options for edges
      */
     constructor(jsonInput, container, rightContainer, networkManager, config) {
         this.container = container;
-        this.networkManager = networkManager;
+        this.groupManager = networkManager;
         this.key = config.key;
 
-        this.implCommMan = new ImplicitCommsMan(jsonInput, rightContainer);
+        this.implCommMan = new ImplicitCommsMan(jsonInput, rightContainer, this);
         this.explCommMan = new ExplicitCommsMan(this);
 
         this.nodesMan = new NodesMan(this.explCommMan, rightContainer);
@@ -149,13 +149,14 @@ export default class DrawNetwork {
      * @param {Object} event Click event
      */
     clickEvent(event) {
+        this.groupManager.hidePopover();
+
         if (event.nodes.length > 0) {
             this.nodeHasBeenClicked(event.nodes[0]);
         } else {
-            this.noNodeIsClicked()
+            this.noNodeIsClicked();
+            this.implCommMan.checkBoundingBoxClick(event);
         }
-
-        this.implCommMan.checkBoundingBoxClick(event);
     }
 
     /** 
@@ -163,7 +164,10 @@ export default class DrawNetwork {
      * @param {Object} event Zoom event
      */
     zoomEvent(event) {
-        this.nodesMan.updateZoomTooltip(this);
+        const tooltip = this.groupManager.tooltip;
+
+        if (tooltip !== null)
+            tooltip.zoomUpdate();
     }
 
     /** 
@@ -171,7 +175,7 @@ export default class DrawNetwork {
     * @param {*} id id of the node 
     */
     nodeHasBeenClicked(id) {
-        this.networkManager.nodeSelected(id);
+        this.groupManager.nodeSelected(id);
 
         //We only create the tooltip in this network
         //We need a timeout to print the tooltip once zoom has ended
@@ -238,7 +242,7 @@ export default class DrawNetwork {
      * Function executed only when this was the network that received the click event but no nodes was clicked
      */
     noNodeIsClicked() {
-        this.networkManager.nodeDeselected();
+        this.groupManager.nodeDeselected();
     }
 
     /**

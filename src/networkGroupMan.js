@@ -7,9 +7,9 @@
 //Namespace
 import { networkHTML } from "./namespaces/networkHTML.js";
 //Local classes
-import DrawNetwork from "./drawNetwork";
+import NetworkMan from "./networkMan.js";
 
-export default class NetworkManager {
+export default class NetworkGroupMan {
 
     /**
      * Constructor of the class
@@ -31,7 +31,7 @@ export default class NetworkManager {
     addNetwork(file, leftContainer, rightContainer, config) {
         try {
             const jsonFile = JSON.parse(file);
-            const network = new DrawNetwork(jsonFile, leftContainer, rightContainer, this, config);
+            const network = new NetworkMan(jsonFile, leftContainer, rightContainer, this, config);
 
             this.activesNetworksMap.set(config.key, network);
             this.activesNetworksArray.push(network);
@@ -64,6 +64,8 @@ export default class NetworkManager {
      * @param {Popover} newTooltip new bootstrap popover object
      */
     setTooltip(newTooltip) {
+        this.hidePopover();
+
         this.tooltip = newTooltip;
     }
 
@@ -72,8 +74,7 @@ export default class NetworkManager {
      * @param {Integer} id id of the selected node
      */
     nodeSelected(id) {
-        if (this.tooltip !== null) this.tooltip.hide();
-
+        this.hidePopover();
         this.activesNetworksArray.forEach((network) => network.nodeSelected(id));
     }
 
@@ -81,8 +82,7 @@ export default class NetworkManager {
      * Broadcast to all networks that no node was selected
      */
     nodeDeselected() {
-        if (this.tooltip !== null) this.tooltip.hide();
-
+        this.hidePopover();
         this.activesNetworksArray.forEach((network) => network.nodeDeselected());
     }
 
@@ -164,5 +164,12 @@ export default class NetworkManager {
     */
     getExplicitCommunities() {
         return this.activesNetworksArray[0].getExplicitCommunities();
+    }
+
+    /**
+     * Hide the current active popover
+     */
+    hidePopover() {
+        if (this.tooltip !== null) { this.tooltip.remove(); this.tooltip = null; }
     }
 }

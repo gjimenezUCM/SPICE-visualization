@@ -8,6 +8,7 @@
 
 //Namespaces
 import { comms } from "../namespaces/communities.js";
+import { networkHTML } from "../namespaces/networkHTML.js";
 //packages
 import { Popover } from 'bootstrap';
 
@@ -17,12 +18,16 @@ export default class ImplicitCommsMan {
      * Constructor of the class
      * @param {JSON} communityJson Json with the implicit community data
      * @param {HTMLElement} container Container where the dataTable is going to be placed
+     * @param {NetworkMan} networkMan networkManager parent of this object
      */
-    constructor(communityJson, container) {
+    constructor(communityJson, container, networkMan) {
         //Data of all implicit communities
         this.implComms = communityJson[comms.ImplGlobalJsonKey];
 
         this.tableContainer = container;
+
+        this.networkMan = networkMan;
+        this.tooltip = null;
     }
 
     /**
@@ -82,7 +87,9 @@ export default class ImplicitCommsMan {
      * @param {DataSet} data Data of the nodes in the network
      * @param {Network} network Network with the nodes
      */
-    drawBoundingBoxes(ctx, data, network) {
+    drawBoundingBoxes(ctx, data) {
+        const network = this.networkMan.network;
+
         //Tracks the draw order of the bounding boxes
         this.bbOrder = new Array();
 
@@ -187,6 +194,10 @@ export default class ImplicitCommsMan {
         for (let i = 0; i < this.tableHtmlRows.length; i++) {
             this.tableHtmlRows[i].right.innerText = newComm[comms.ImplWantedAttr[i]];
         }
+
+        setTimeout(function () {
+            this.updateTooltip(newComm, this.bb[i]);
+        }.bind(this), 100);
     }
 
     /**
@@ -198,6 +209,104 @@ export default class ImplicitCommsMan {
         }
     }
 
+    /**
+     * Update the Tooltip with the comunity clicked data
+     * @param {Object} community 
+     * @param {BoundingBox} bb 
+     * @param {Boolean} respawn 
+     */
+    updateTooltip(community, bb, respawn = true) {
+        const canvasPosition = this.getElementPosition(networkHTML.topCanvasContainer + this.networkMan.key)
+
+        const bbLeft = this.networkMan.network.canvasToDOM({ x: bb.left, y: bb.top });
+        const bbRight = this.networkMan.network.canvasToDOM({ x: bb.right, y: bb.bottom });
+
+        const clickX = bbLeft.x + (bbRight.x - bbLeft.x) / 2 + canvasPosition.left;
+        const clickY = bbLeft.y + (bbRight.y - bbLeft.y) / 2 + canvasPosition.top;
+
+        const title = "<h5> " + community.id + "</h5>";
+        const content = this.getTooltipContent(community);
+
+        if (this.tooltip === null) {
+
+            //Create the popover
+            const options = {
+                trigger: "manual",
+                placement: "right",
+                template: "<div class=\"popover node\" role=\"tooltip\"><div class=\"popover-arrow\"></div><h3 class=\"popover-header\"></h3><div class=\"popover-body\"></div></div>",
+                fallbackPlacements: ["right"],
+                content: " ",
+                offset: [0, 0],
+                html: true,
+            };
+
+            this.popoverContainer = document.createElement("div");
+            document.body.append(this.popoverContainer);
+
+
+            this.tooltip = new Popover(this.popoverContainer, options);
+
+            this.tooltip.zoomUpdate = () => this.updateTooltip(community, bb, false);
+            this.tooltip.remove = () => this.removeTooltip();
+        }
+
+        this.popoverContainer.style.top = clickY + "px";
+        this.popoverContainer.style.left = clickX + "px";
+        this.popoverContainer.style.position = "absolute";
+
+        if (respawn) {
+            this.tooltip.setContent({
+                '.popover-header': title,
+                '.popover-body': content
+            });
+            this.tooltip.show();
+        } else {
+            this.tooltip.update();
+        }
+
+        this.networkMan.groupManager.setTooltip(this.tooltip);
+    }
+
+    /** 
+     * Get the element position in the dom
+     * @param {Integer} id id of the element
+     * @returns {Object} Returns an object in the format of {top: (float), left: (float)}
+     */
+    getElementPosition(id) {
+        const element = document.getElementById(id);
+        const cs = window.getComputedStyle(element);
+        const marginTop = cs.getPropertyValue('margin-top');
+        const marginLeft = cs.getPropertyValue('margin-left');
+
+        const top = element.offsetTop - parseFloat(marginTop);
+        const left = element.offsetLeft - parseFloat(marginLeft);
+
+        return { top: top, left: left };
+    }
+
+    /**
+     * Returns the content of the community Tooltip
+     * @param {Object} community 
+     * @returns {String} returns a string with the html content
+     */
+    getTooltipContent(community) {
+        let content = "";
+
+        for (let i = 0; i < comms.ImplWantedAttr.length; i++) {
+            content += "<b>" + comms.ImplWantedAttr[i] + "</b> "
+            content += community[comms.ImplWantedAttr[i]] + "<br>";
+        }
+
+        return content;
+    }
+
+    /**
+     * Remove the current tooltip
+     */
+    removeTooltip() {
+        this.tooltip.hide();
+        this.tooltip = null;
+    }
 
     //This is intended for debug purpouses
     getCommunityBBcolor(index) {
