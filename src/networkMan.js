@@ -96,6 +96,13 @@ export default class NetworkMan {
                     node: this.nodesMan.nodeChosen.bind(this),
                     label: this.nodesMan.labelChosen.bind(this),
                 },
+                color: {
+                    background: nodes.NodeColor,
+                    border: nodes.NodeColor,
+                },
+                font: {
+                    vadjust: nodes.NodevOffset,
+                }
 
             },
             groups: {
@@ -155,8 +162,11 @@ export default class NetworkMan {
             this.nodeHasBeenClicked(event.nodes[0]);
         } else {
             this.noNodeIsClicked();
-            this.implCommMan.checkBoundingBoxClick(event);
+            this.implCommMan.updateTooltipInfo(event);
+            this.implCommMan.updateCommunityInfoFromClick(event);
         }
+
+        
     }
 
     /** 
@@ -194,6 +204,8 @@ export default class NetworkMan {
 
         this.nodesMan.updateDataPanel(id);
 
+        //Update community data table
+        this.implCommMan.updateCommunityInfoFromNodeId(id);
         //Search for the nodes that are connected to the selected Node
         const selectedNodes = new Array();
         selectedNodes.push(id)
@@ -220,13 +232,12 @@ export default class NetworkMan {
         }
         this.network.fit(fitOptions);
 
-        console.log(selectedNodes);
         //Update all nodes color acording to their selected status
         const newNodes = new Array();
         this.data.nodes.forEach((node) => {
             if (selectedNodes.includes(node.id)) {
                 if (!node.defaultColor) {
-                    this.nodesMan.turnNodeColorToDefault(node)
+                    this.nodesMan.turnNodeColorToDefault(node);
                     newNodes.push(node);
                 }
 

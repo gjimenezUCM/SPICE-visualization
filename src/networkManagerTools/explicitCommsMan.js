@@ -19,7 +19,7 @@ export default class ExplicitCommsMan {
 
         //DEBUG. This should be an input from the user
         //communitiesKeys = new Array("ageGroup", "language");
-        
+
 
         //Contains all explicit Communities with its values
         this.communitiesData = new Array();
@@ -146,7 +146,7 @@ export default class ExplicitCommsMan {
 
             return this.nodeColors.get(key);
         } else {
-            return {Color: nodes.NodeColor, Border: nodes.NodeColor};
+            return nodes.NodeColor;
         }
     }
 

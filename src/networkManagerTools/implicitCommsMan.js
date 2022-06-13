@@ -167,12 +167,9 @@ export default class ImplicitCommsMan {
         */
         for (let i = 0; i < this.bb.length; i++) {
             if (this.clickInsideBox(this.bb[i], x, y)) {
-                this.updateCommunityInfo(i);
-                return;
+                return i;
             }
         }
-
-        this.clearCommunityInfo();
     }
 
     /**
@@ -188,17 +185,42 @@ export default class ImplicitCommsMan {
 
     /**
      * Update the Table with the data of a community
-     * @param {Integer} i index of the bounding box clicked
+     * @param {Object} event Data of the click event that trigered this function
      */
-    updateCommunityInfo(i) {
-        const newComm = this.implComms[this.bbOrder[i]];
+    updateCommunityInfoFromClick(event) {
+        this.clearCommunityInfo();
+
+        let i = this.checkBoundingBoxClick(event);
+        if (i !== undefined) {
+            const newComm = this.implComms[this.bbOrder[i]];
+            for (let i = 0; i < this.tableHtmlRows.length; i++) {
+                this.tableHtmlRows[i].right.innerText = newComm[comms.ImplWantedAttr[i]];
+            }
+        }
+    }
+
+    updateCommunityInfoFromNodeId(id) {
+        let i = this.networkMan.data.nodes.get(id)[comms.ImplUserNewKey];
+        const newComm = this.implComms[i];
         for (let i = 0; i < this.tableHtmlRows.length; i++) {
             this.tableHtmlRows[i].right.innerText = newComm[comms.ImplWantedAttr[i]];
         }
+    }
 
-        setTimeout(function () {
-            this.updateTooltip(newComm, this.bb[i]);
-        }.bind(this), nodes.ZoomDuration + nodes.TooltipSpawnTimer / 2);
+    /**
+     * Update the Tooltip with the data of a community
+     * @param {Object} event Data of the click event that trigered this function
+     */
+    updateTooltipInfo(event) {
+        let i = this.checkBoundingBoxClick(event);
+
+        if (i !== undefined) {
+            const newComm = this.implComms[this.bbOrder[i]];
+
+            setTimeout(function () {
+                this.updateTooltip(newComm, this.bb[i]);
+            }.bind(this), nodes.ZoomDuration + nodes.TooltipSpawnTimer / 2);
+        }
     }
 
     /**
@@ -219,7 +241,7 @@ export default class ImplicitCommsMan {
     updateTooltip(community, bb, respawn = true) {
         let tooltip = this.networkMan.groupManager.tooltip;
         let container = this.networkMan.groupManager.tooltipContainer;
-        
+
         if (respawn) {
             if (tooltip !== null) {
                 tooltip.hide();

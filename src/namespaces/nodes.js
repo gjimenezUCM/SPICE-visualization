@@ -25,9 +25,11 @@ export const nodes = {
     TooltipSpawnTimer: 500,
 
     //Default value for a background color when the explicit community doesnt change it
-    NodeColor: "#D2E5FF",
+    NodeColor: "#D2C7F9",
     //Default value for a node shape when the explicit community doesnt change it
-    NodeShape: "circle",
+    NodeShape: "dot",
+    //Default value for vAdjust label for the default shape,
+    NodevOffset: -31,
 
     NodeBorderWidth: 2,
     NodeBorderWidthSelected: 4,

@@ -296,15 +296,13 @@ export default class NodesMan {
     * @param {Object} node node that is going to be edited
     */
     turnNodeColorToDefault(node) {
-        console.log(node);
         const color = this.explCommMan.getNodeBackgroundColor(node);
-
-        node.color = {
+        
+        node["color"] = {
             background: color,
             border: color
         }
         node.defaultColor = true;
-        console.log(node);
     }
 
     /** 
