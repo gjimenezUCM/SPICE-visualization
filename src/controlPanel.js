@@ -1,4 +1,5 @@
 import { networkHTML } from "./namespaces/networkHTML";
+import { Collapse } from 'bootstrap';
 
 export default class ControlPanel {
 
@@ -25,22 +26,22 @@ export default class ControlPanel {
 
         const sliderContainer = this.createThresholdSliderContainer();
         const checkboxContainer = this.createVariableEdgeCheckBoxContainer();
-        //const explicitContainer = this.createExplicitCommunityChooser(exp_communities);
+        const legendContainer = this.createLegendContainer();
 
         this.container.appendChild(inputTitle);
         this.container.appendChild(sliderContainer);
         this.container.appendChild(checkboxContainer);
-        //this.container.appendChild(explicitContainer);
+        this.container.appendChild(legendContainer);
 
         document.getElementById(networkHTML.controlPanelParentContainer).appendChild(this.container);
 
         //TODO. User should be able to choose what communities want to represent visualy
         this.filteredCommunities = new Array();
-        for(let i = 0; i < communities.filterSize; i++){
+        for (let i = 0; i < communities.filterSize; i++) {
             this.filteredCommunities.push(communities.data[i]);
         }
         this.networkManager.initFilterALL(this.filteredCommunities);
-        
+
     }
 
     /** 
@@ -142,5 +143,77 @@ export default class ControlPanel {
         this.isActive = false;
 
         document.getElementById(networkHTML.controlPanelParentContainer).removeChild(this.container);
+    }
+
+
+    createLegendContainer(){
+        let div = document.createElement("div");
+        div.innerText = "Internal Acoordeon 1";
+        let acoordion1 = this.createAcordion("miPrimeraId1", [div]);
+
+        div = document.createElement("div");
+        div.innerText = "Internal Acoordeon 2";
+        let acoordion2 = this.createAcordion("miPrimeraId2", [div]);
+
+        div = document.createElement("div");
+        div.innerText = "Internal Acoordeon 3";
+        let acoordion3 = this.createAcordion("miPrimeraId3", [div]);
+
+        let acoordion = this.createAcordion("topId", [acoordion1, acoordion2, acoordion3]);
+
+        return acoordion;
+    }
+
+    createAcordion(id, collapsable) {
+
+        const topAcordion = document.createElement("div");
+        topAcordion.className = "accordion";
+
+        const topItem = document.createElement("div");
+        topItem.className = "accordion-item";
+        topAcordion.append(topItem);
+
+        const topHeader = document.createElement("h2");
+        topHeader.className = "accordion-header";
+        topItem.append(topHeader);
+
+        const topButton = document.createElement("button");
+        topButton.className = "accordion-button collapsed";
+        topButton.type = "button";
+        topButton.innerText = "Legend";
+        topButton.setAttribute("data-bs-toggle", "collapse");
+        topButton.setAttribute("data-bs-target", "#" + id);
+
+        topHeader.append(topButton);
+
+        const colOne = document.createElement("div");
+        colOne.className = "accordion-collapse collapse";
+        colOne.id = id;
+        topItem.append(colOne);
+
+        const colOneBody = document.createElement("div");
+        colOneBody.className = "accordion-body";
+        colOne.append(colOneBody);
+
+        for (let i = 0; i < collapsable.length; i++) {
+
+            colOneBody.append(collapsable[i]);
+
+        }
+
+        new Collapse(colOne, { toggle: false });
+        colOne.addEventListener("show.bs.collapse", (event) => {
+
+            if (event.target.id === id)
+                topButton.className = "accordion-button";
+        });
+        colOne.addEventListener("hide.bs.collapse", (event) => {
+            if (event.target.id === id)
+                topButton.className = "accordion-button collapsed";
+        });
+
+
+        return topAcordion;
+
     }
 }   
