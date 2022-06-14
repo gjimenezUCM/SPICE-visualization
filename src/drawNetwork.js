@@ -68,6 +68,10 @@ export default class DrawNetwork {
             color: "rgba(255, 130, 132, 1)", border: "rgba(224, 100, 103, 1)",
             colorSelected: "rgba(238, 193, 174, 1)", borderSelected: "rgba(230, 172, 173, 1)"
         }); //Red
+        this.groupColor.push({
+             color: "rgba(255, 255, 170, 0.6)", border: "rgba(255, 222, 120, 1)", 
+            colorSelected: "rgba(255, 255, 170, 0.6)", borderSelected: "rgba(255, 222, 120, 1)"
+        }); //Yellow
 
         this.darkenColor = { background: "rgba(155, 155, 155, 0.3)", border: "rgba(100, 100, 100, 0.3)" };
 
@@ -97,10 +101,10 @@ export default class DrawNetwork {
      */
     initDataTableParameters() {
         //Internal/Aux attributes that are not intended to be shown to the user. These tags should be the same as the node keys names
-        this.notShowAttributes = new Array("defaultColor", "borderWidth", "color", "group");
+        this.notShowAttributes = new Array("defaultColor", "borderWidth", "color", "group", "shape", "explicit_community", "boxGroup");
 
         //Atributes that all nodes have and are important to show. These tags should be the same as the node keys names
-        this.mainShowAttributes = new Array("id", "label", this.groupColor_key, "boxGroup");
+        this.mainShowAttributes = new Array("id", "label", /*this.groupColor_key, "boxGroup"*/);
 
         //Array with all dataTable columns. Its used to easily iterate over all of them
         this.dataPanelContainers = new Array();
@@ -127,16 +131,25 @@ export default class DrawNetwork {
      * @returns 
      */
     parseNodes(json) {
+        const shapes =  {
+           EN: "circle",
+           ES: "diamond",
+           IT: "box", 
+           HE: "triangle" 
+        };
+        const age = ["young", "adult", "elderly"];
         for (const node of json.users) {
 
             //"BoxGroup" is the key we will use to track what nodes should be inside the same big bounding box
             node["boxGroup"] = parseInt(node[this.boxGroup_key]);
 
+            console.log(node.ageGroup, age.indexOf(node.ageGroup));
             //Vis uses "group" key to change the color of all nodes with the same key
-            node["group"] = "group_" + node[this.groupColor_key];
+            node["group"] = "group_" + age.indexOf(node.ageGroup);//node[this.groupColor_key];
 
             //This attribute will be used to know if the node is with the default color. To improve performance
             node["defaultColor"] = true;
+            node['shape'] = shapes[node.language];
         }
         const nodes = new DataSet(json.users);
         return nodes;
@@ -321,6 +334,16 @@ export default class DrawNetwork {
                             border: this.groupColor[1].borderSelected,
                         }
                     }
+                },
+                group_2: {
+                    color: {
+                        background: this.groupColor[2].color,
+                        border: this.groupColor[2].border,
+                        highlight: {
+                            background: this.groupColor[2].colorSelected,
+                            border: this.groupColor[2].borderSelected,
+                        }
+                    }
                 }
             },
             physics: {
@@ -433,8 +456,10 @@ export default class DrawNetwork {
         let content = "";
 
         content += "<b> Label: </b> " + node["label"] + "<br>";
-        content += "<b> " + this.groupColor_key + ": </b> " + node[this.groupColor_key] + "<br>";
-        content += "<b> Group: </b> " + node["boxGroup"] + "";
+        //content += "<b> " + this.groupColor_key + ": </b> " + node[this.groupColor_key] + "<br>";
+        content += "<b> Age: </b> " + node.ageGroup + "<br>";
+        content += "<b> Nationality: </b> " + node.language + "<br>";
+        content += "<b> Community: </b> " + node["boxGroup"] + "";
 
         return content;
     }
