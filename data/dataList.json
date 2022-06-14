@@ -1,13 +1,9 @@
 {
 	"files": [{
-		"name": "data0"
+		"name": "perspective0"
 	}, {
-		"name": "data1"
+		"name": "perspective1"
 	}, {
-		"name": "data2"
-	}, {
-		"name": "data3"
-	}, {
-		"name": "data4"
+		"name": "perspective2"
 	}]
 }

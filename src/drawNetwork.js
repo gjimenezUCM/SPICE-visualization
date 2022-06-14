@@ -197,7 +197,7 @@ export default class DrawNetwork {
 
         const titleContainer = document.createElement('h5');
         titleContainer.className = "middle attributes border-bottom border-dark";
-        titleContainer.textContent = "Node Attributes";
+        titleContainer.textContent = "User Attributes";
 
         dataContainer.appendChild(titleContainer);
 
