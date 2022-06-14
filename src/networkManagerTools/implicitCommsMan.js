@@ -56,7 +56,7 @@ export default class ImplicitCommsMan {
     /**
      * Add a row to the community table
      * @param {integer} i index of the new row
-     * @param {integer} nRow max of rows
+     * @param {integer} nRow max number of rows
      * @param {HTMLElement} tableContainer html container of the table
      */
     addTableRow(i, nRow, tableContainer) {
@@ -86,7 +86,6 @@ export default class ImplicitCommsMan {
      * Draw the bounding boxes behind the network nodes
      * @param {CanvasRenderingContext2D} ctx Context of the canvas 
      * @param {DataSet} data Data of the nodes in the network
-     * @param {Network} network Network with the nodes
      */
     drawBoundingBoxes(ctx, data) {
         const network = this.networkMan.network;
@@ -184,7 +183,7 @@ export default class ImplicitCommsMan {
     }
 
     /**
-     * Update the Table with the data of a community
+     * Update the Table with the data of a community based on what bounding box was clicked
      * @param {Object} event Data of the click event that trigered this function
      */
     updateCommunityInfoFromClick(event) {
@@ -199,6 +198,10 @@ export default class ImplicitCommsMan {
         }
     }
 
+    /**
+     * Update the Table with the data of a community based on the id of the node clicked
+     * @param {Integer} id 
+     */
     updateCommunityInfoFromNodeId(id) {
         let i = this.networkMan.data.nodes.get(id)[comms.ImplUserNewKey];
         const newComm = this.implComms[i];
@@ -234,9 +237,9 @@ export default class ImplicitCommsMan {
 
     /**
      * Update the Tooltip with the comunity clicked data
-     * @param {Object} community 
-     * @param {BoundingBox} bb 
-     * @param {Boolean} respawn 
+     * @param {Object} community Data of the community clicked
+     * @param {BoundingBox} bb BB of the community clicked to get its center and spawn the tooltip there
+     * @param {Boolean} respawn If true, the tooltip will be created from 0 and will have a "fade in" animation
      */
     updateTooltip(community, bb, respawn = true) {
         let tooltip = this.networkMan.groupManager.tooltip;
@@ -251,6 +254,7 @@ export default class ImplicitCommsMan {
                 container.remove();
         }
 
+        //Get the exact position of the tooltip
         const canvasPosition = this.getElementPosition(networkHTML.topCanvasContainer + this.networkMan.key)
 
         const bbLeft = this.networkMan.network.canvasToDOM({ x: bb.left, y: bb.top });
@@ -264,7 +268,7 @@ export default class ImplicitCommsMan {
 
         if (tooltip === null) {
 
-            //Create the popover
+            //We use a bootstrap Popover as a tooltip
             const options = {
                 trigger: "manual",
                 placement: "right",

@@ -1,11 +1,21 @@
-import { networkHTML } from "./namespaces/networkHTML";
-import { Collapse } from 'bootstrap';
+/**
+ * @fileoverview This Class creates a single control panel for all networks. It also manages the user input
+ * to update networks acordingly
+ * @package It requires bootstrap to be able to create Collapses.
+ * @author Marco Expósito Pérez
+ */
+//Namespaces
+import { networkHTML } from "./namespaces/networkHTML.js";
 import { comms } from "./namespaces/communities.js";
-
-import Utils from "./Utils";
+//Packages
+import { Collapse } from 'bootstrap';
 
 export default class ControlPanel {
 
+    /**
+     * Constructor of the class
+     * @param {NetworkGroupManager} networkManager manager of all networks
+     */
     constructor(networkManager) {
         this.isActive = false;
         this.networkManager = networkManager;
@@ -15,12 +25,13 @@ export default class ControlPanel {
 
     /**
      * Creates the controlPanel if its not currently active
-     * @param {Object} communities Filtered communities used for some of the inputs
      */
-    createControlPanel(communities) {
+    createControlPanel() {
         if (this.isActive)
             return;
         this.isActive = true;
+
+        const communities = this.networkManager.getExplicitCommunities();
 
         //Create the control panel
         this.container = document.createElement("div");
@@ -54,7 +65,7 @@ export default class ControlPanel {
     /** 
      * Create a container with a slider that controls the minimum similarity Threshold 
      * for edges to be visible in the network
-     * @returns Container with the slider
+     * @returns {HTMLElement} Container with the slider
      */
     createThresholdSliderContainer() {
         const sliderContainer = document.createElement('div');
@@ -112,7 +123,7 @@ export default class ControlPanel {
     /** 
     * Create a container with a checkbox that controls if the network edges width should vary 
     * with its similarity
-    * @returns Container with the checkbox
+    * @returns {HTMLElement}  Container with the checkbox
     */
     createVariableEdgeCheckBoxContainer() {
         const checkboxContainer = document.createElement('div');
@@ -152,23 +163,33 @@ export default class ControlPanel {
         document.getElementById(networkHTML.controlPanelParentContainer).removeChild(this.container);
     }
 
-
+    /**
+     * Create a container with the legend. Legend rows also allow to filter the attributes of the 
+     * explicit communities
+     * @param {Object} filter Object with the format of {key: (string), values: (String[])}
+     * @returns {HTMLElement} returns the container with the legend/filter
+     */
     createLegendContainer(filter) {
         const innerAcoordionArray = [];
         for (let i = 0; i < filter.length; i++) {
-            const div = this.createLegendButtons(filter[i].values, i);
-            const innerAcord = this.createAcordion(filter[i].key, filter[i].key, [div]);
+            const div = this.createFilterButtons(filter[i].values, i);
+            const innerAcord = this.createAccordion(filter[i].key, filter[i].key, [div]);
 
             innerAcoordionArray.push(innerAcord);
         }
 
-        let acoordion = this.createAcordion("topId", "Legend", innerAcoordionArray, true);
+        let acoordion = this.createAccordion("topId", "Legend", innerAcoordionArray, true);
 
         return acoordion;
     }
 
-
-    createLegendButtons(values, n) {
+    /**
+     * Create all buttons that will filter the network for a community's values
+     * @param {String[]} values each value will create a new button
+     * @param {Integer} n Order of the community in the filter
+     * @returns {HTMLElement} returns the container with all buttons
+     */
+    createFilterButtons(values, n) {
         const container = document.createElement("div");
 
         for (let i = 0; i < values.length; i++) {
@@ -181,7 +202,7 @@ export default class ControlPanel {
 
             const newButton = document.createElement("Button");
             newButton.className = networkHTML.legendButtonClass + " active";
-            newButton.onclick = () => this.legendButtonClick(values[i], newButton);
+            newButton.onclick = () => this.filterButtonClick(values[i], newButton);
             topRow.append(newButton);
 
             const rowContainer = document.createElement("div");
@@ -202,16 +223,25 @@ export default class ControlPanel {
         return container;
     }
 
-    createAcordion(id, buttonName, collapsable, topClass = false) {
-        const topAcordion = document.createElement("div");
-        topAcordion.className = "accordion";
+    /**
+     * Create a accordion using bootstrap collapse class
+     * @param {String} id id of the accordion. All acordions with the same id will be closed 
+     * and opened at the same time 
+     * @param {String} buttonName Inner text of the accordion button
+     * @param {HTMLElement[]} collapsable Array of html elements to be collapsed inside this accordion
+     * @param {Boolean} topAccord Indicates if its the top accordion in a nested structure
+     * @returns {HTMLElement} returns a container with the accordion
+     */
+    createAccordion(id, buttonName, collapsable, topAccord = false) {
+        const topAccordion = document.createElement("div");
+        topAccordion.className = "accordion";
 
-        if (topClass)
-            topAcordion.className = "top " + topAcordion.className;
+        if (topAccord)
+            topAccordion.className = "top " + topAccordion.className;
 
         const topItem = document.createElement("div");
         topItem.className = "accordion-item";
-        topAcordion.append(topItem);
+        topAccordion.append(topItem);
 
         const topHeader = document.createElement("h2");
         topHeader.className = "accordion-header";
@@ -252,10 +282,17 @@ export default class ControlPanel {
         });
 
 
-        return topAcordion;
+        return topAccordion;
 
     }
 
+    /**
+     * Updates a container with the value visualized in some way. For example, Colors are visualized in 
+     * a square whose background is the color
+     * @param {HTMLElement} container container to be edited
+     * @param {Integer} filterPosition order in the filter
+     * @param {Integer} valueIndex order within the community values
+     */
     getCommunityValueIndicator(container, filterPosition, valueIndex) {
         let output = document.createElement("div");
 
@@ -273,28 +310,33 @@ export default class ControlPanel {
         container.append(output);
     }
 
-    legendButtonClick(value, button) {
+    /**
+     * Function executed when a filter/legend button is clicked
+     * @param {String} value value linked with the button
+     * @param {HTMLElement} button button 
+     */
+    filterButtonClick(value, button) {
         const btnClass = button.className;
         const isActive = btnClass.slice(btnClass.length - 6);
-        
-        if(isActive === "active"){
+
+        if (isActive === "active") {
             button.className = networkHTML.legendButtonClass;
 
             this.filterValuesToHide.push(value);
-        }else{
+        } else {
             button.className = networkHTML.legendButtonClass + "  active";
 
             const index = this.filterValuesToHide.indexOf(value);
-            if(index === -1){
-                this.legendButtonClick(value, button);
+            if (index === -1) {
+                this.filterButtonClick(value, button);
                 return;
 
-            }else{
+            } else {
                 this.filterValuesToHide.splice(index, 1);
             }
         }
 
         this.networkManager.updateFilterActivesALL(this.filterValuesToHide);
-       
+
     }
 }   

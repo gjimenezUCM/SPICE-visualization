@@ -1,6 +1,6 @@
 /**
  * @fileoverview This Class works as a controler between user input and all active networks.It also works
- * to broadcast events between diferent networks. 
+ * to broadcast and manage events between diferent networks. 
  * @author Marco Expósito Pérez
  */
 
@@ -142,14 +142,6 @@ export default class NetworkGroupMan {
     }
 
     /**
-     * Returns the current number of active networks
-     * @returns {Integer} Returns the number of active networks
-     */
-    getNnetworks() {
-        return this.activesNetworksArray.length;
-    }
-
-    /**
      * Save these communities as the selected communities for filtering
      * @param {String} key key of the network
      * @param {Object} communities Object with the format of {key: (string), values: (String[])}
@@ -168,30 +160,6 @@ export default class NetworkGroupMan {
         this.activesNetworksArray.forEach((network) => {
             this.selectCommunities(network.key, communities);
         });
-    }
-
-    /**
-     * Returns all detected Explicit Communities and the max size of our filter of the first network
-     * (All networks should have the same)
-     * @returns {Object} Object with the format of {data: {key: (string), values: (String[])}, filterSize: (int)}
-     */
-    getExplicitCommunities() {
-        return this.activesNetworksArray[0].getExplicitCommunities();
-    }
-
-    /**
-     * Returns current selected communities used in filtering node visuals
-     * @returns {Object} Object with the format of {key: (string), values: (String[])}
-     */
-     getSelectedCommunities() {
-        return this.activesNetworksArray[0].getSelectedCommunities();
-    }
-
-    /**
-     * Hide the current active popover
-     */
-    hidePopover() {
-        if (this.tooltip !== null) { this.tooltip.hide(); }
     }
 
     /**
@@ -214,4 +182,35 @@ export default class NetworkGroupMan {
         });
     }
 
+    /**
+     * Hide the current active popover
+     */
+    hidePopover() {
+        if (this.tooltip !== null) { this.tooltip.hide(); }
+    }
+
+    /**
+     * Returns the current number of active networks
+     * @returns {Integer} Returns the number of active networks
+     */
+    getNnetworks() {
+        return this.activesNetworksArray.length;
+    }
+
+    /**
+     * Returns all detected Explicit Communities and the max size of our filter of the first network
+     * (All networks should have the same)
+     * @returns {Object} Object with the format of {data: {key: (string), values: (String[])}, filterSize: (int)}
+     */
+    getExplicitCommunities() {
+        return this.activesNetworksArray[0].getExplicitCommunities();
+    }
+
+    /**
+     * Returns current selected communities used in filtering node visuals
+     * @returns {Object} Object with the format of {key: (string), values: (String[])}
+     */
+    getSelectedCommunities() {
+        return this.activesNetworksArray[0].getSelectedCommunities();
+    }
 }

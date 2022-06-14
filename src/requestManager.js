@@ -23,18 +23,19 @@ export default class RequestManager {
 
     /**
      * Send a GET petition to obtain a singleFile in a directory
-     * @param {*} name 
+     * @param {String} name Name of the file we want to get. It needs to include the extension
+     * @param {String} directory Optional parameter to change the target directory
      * @returns 
      */
     getFile(name, directory = "./") {
-        return this.axios.get(directory+name, {
+        return this.axios.get(directory + name, {
             params: {}
         })
-        .then((response) => {
-             return response.data;
-        })
-        .catch((error) => {
-            return error;
-        });
+            .then((response) => {
+                return response.data;
+            })
+            .catch((error) => {
+                return error;
+            });
     }
 }

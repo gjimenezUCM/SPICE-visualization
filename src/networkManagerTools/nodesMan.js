@@ -31,7 +31,7 @@ export default class NodesMan {
     /**
      * Parse the json into a proper nodes Dataset to use to draw the network
      * @param {Object} json json with the nodes data
-     * @returns {DataSet} a vis.js DataSet with the nodes data ready to for the network drawing
+     * @returns {DataSet} a vis.js DataSet with the nodes data ready to draw the network
      */
     parseNodes(json) {
         for (let node of json[nodes.UsersGlobalJsonKey]) {
@@ -73,6 +73,7 @@ export default class NodesMan {
             const row = document.createElement('div');
             row.className = nodes.borderMainHTMLrow;
 
+            //If its the last row with data, we remove the border
             if (i >= nodes.NodesWantedAttr.length - 1)
                 row.className = nodes.borderlessHTMLrow;
 
@@ -80,6 +81,7 @@ export default class NodesMan {
             colLeft.className = "col-6 ";
             colLeft.innerHTML = "";
 
+            //If we are writing a wantedNodeAttrb, we want to show the key of it in the table
             if (i < nodes.NodesWantedAttr.length)
                 colLeft.innerHTML = "<b>" + nodes.NodesWantedAttr[i] + "</b>";
 
@@ -99,7 +101,7 @@ export default class NodesMan {
     }
 
     /**
-     * Update the data panel to show a node data
+     * Update the data panel to show a node's data
      * @param {integer} id the id of the node
      */
     updateDataPanel(id) {
@@ -128,6 +130,7 @@ export default class NodesMan {
         for (let i = 0; i < keys.length; i++) {
             const currentKey = keys[i];
 
+            //We change the border between the last wanted attribute and the explicit Community attributes
             if (lastImportantRowIndex !== null) {
                 this.tableHtmlRows[lastImportantRowIndex].row.className = nodes.borderSeparatorHTMLrow;
                 lastImportantRowIndex = null;
@@ -161,12 +164,13 @@ export default class NodesMan {
         }
     }
 
-    /** Update a dataPanel row 
-     * 
+    /** 
+     * Update a dataPanel row 
      * @param {integer} index index of the row to update
      * @param {String} key new Text in the left column
      * @param {String} value new Text in the right column
      * @param {Boolean} bottomBorder Boolean indicating if the row should have bottom Border
+     * @param {Boolean} greyBorder Boolean indicating if the row should have grey Border
      */
     updateDataPanelRow(index, key, value, bottomBorder, greyBorder) {
         this.tableHtmlRows[index].left.innerHTML = "<b>" + key + "</b>";
@@ -213,9 +217,9 @@ export default class NodesMan {
         const title = "<h5> " + id + "</h5>";
         const content = this.getTooltipContent(id);
 
-        //Create the popover
         if (tooltip === null) {
-
+        
+            //We use a bootstrap Popover as a tooltip
             const options = {
                 trigger: "manual",
                 placement: "right",
@@ -318,9 +322,11 @@ export default class NodesMan {
         };
     }
     /** 
-     * Function executed when a node is selected
-     * @param {Object} values parameters of the node
-     * @param {Boolean} selected if the node has been selected
+     * Function executed when a node is selected that update the node visual attributes
+     * @param {Object} values value of the parameters that will change
+     * @param {Integer} id id of the node (unused)
+     * @param {Boolean} selected Boolean that says if the node has been selected
+     * @param {Boolean} hovering Boolean that says if the node has been hovered (unused)
      */
     nodeChosen(values, id, selected, hovering) {
         if (selected) {
@@ -328,6 +334,13 @@ export default class NodesMan {
         }
     }
 
+    /** 
+     * Function executed when a node is selected that update node's attributes of its label
+     * @param {Object} values label's parameters that will change
+     * @param {Integer} id id of the node (unused)
+     * @param {Boolean} selected Boolean that says if the node has been selected
+     * @param {Boolean} hovering Boolean that says if the node has been hovered (unused)
+     */
     labelChosen(values, id, selected, hovering) {
         if (selected) {
             values.vadjust -= 10;

@@ -164,6 +164,7 @@ export default class ExplicitCommsMan {
     /**
      * Hide all nodes that contain any of these filtered communities
      * @param {String[]} filter Array with the name of all values to be hiden
+     * @param {DataSet} nodes Dataset with the network's data of all nodes
      */
     updateFilterActives(filter, nodes) {
         const newNodes = new Array();

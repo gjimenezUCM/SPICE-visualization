@@ -1,14 +1,20 @@
-import NetworkGroupMan from "./networkGroupMan.js";
-import RequestManager from "./requestManager";
+/**
+ * @fileoverview This Class creates a selector to choose what networks to show/hide. It also creates the basic
+ * html structure for all the visualization and create the control panel and networks when necesary
+ * @package It requires bootstrap to be able to create Dropdowns.
+ * @author Marco Expósito Pérez
+ */
+
+//Namespaces
+import { networkHTML } from "./namespaces/networkHTML.js";
+//Packages
 import { Dropdown } from 'bootstrap';
-import { Popover } from 'bootstrap';
+//Local classes
+import NetworkGroupMan from "./networkGroupMan.js";
+import RequestManager from "./requestManager.js";
+import ControlPanel from "./controlPanel.js";
 
-import Explicit_community from "./explicitCommunity";
-import Utils from "./Utils";
-import { networkHTML } from "./namespaces/networkHTML";
-import ControlPanel from "./controlPanel";
-
-export default class EventsManager {
+export default class CreateVisualization {
 
     /**
      * Constructor of the class
@@ -20,11 +26,7 @@ export default class EventsManager {
 
         this.requestManager = new RequestManager(baseURL);
         this.networkManager = new NetworkGroupMan();
-
         this.controlPanel = new ControlPanel(this.networkManager);
-
-        this.initialSliderValue = 1.0;
-        this.initialVariableWidthValue = false;
 
         this.createHTMLSkeleton();
         this.getAllAvailableFiles();
@@ -50,6 +52,7 @@ export default class EventsManager {
         document.body.appendChild(networks);
 
     }
+
     /**
      * Get the number of available files from the database
      */
@@ -63,7 +66,7 @@ export default class EventsManager {
             })
             .catch((error) => {
                 console.log(error);
-                alert("Error while reading the file with all file names");
+                alert("Error while getting the file with all file names");
             });
     }
 
@@ -117,8 +120,8 @@ export default class EventsManager {
     }
 
     /**
-     * Open/Closes the network based on the state of the option
-     * @param {Object} option option with active or inactive state
+     * show/Hides the network based on the state of the option
+     * @param {HTMLElement} option dropdown option/button clicked
      * @param {String} key key of the network
      */
     optionClicked(option, key) {
@@ -143,7 +146,7 @@ export default class EventsManager {
             })
             .catch((error) => {
                 console.log(error);
-                alert("Error while reading the selected file");
+                alert("Error while getting the selected file");
             });   
         }
     }
@@ -172,14 +175,8 @@ export default class EventsManager {
         title.className = "col-sm-1";
         title.innerHTML = key;
 
-        // const legendButton = document.createElement("button");
-        // legendButton.className = "col-sm-2 btn btn-primary";
-        // legendButton.innerText = "Legend";
-
         titleContainer.appendChild(separator)
         titleContainer.appendChild(title);
-        // titleContainer.appendChild(legendButton);
-
         networkContainer.appendChild(titleContainer);
 
         //Row with the network to the left, and the data/input options to the right
@@ -197,7 +194,6 @@ export default class EventsManager {
         rowContainer.appendChild(columnRightContainer);
         networkContainer.appendChild(rowContainer);
 
-        //Network
         topContainer.appendChild(networkContainer);
 
         const config = {
@@ -207,58 +203,7 @@ export default class EventsManager {
         };
 
         this.networkManager.addNetwork(file, columnLeftContainer, columnRightContainer, config)
-
-        const networkCommunities = this.networkManager.getExplicitCommunities();
         
-        //this.createLegend(legendButton, networkCommunities);
-        
-        this.controlPanel.createControlPanel(networkCommunities)
+        this.controlPanel.createControlPanel()
     }
-
-
-
-    // highlightCommunity(button, key, value) {
-    //     if (value === "\"\"") {
-    //         value = "";
-    //     }
-
-    //     const isActive = button.className.split(" ").pop() === "active";
-    //     if (isActive) {
-    //         button.className = "dropdown-item";
-
-
-    //         for (let i = 0; i < this.selectedCommunities.length; i++) {
-    //             if (this.selectedCommunities[i].key === key) {
-
-    //                 const index = this.selectedCommunities[i].values.indexOf(value);
-    //                 this.selectedCommunities[i].values.splice(index, 1);
-
-    //                 if (this.selectedCommunities[i].values.length === 0) {
-    //                     this.selectedCommunities = this.selectedCommunities.filter(data => data.key !== key);
-    //                 }
-    //             }
-    //         }
-
-
-
-    //     } else {
-    //         button.className = "dropdown-item active";
-
-    //         let newCommunity = true;
-    //         for (let i = 0; i < this.selectedCommunities.length; i++) {
-    //             if (this.selectedCommunities[i].key === key) {
-    //                 this.selectedCommunities[i].values.push(value);
-    //                 newCommunity = false;
-    //             }
-    //         }
-
-    //         if (newCommunity) {
-    //             this.selectedCommunities.push(new Explicit_community(key, new Array(value)));
-    //         }
-
-    //     }
-
-    //     this.networkManager.highlightCommunityALL(this.selectedCommunities);
-    // }
-
 }

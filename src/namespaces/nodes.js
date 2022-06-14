@@ -55,6 +55,7 @@ export const nodes = {
     //--- Explicit Communities Variable Attributes ---
 
     //Characteristics that change based on the explicit communities
+    
     BackgroundColors: [
         "rgb(255, 0, 0, 1)", //Red
         "rgb(0, 255, 72, 1)", //Green

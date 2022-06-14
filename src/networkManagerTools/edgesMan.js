@@ -10,7 +10,6 @@ import { edges } from "../namespaces/edges.js";
 //Packages
 import { DataSet } from "vis-data/peer";
 
-
 export default class EdgesMan {
 
     /**
@@ -83,7 +82,7 @@ export default class EdgesMan {
      * @param {Object} values value of the parameters that will change
      * @param {Integer} id id of the edge (unused)
      * @param {Boolean} selected Boolean that says if the edge has been selected
-     * @param {Boolean} hovering Boolean that says if the edge has been hovered
+     * @param {Boolean} hovering Boolean that says if the edge has been hovered (unused)
      */
     labelEdgeChosen(values, id, selected, hovering) {
         if (selected) {

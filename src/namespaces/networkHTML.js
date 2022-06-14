@@ -1,11 +1,9 @@
 /**
- * @fileoverview This File contains a namespace about networks HTMLElements constants.
+ * @fileoverview This File contains a namespace about HTMLElements constants used in this networks project.
  * @author Marco Expósito Pérez
  */
 
 export const networkHTML = {
-
-
 
     //ID of the container with the Select Algoritmh dropdown
     algorithmDropdownContainer: "algorithm_Dropdown",

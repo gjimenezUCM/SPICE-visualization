@@ -30,7 +30,7 @@ export const comms = {
 
     //--- Legends Helpers ---
 
-    getShapehtml: (output, index) => getShapehtml(output, index),
+    getShapehtml: (html, index) => getShapehtml(html, index),
 
     //--- DataTable ---
 
@@ -89,9 +89,13 @@ const getShapeOfN = function (n) {
     return nodes.AvailableShapes[n];
 }
 
-
-const getShapehtml = function (output, n) {
+/**
+ * Updates the html to match the class that its n-shape should have
+ * @param {HTMLElement} html html to edit
+ * @param {Integer} n n of the shape
+ */
+const getShapehtml = function (html, n) {
     let shape = getShapeOfN(n).Shape;
 
-    output.className = shape;
+    html.className = shape;
 }

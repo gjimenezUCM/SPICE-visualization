@@ -42,7 +42,4 @@ export const edges = {
     LabelColorSelected: "#000000",
     LabelStrokeColorSelected:"#ffffff",
     LabelStrokeWidthSelected: 1,
-
-
-
 }

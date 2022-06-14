@@ -165,8 +165,6 @@ export default class NetworkMan {
             this.implCommMan.updateTooltipInfo(event);
             this.implCommMan.updateCommunityInfoFromClick(event);
         }
-
-
     }
 
     /** 
@@ -202,10 +200,11 @@ export default class NetworkMan {
     nodeSelected(id) {
         this.network.selectNodes([id], true);
 
+        //Update node data table
         this.nodesMan.updateDataPanel(id);
-
         //Update community data table
         this.implCommMan.updateCommunityInfoFromNodeId(id);
+
         //Search for the nodes that are connected to the selected Node
         const selectedNodes = new Array();
         selectedNodes.push(id)
@@ -310,7 +309,15 @@ export default class NetworkMan {
         });
         this.data.nodes.update(newNodes);
     }
-    
+
+    /**
+     * Update node visuals of all networks to match current filter
+     * @param {String[]} filter string array with all values to hide
+     */
+    updateFilterActives(filter) {
+        this.explCommMan.updateFilterActives(filter, this.data.nodes);
+    }
+
     /**
      * Returns all detected Explicit Communities and the max size of our filter
      * @returns {Object} Object with the format of {data: {key: (string), values: (String[])}, filterSize: (int)}
@@ -323,16 +330,8 @@ export default class NetworkMan {
      * Returns current selected communities used in filtering node visuals
      * @returns {Object} Object with the format of {key: (string), values: (String[])}
      */
-     getSelectedCommunities(){
+    getSelectedCommunities() {
         return this.explCommMan.getSelectedCommunities();
-    }
-
-/**
-     * Update node visuals of all networks to match current filter
-     * @param {String[]} filter string array with all values to hide
-     */
-    updateFilterActives(filter){
-        this.explCommMan.updateFilterActives(filter, this.data.nodes);
     }
 }
 
