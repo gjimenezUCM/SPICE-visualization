@@ -150,23 +150,23 @@ export default class NetworkGroupMan {
     }
 
     /**
-     * Init the key's network's nodes visuals and parameters to change node's attributes based on the communities 
+     * Save these communities as the selected communities for filtering
      * @param {String} key key of the network
      * @param {Object} communities Object with the format of {key: (string), values: (String[])}
      */
-    initFilter(key, communities) {
+    selectCommunities(key, communities) {
         const network = this.activesNetworksMap.get(key);
 
-        network.initFilter(communities);
+        network.selectCommunities(communities);
     }
 
     /**
-     * Init all networks's nodes visuals and parameters to change node's attributes based on the communities 
+     * Save in all networks's these communities as the selected communities for filtering
      * @param {Object} communities Object with the format of {key: (string), values: (String[])}
      */
-    initFilterALL(communities) {
+    selectCommunitiesALL(communities) {
         this.activesNetworksArray.forEach((network) => {
-            this.initFilter(network.key, communities);
+            this.selectCommunities(network.key, communities);
         });
     }
 
@@ -180,10 +180,38 @@ export default class NetworkGroupMan {
     }
 
     /**
+     * Returns current selected communities used in filtering node visuals
+     * @returns {Object} Object with the format of {key: (string), values: (String[])}
+     */
+     getSelectedCommunities() {
+        return this.activesNetworksArray[0].getSelectedCommunities();
+    }
+
+    /**
      * Hide the current active popover
      */
     hidePopover() {
         if (this.tooltip !== null) { this.tooltip.hide(); }
+    }
+
+    /**
+     * Update node visuals of a network to match current blacklist filter
+     * @param {String[]} filter string array with all values to hide
+     */
+    updateFilterActives(key, filter) {
+        const network = this.activesNetworksMap.get(key);
+
+        network.updateFilterActives(filter);
+    }
+
+    /**
+     * Update node visuals of all networks to match current blacklist filter
+     * @param {String[]} filter string array with all values to hide
+     */
+    updateFilterActivesALL(filter) {
+        this.activesNetworksArray.forEach((network) => {
+            this.updateFilterActives(network.key, filter);
+        });
     }
 
 }

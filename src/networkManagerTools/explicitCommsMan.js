@@ -63,10 +63,10 @@ export default class ExplicitCommsMan {
     }
 
     /**
-     * Init all parameters to create a new filter.
+     * Update current selected communities and init all necesary variables
      * @param {Object} communities Object with the format of {key: (string), values: (String[])}
      */
-    initFilter(communities) {
+    updateSelectedCommunities(communities) {
         this.commFilter = communities;
 
         for (let i = 0; i < this.commChecker.length; i++) {
@@ -155,55 +155,40 @@ export default class ExplicitCommsMan {
             value = nodeComms[this.commFilter[0].key];
 
             return this.nodeColors.get(value);
-        } else { 
+        } else {
             //If we dont have a filter or we are not filtering colors, we return the default color
             return nodes.NodeColor;
         }
     }
 
     /**
-     * Make all nodes that doesnt have the selectedCommunities darker than usual
-     * @param {Object} selectedCommunities Object with the format of {key: (string), values: (String[])}
+     * Hide all nodes that contain any of these filtered communities
+     * @param {String[]} filter Array with the name of all values to be hiden
      */
-    highlightCommunities(selectedCommunities) {
-        const n = selectedCommunities.length;
-
-        //Update all nodes color acording to their selected status
+    updateFilterActives(filter, nodes) {
         const newNodes = new Array();
-        this.networkMan.data.nodes.forEach((node) => {
-            let count = 0;
-            for (let i = 0; i < n; i++) {
-                if (this.nodeHasCommunity(node, selectedCommunities[i].key, selectedCommunities[i].values)) {
-                    count++;
+
+        nodes.forEach((node) => {
+            const explComms = node[comms.ExpUserKsonKey];
+            const keys = Object.keys(explComms);
+
+            let isHidden = false;
+            for (let i = 0; i < keys.length; i++) {
+                const value = explComms[keys[i]]
+
+                if (filter.includes(value)) {
+                    isHidden = true;
+                    this.networkMan.nodesMan.turnNodeDark(node);
+                    break;
                 }
             }
-
-            if (count === n)
-                this.networkMan.nodesMan.turnNodeColorToDefault(node)
-            else
-                this.networkMan.nodesMan.turnNodeDark(node)
+            if(!isHidden){
+                this.networkMan.nodesMan.turnNodeColorToDefault(node);
+            }
 
             newNodes.push(node);
         });
-
-        this.networkMan.data.nodes.update(newNodes);
-    }
-
-    /**
-     * Function that check if the node has the community key and any of the values of that community
-     * @param {Object} node node that is being checked
-     * @param {String} key key of the community
-     * @param {String[]} values valid values of the comunity
-     * @returns {Boolean} Returns if it has the community
-     */
-    nodeHasCommunity(node, key, values) {
-        for (let i = 0; i < values.length; i++) {
-
-            if (node[comms.ExpUserKsonKey][key] === values[i])
-                return true;
-        }
-
-        return false;
+        nodes.update(newNodes);
     }
 
     /**
@@ -212,5 +197,13 @@ export default class ExplicitCommsMan {
      */
     getCommunitiesData() {
         return { data: this.communitiesData, filterSize: this.commChecker.length };
+    }
+
+    /**
+     * Returns current selected communities used in filtering node visuals
+     * @returns {Object} Object with the format of {key: (string), values: (String[])}
+     */
+    getSelectedCommunities() {
+        return this.commFilter;
     }
 }

@@ -294,23 +294,12 @@ export default class NetworkMan {
     }
 
     /**
-     * Highlight all nodes that contains selectedCommunities key and values
-     * @param {Object} selectedCommunities Object with the format of {key: (string), values: (String[])}
-     */
-    highlightCommunity(selectedCommunities) {
-        const n = selectedCommunities.length;
-        if (n === 0) {
-            this.nodeDeselected();
-        } else
-            this.explCommMan.highlightCommunities(selectedCommunities);
-    }
-
-    /**
-     * Init the node visuals and parameters to change node's attributes based on the communities 
+     * Save these communities as the selected communities for filtering and update all nodes visuals based 
+     * on the selected communities and node values for each of them 
      * @param {Object} communities Object with the format of {key: (string), values: (String[])}
      */
-    initFilter(communities) {
-        this.explCommMan.initFilter(communities);
+    selectCommunities(communities) {
+        this.explCommMan.updateSelectedCommunities(communities);
 
         const newNodes = new Array();
         this.data.nodes.forEach((node) => {
@@ -330,7 +319,21 @@ export default class NetworkMan {
         return this.explCommMan.getCommunitiesData();
     }
 
+    /**
+     * Returns current selected communities used in filtering node visuals
+     * @returns {Object} Object with the format of {key: (string), values: (String[])}
+     */
+     getSelectedCommunities(){
+        return this.explCommMan.getSelectedCommunities();
+    }
 
+/**
+     * Update node visuals of all networks to match current filter
+     * @param {String[]} filter string array with all values to hide
+     */
+    updateFilterActives(filter){
+        this.explCommMan.updateFilterActives(filter, this.data.nodes);
+    }
 }
 
 

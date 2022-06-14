@@ -1,11 +1,16 @@
 import { networkHTML } from "./namespaces/networkHTML";
 import { Collapse } from 'bootstrap';
+import { comms } from "./namespaces/communities.js";
+
+import Utils from "./Utils";
 
 export default class ControlPanel {
 
     constructor(networkManager) {
         this.isActive = false;
         this.networkManager = networkManager;
+
+        this.filterValuesToHide = new Array();
     }
 
     /**
@@ -26,12 +31,10 @@ export default class ControlPanel {
 
         const sliderContainer = this.createThresholdSliderContainer();
         const checkboxContainer = this.createVariableEdgeCheckBoxContainer();
-        const legendContainer = this.createLegendContainer();
 
         this.container.appendChild(inputTitle);
         this.container.appendChild(sliderContainer);
         this.container.appendChild(checkboxContainer);
-        this.container.appendChild(legendContainer);
 
         document.getElementById(networkHTML.controlPanelParentContainer).appendChild(this.container);
 
@@ -40,8 +43,12 @@ export default class ControlPanel {
         for (let i = 0; i < communities.filterSize; i++) {
             this.filteredCommunities.push(communities.data[i]);
         }
-        this.networkManager.initFilterALL(this.filteredCommunities);
+        this.networkManager.selectCommunitiesALL(this.filteredCommunities);
 
+        const filter = this.networkManager.getSelectedCommunities();
+
+        const legendContainer = this.createLegendContainer(filter);
+        this.container.appendChild(legendContainer);
     }
 
     /** 
@@ -146,28 +153,61 @@ export default class ControlPanel {
     }
 
 
-    createLegendContainer(){
-        let div = document.createElement("div");
-        div.innerText = "Internal Acoordeon 1";
-        let acoordion1 = this.createAcordion("miPrimeraId1", [div]);
+    createLegendContainer(filter) {
+        const innerAcoordionArray = [];
+        for (let i = 0; i < filter.length; i++) {
+            const div = this.createLegendButtons(filter[i].values, i);
+            const innerAcord = this.createAcordion(filter[i].key, filter[i].key, [div]);
 
-        div = document.createElement("div");
-        div.innerText = "Internal Acoordeon 2";
-        let acoordion2 = this.createAcordion("miPrimeraId2", [div]);
+            innerAcoordionArray.push(innerAcord);
+        }
 
-        div = document.createElement("div");
-        div.innerText = "Internal Acoordeon 3";
-        let acoordion3 = this.createAcordion("miPrimeraId3", [div]);
-
-        let acoordion = this.createAcordion("topId", [acoordion1, acoordion2, acoordion3]);
+        let acoordion = this.createAcordion("topId", "Legend", innerAcoordionArray, true);
 
         return acoordion;
     }
 
-    createAcordion(id, collapsable) {
 
+    createLegendButtons(values, n) {
+        const container = document.createElement("div");
+
+        for (let i = 0; i < values.length; i++) {
+            let value = values[i];
+            if (value == "") value = "\"\"";
+
+            const topRow = document.createElement("div");
+            topRow.className = "row align-items-left"
+            container.append(topRow);
+
+            const newButton = document.createElement("Button");
+            newButton.className = networkHTML.legendButtonClass + " active";
+            newButton.onclick = () => this.legendButtonClick(values[i], newButton);
+            topRow.append(newButton);
+
+            const rowContainer = document.createElement("div");
+            rowContainer.className = "row align-items-center"
+            newButton.append(rowContainer)
+
+            const leftContainer = document.createElement("div");
+            leftContainer.className = "col value";
+            leftContainer.innerText = value;
+            rowContainer.append(leftContainer);
+
+            const rightContainer = document.createElement("div");
+            rightContainer.className = "col";
+            this.getCommunityValueIndicator(rightContainer, n, i);
+            rowContainer.append(rightContainer);
+        }
+
+        return container;
+    }
+
+    createAcordion(id, buttonName, collapsable, topClass = false) {
         const topAcordion = document.createElement("div");
         topAcordion.className = "accordion";
+
+        if (topClass)
+            topAcordion.className = "top " + topAcordion.className;
 
         const topItem = document.createElement("div");
         topItem.className = "accordion-item";
@@ -180,7 +220,7 @@ export default class ControlPanel {
         const topButton = document.createElement("button");
         topButton.className = "accordion-button collapsed";
         topButton.type = "button";
-        topButton.innerText = "Legend";
+        topButton.innerText = buttonName;
         topButton.setAttribute("data-bs-toggle", "collapse");
         topButton.setAttribute("data-bs-target", "#" + id);
 
@@ -195,10 +235,9 @@ export default class ControlPanel {
         colOneBody.className = "accordion-body";
         colOne.append(colOneBody);
 
+
         for (let i = 0; i < collapsable.length; i++) {
-
             colOneBody.append(collapsable[i]);
-
         }
 
         new Collapse(colOne, { toggle: false });
@@ -215,5 +254,47 @@ export default class ControlPanel {
 
         return topAcordion;
 
+    }
+
+    getCommunityValueIndicator(container, filterPosition, valueIndex) {
+        let output = document.createElement("div");
+
+        switch (filterPosition) {
+            case 0:
+                output.className = "box";
+                output.style.backgroundColor = comms.NodeAttr.getColor(valueIndex);
+                break;
+
+            case 1:
+                comms.getShapehtml(output, valueIndex)
+                break;
+        }
+
+        container.append(output);
+    }
+
+    legendButtonClick(value, button) {
+        const btnClass = button.className;
+        const isActive = btnClass.slice(btnClass.length - 6);
+        
+        if(isActive === "active"){
+            button.className = networkHTML.legendButtonClass;
+
+            this.filterValuesToHide.push(value);
+        }else{
+            button.className = networkHTML.legendButtonClass + "  active";
+
+            const index = this.filterValuesToHide.indexOf(value);
+            if(index === -1){
+                this.legendButtonClick(value, button);
+                return;
+
+            }else{
+                this.filterValuesToHide.splice(index, 1);
+            }
+        }
+
+        this.networkManager.updateFilterActivesALL(this.filterValuesToHide);
+       
     }
 }   

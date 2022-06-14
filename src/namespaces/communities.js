@@ -28,6 +28,10 @@ export const comms = {
         getShape: (n) => getShapeOfN(n),
     },
 
+    //--- Legends Helpers ---
+
+    getShapehtml: (output, index) => getShapehtml(output, index),
+
     //--- DataTable ---
 
     //Whitelist with the keys that will be shown in the Community Data Panel. Color is intended for debug purpouses
@@ -83,4 +87,11 @@ const getShapeOfN = function (n) {
     n = n % nodes.AvailableShapes.length;
 
     return nodes.AvailableShapes[n];
+}
+
+
+const getShapehtml = function (output, n) {
+    let shape = getShapeOfN(n).Shape;
+
+    output.className = shape;
 }
