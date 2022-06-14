@@ -45,6 +45,8 @@ export default class NodesMan {
                 delete node["group"];
 
             node["defaultColor"] = true;
+
+            this.nExplCommunities = Object.keys(node[comms.ExpUserKsonKey]).length;
         }
         this.nodes = new DataSet(json.users);
 
@@ -55,7 +57,8 @@ export default class NodesMan {
      * Create the Table/html with the data about the selected node. Its empty if none is selected
      */
     createNodesDataTable() {
-        const nExplCommunities = Object.keys(this.nodes.get(0)[comms.ExpUserKsonKey]).length
+        
+        const nExplCommunities = this.nExplCommunities;
         const nRow = nodes.NodesWantedAttr.length + nExplCommunities;
 
         const dataContainer = document.createElement('div');
