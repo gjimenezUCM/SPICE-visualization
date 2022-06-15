@@ -6,15 +6,12 @@ export default class RequestsManager {
 
     constructor() {
         this.axios = new Axios({
-            baseURL: "../",
-            headers: {
-                'Access-Control-Allow-Origin': 'file:',
-            }
+            baseURL: "https://raw.githubusercontent.com/gjimenezUCM/SPICE-visualization/main/data/",
         });
     }
 
     getNetwork(name) {
-        return this.axios.get('/data/'+name, {
+        return this.axios.get('./'+name, {
             params: {}
         })
         .then((response) => {
@@ -25,7 +22,7 @@ export default class RequestsManager {
     getAllFileNames(){
         let name = "dataList.json";
         
-        return this.axios.get('/data/'+name, {
+        return this.axios.get('./'+name, {
             params: {}
         })
         .then((response) => {
