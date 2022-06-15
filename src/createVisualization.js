@@ -21,8 +21,8 @@ export default class CreateVisualization {
      */
     constructor() {
         //TODO this should be editable
-        const baseURL = "../";
-        this.dataDirectory = "data/";
+        const baseURL = "https://raw.githubusercontent.com/gjimenezUCM/SPICE-visualization/main/data/";
+        this.dataDirectory = "./";
 
         this.requestManager = new RequestManager(baseURL);
         this.networkManager = new NetworkGroupMan();

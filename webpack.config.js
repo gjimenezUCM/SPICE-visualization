@@ -22,4 +22,9 @@ module.exports = {
         },
         port: 1234
     },
+	plugins: [
+        new HtmlWebpackPlugin({
+            template: './html/index.html'
+        })
+    ]
 };
