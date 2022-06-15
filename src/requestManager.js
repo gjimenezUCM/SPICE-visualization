@@ -15,9 +15,6 @@ export default class RequestManager {
     constructor(baseURL) {
         this.axios = new Axios({
             baseURL: baseURL,
-            headers: {
-                'Access-Control-Allow-Origin': 'file:',
-            }
         });
     }
 
