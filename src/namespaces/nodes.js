@@ -30,9 +30,9 @@ export const nodes = {
     NodeShape: "dot",
     //Default value for vAdjust label for the default shape,
     NodevOffset: -31,
-    
-    NodeBorderWidth: 3,
-    NodeBorderWidthSelected: 3,
+
+    NodeBorderWidth: 4,
+    NodeBorderWidthSelected: 4,
 
     LabelSize: 13,
     //--- DataTable ---
@@ -56,16 +56,20 @@ export const nodes = {
     //--- Explicit Communities Variable Attributes ---
 
     //Characteristics that change based on the explicit communities
-    
+
     BackgroundColors: [
         "rgb(255, 0, 0, 1)", //Red
         "rgb(0, 255, 72, 1)", //Green
         "rgb(25, 166, 255, 1)", //Blue
         "rgb(255, 252, 25, 1)", //Yellow
+        "rgb(232, 134, 12, 1)", //Orange
+        "rgb(123, 12, 232, 1)", //Purple
     ],
 
-    BoderColors:[
+    BoderColors: [
         "rgb(128, 126, 13, 1)", //Yellow
+        "rgb(62, 6, 116, 1)", //Purple
+        "rgb(13, 84, 128, 1)", //Blue
         "rgb(128, 0, 0, 1)", //Red
         "rgb(0, 128, 36, 1)", //Green
         "rgb(13, 84, 128, 1)", //Blue

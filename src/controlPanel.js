@@ -155,11 +155,15 @@ export default class ControlPanel {
         this.networkManager.variableEdgeChangeALL(checkBox.checked);
     }
 
+    /**
+     * Create a dropdown that lets u pick what communities to filter the network
+     * @returns {HTMLElement} container with the dropdown
+     */
     createFilterChooser() {
         const communities = this.networkManager.getExplicitCommunities();
 
         this.filteredCommunities = new Array();
-        this.maxFilterSize = 2;//communities.filterSize;
+        this.maxFilterSize = communities.filterSize;
 
         const n = communities.data.length;
 
@@ -205,6 +209,11 @@ export default class ControlPanel {
         return topContainer;
     }
 
+    /**
+     * Function Executed when a filter dropdown option is clicked. Updates the button state and the legend/network
+     * @param {HTMLElement} button button clicked
+     * @param {String} key community key to select/unselect 
+     */
     chooseFilterClick(button, key) {
         const index = this.filteredCommunities.indexOf(key);
 
@@ -225,10 +234,13 @@ export default class ControlPanel {
             button.className = "dropdown-item active";
         }
 
-        this.updateHiddenCommunities();
+        this.updateLegend();
     }
 
-    updateHiddenCommunities() {
+    /**
+     * Update the Legend with the new filtered Communities
+     */
+    updateLegend() {
         if (this.legendContainer !== null) {
             this.container.removeChild(this.legendContainer);
             this.legendContainer = null;
@@ -237,6 +249,9 @@ export default class ControlPanel {
         this.createLegend();
     }
 
+    /**
+     * Create the legend options and update the network visuals
+     */
     createLegend() {
         this.networkManager.selectCommunitiesALL(this.filteredCommunities);
 
@@ -400,6 +415,13 @@ export default class ControlPanel {
             case 1:
                 comms.getShapehtml(output, valueIndex)
                 break;
+
+            case 2:
+                output.className = "box";
+                output.style.borderColor = comms.NodeAttr.getBorder(valueIndex);
+                output.style.borderWidth = "4px";
+                break;
+
         }
 
         container.append(output);

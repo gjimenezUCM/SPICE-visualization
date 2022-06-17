@@ -234,6 +234,7 @@ export default class ExplicitCommsMan {
             }
             if (!isHidden) {
                 this.networkMan.nodesMan.turnNodeColorToDefault(node);
+                this.networkMan.nodesMan.turnNodeBorderToDefault(node);
             }
 
             newNodes.push(node);

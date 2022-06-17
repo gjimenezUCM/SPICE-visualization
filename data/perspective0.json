@@ -146,7 +146,8 @@
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN",
-                "religion": "Christianity"
+                "religion": "Christianity",
+                "height": "small"
             }
         },
         {
@@ -156,7 +157,8 @@
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN",
-                "religion": "Christianity"
+                "religion": "Christianity",
+                "height": "medium"
             }
         },
         {
@@ -166,7 +168,8 @@
             "explicit_community": {
                 "ageGroup": "",
                 "language": "EN",
-                "religion": "Christianity"
+                "religion": "Christianity",
+                "height": "tall"
             }
         },
         {
@@ -176,7 +179,8 @@
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "EN",
-                "religion": "Christianity"
+                "religion": "Christianity",
+                "height": "small"
             }
         },
         {
@@ -186,7 +190,8 @@
             "explicit_community": {
                 "ageGroup": "elderly",
                 "language": "EN",
-                "religion": "Judaism"
+                "religion": "Judaism",
+                "height": "medium"
             }
         },
         {
@@ -196,7 +201,8 @@
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN",
-                "religion": "Judaism"
+                "religion": "Judaism",
+                "height": "tall"
             }
         },
         {
@@ -206,7 +212,8 @@
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "EN",
-                "religion": "Judaism"
+                "religion": "Judaism",
+                "height": "small"
             }
         },
         {
@@ -216,7 +223,8 @@
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "ES",
-                "religion": "Christianity"
+                "religion": "Christianity",
+                "height": "small"
             }
         },
         {
@@ -226,7 +234,8 @@
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "ES",
-                "religion": "Islam"
+                "religion": "Islam",
+                "height": "medium"
             }
         },
         {
@@ -236,7 +245,8 @@
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "FI",
-                "religion": "Christianity"
+                "religion": "Christianity",
+                "height": "medium"
             }
         },
         {
@@ -246,7 +256,8 @@
             "explicit_community": {
                 "ageGroup": "",
                 "language": "FI",
-                "religion": "Islam"
+                "religion": "Islam",
+                "height": "medium"
             }
         },
         {
@@ -256,7 +267,8 @@
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "FI",
-                "religion": "Islam"
+                "religion": "Islam",
+                "height": "medium"
             }
         },
         {
@@ -266,7 +278,8 @@
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE",
-                "religion": "Judaism"
+                "religion": "Judaism",
+                "height": "tall"
             }
         },
         {
@@ -276,7 +289,8 @@
             "explicit_community": {
                 "ageGroup": "elderly",
                 "language": "HE",
-                "religion": "Christianity"
+                "religion": "Christianity",
+                "height": "small"
             }
         },
         {
@@ -286,7 +300,8 @@
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "HE",
-                "religion": "Judaism"
+                "religion": "Judaism",
+                "height": "small"
             }
         },
         {
@@ -296,7 +311,8 @@
             "explicit_community": {
                 "ageGroup": "elderly",
                 "language": "HE",
-                "religion": "Islam"
+                "religion": "Islam",
+                "height": "tall"
             }
         },
         {
@@ -306,7 +322,8 @@
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "HE",
-                "religion": "Christianity"
+                "religion": "Christianity",
+                "height": "small"
             }
         },
         {
@@ -316,7 +333,8 @@
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "HE",
-                "religion": "Judaism"
+                "religion": "Judaism",
+                "height": "medium"
             }
         },
         {
@@ -326,7 +344,8 @@
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "HE",
-                "religion": "Judaism"
+                "religion": "Judaism",
+                "height": "medium"
             }
         },
         {
@@ -336,7 +355,8 @@
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE",
-                "religion": "Islam"
+                "religion": "Islam",
+                "height": "tall"
             }
         },
         {
@@ -346,7 +366,8 @@
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE",
-                "religion": "Christianity"
+                "religion": "Christianity",
+                "height": "small"
             }
         },
         {
@@ -356,7 +377,8 @@
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE",
-                "religion": "Christianity"
+                "religion": "Christianity",
+                "height": "medium"
             }
         },
         {
@@ -366,7 +388,8 @@
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT",
-                "religion": "Judaism"
+                "religion": "Judaism",
+                "height": "medium"
             }
         },
         {
@@ -376,7 +399,8 @@
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT",
-                "religion": "Islam"
+                "religion": "Islam",
+                "height": "medium"
             }
         },
         {
@@ -386,7 +410,8 @@
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "IT",
-                "religion": "Christianity"
+                "religion": "Christianity",
+                "height": "tall"
             }
         },
         {
@@ -396,7 +421,8 @@
             "explicit_community": {
                 "ageGroup": "elderly",
                 "language": "IT",
-                "religion": "Judaism"
+                "religion": "Judaism",
+                "height": "small"
             }
         },
         {
@@ -406,7 +432,8 @@
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN",
-                "religion": "Islam"
+                "religion": "Islam",
+                "height": "small"
             }
         },
         {
@@ -416,7 +443,8 @@
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN",
-                "religion": "Christianity"
+                "religion": "Christianity",
+                "height": "tall"
             }
         },
         {
@@ -426,7 +454,8 @@
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN",
-                "religion": "Judaism"
+                "religion": "Judaism",
+                "height": "tall"
             }
         },
         {
@@ -436,7 +465,8 @@
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN",
-                "religion": "Agnostic"
+                "religion": "Agnostic",
+                "height": "tall"
             }
         }
     ],
