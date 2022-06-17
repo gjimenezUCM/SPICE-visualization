@@ -144,7 +144,7 @@ export default class NetworkGroupMan {
     /**
      * Save these communities as the selected communities for filtering
      * @param {String} key key of the network
-     * @param {Object} communities Object with the format of {key: (string), values: (String[])}
+     * @param {String[]} communities string with the name of the communities to select
      */
     selectCommunities(key, communities) {
         const network = this.activesNetworksMap.get(key);
@@ -154,7 +154,7 @@ export default class NetworkGroupMan {
 
     /**
      * Save in all networks's these communities as the selected communities for filtering
-     * @param {Object} communities Object with the format of {key: (string), values: (String[])}
+     * @param {String[]} communities string with the name of the communities to select
      */
     selectCommunitiesALL(communities) {
         this.activesNetworksArray.forEach((network) => {

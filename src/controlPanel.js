@@ -2,6 +2,7 @@
  * @fileoverview This Class creates a single control panel for all networks. It also manages the user input
  * to update networks acordingly
  * @package It requires bootstrap to be able to create Collapses.
+ * @package It requires bootstrap to be able to create Dropdowns.
  * @author Marco Expósito Pérez
  */
 //Namespaces
@@ -9,6 +10,7 @@ import { networkHTML } from "./namespaces/networkHTML.js";
 import { comms } from "./namespaces/communities.js";
 //Packages
 import { Collapse } from 'bootstrap';
+import { Dropdown } from 'bootstrap';
 
 export default class ControlPanel {
 
@@ -20,7 +22,15 @@ export default class ControlPanel {
         this.isActive = false;
         this.networkManager = networkManager;
 
+        //Communities that change nodes visual properties and can be hidden
+        this.filteredCommunities = new Array();
+        //Map that links the key of a filter atrribute with its dropdown button 
+        this.filterToDropdown = new Map();
+        //Maximum number of communities that can be filtered/visualy represented
+        this.maxFilterSize = 0;
+
         this.filterValuesToHide = new Array();
+        this.legendContainer = null;
     }
 
     /**
@@ -42,24 +52,17 @@ export default class ControlPanel {
 
         const sliderContainer = this.createThresholdSliderContainer();
         const checkboxContainer = this.createVariableEdgeCheckBoxContainer();
+        const filterChooser = this.createFilterChooser();
 
         this.container.appendChild(inputTitle);
         this.container.appendChild(sliderContainer);
         this.container.appendChild(checkboxContainer);
+        this.container.appendChild(filterChooser);
+
+        this.container.append(document.createElement("br"));
 
         document.getElementById(networkHTML.controlPanelParentContainer).appendChild(this.container);
 
-        //TODO. User should be able to choose what communities want to represent visualy
-        this.filteredCommunities = new Array();
-        for (let i = 0; i < communities.filterSize; i++) {
-            this.filteredCommunities.push(communities.data[i]);
-        }
-        this.networkManager.selectCommunitiesALL(this.filteredCommunities);
-
-        const filter = this.networkManager.getSelectedCommunities();
-
-        const legendContainer = this.createLegendContainer(filter);
-        this.container.appendChild(legendContainer);
     }
 
     /** 
@@ -152,6 +155,98 @@ export default class ControlPanel {
         this.networkManager.variableEdgeChangeALL(checkBox.checked);
     }
 
+    createFilterChooser() {
+        const communities = this.networkManager.getExplicitCommunities();
+
+        this.filteredCommunities = new Array();
+        this.maxFilterSize = 2;//communities.filterSize;
+
+        const n = communities.data.length;
+
+        //Create dropdown skeleton
+        const topContainer = document.createElement("div");
+        topContainer.className = "dropdown";
+
+        const mainButton = document.createElement("button");
+        mainButton.innerText = "Select Filter";
+        mainButton.className = "btn btn-secondary dropdown-toggle";
+
+        mainButton.setAttribute("data-bs-toggle", "dropdown");
+        mainButton.setAttribute("aria-expanded", "false");
+        //Dropdown closes by clicking outside it
+        mainButton.setAttribute("data-bs-auto-close", "outside");
+        topContainer.append(mainButton);
+
+        const optionsContainer = document.createElement("ul");
+        optionsContainer.className = "dropdown-menu dropdown-menu-dark";
+
+        topContainer.append(optionsContainer);
+
+        //Fill the dropdown with the files
+        for (let i = 0; i < n; i++) {
+
+            const key = communities.data[i].key;
+            const newFileContainer = document.createElement('li');
+
+            const newFileButton = document.createElement('a');
+            newFileButton.className = "dropdown-item";
+            newFileButton.innerHTML = key;
+            newFileButton.style.userSelect = "none";
+            newFileButton.onclick = () => this.chooseFilterClick(newFileButton, key);
+
+            this.filterToDropdown.set(key, newFileButton);
+            newFileContainer.appendChild(newFileButton);
+            optionsContainer.appendChild(newFileContainer);
+        }
+
+        const options = {}
+        new Dropdown(mainButton, options);
+
+        return topContainer;
+    }
+
+    chooseFilterClick(button, key) {
+        const index = this.filteredCommunities.indexOf(key);
+
+        if (index !== -1) {
+            this.filteredCommunities.splice(index, 1);
+            button.className = "dropdown-item";
+
+        } else {
+
+            if (this.filteredCommunities.length === this.maxFilterSize) {
+
+                const first = this.filteredCommunities[0];
+                this.filterToDropdown.get(first).className = "dropdown-item";
+                this.filteredCommunities.splice(0, 1);
+
+            }
+            this.filteredCommunities.push(key);
+            button.className = "dropdown-item active";
+        }
+
+        this.updateHiddenCommunities();
+    }
+
+    updateHiddenCommunities() {
+        if (this.legendContainer !== null) {
+            this.container.removeChild(this.legendContainer);
+            this.legendContainer = null;
+        }
+
+        this.createLegend();
+    }
+
+    createLegend() {
+        this.networkManager.selectCommunitiesALL(this.filteredCommunities);
+
+        const filter = this.networkManager.getSelectedCommunities();
+
+        if (this.filteredCommunities.length > 0) {
+            this.legendContainer = this.createLegendContainer(filter);
+            this.container.appendChild(this.legendContainer);
+        }
+    }
     /**
      * Remove the controlPanel if its active
      */

@@ -68,12 +68,19 @@ export default class ExplicitCommsMan {
 
     /**
      * Update current selected communities and init all necesary variables
-     * @param {Object} communities Object with the format of {key: (string), values: (String[])}
+     * @param {String[]} communities String with the key of the communities to select
      */
     updateSelectedCommunities(communities) {
-        this.commFilter = communities;
+        this.commFilter = new Array();
 
-        for (let i = 0; i < this.commChecker.length; i++) {
+        for(let i = 0; i < this.communitiesData.length; i++){
+            if(communities.includes(this.communitiesData[i].key)){
+                this.commFilter.push( this.communitiesData[i] );
+            }
+        }
+
+       
+        for (let i = 0; i < this.commFilter.length; i++) {
             const element = this.commChecker[i];
             element.init(this.commFilter[i].values);
         }

@@ -298,19 +298,36 @@ export default class NetworkMan {
     /**
      * Save these communities as the selected communities for filtering and update all nodes visuals based 
      * on the selected communities and node values for each of them 
-     * @param {Object} communities Object with the format of {key: (string), values: (String[])}
+     * @param {String[]} communities string with the name of the communities to select
      */
     selectCommunities(communities) {
-        this.explCommMan.updateSelectedCommunities(communities);
+        if (communities.length === 0) {
+            this.explCommMan.commFilter = new Array();
 
-        const newNodes = new Array();
-        this.data.nodes.forEach((node) => {
+            const newNodes = new Array();
+            this.data.nodes.forEach((node) => {
 
-            this.explCommMan.updateNodeVisuals(node);
-            newNodes.push(node);
+                this.nodesMan.removeAllCommunityCharacteristics(node);
+                newNodes.push(node);
 
-        });
-        this.data.nodes.update(newNodes);
+            });
+            this.data.nodes.update(newNodes);
+
+        } else {
+
+            this.explCommMan.updateSelectedCommunities(communities);
+
+            const newNodes = new Array();
+            this.data.nodes.forEach((node) => {
+
+                this.nodesMan.removeAllCommunityCharacteristics(node);
+                this.explCommMan.updateNodeVisuals(node);
+                
+                newNodes.push(node);
+
+            });
+            this.data.nodes.update(newNodes);
+        }
     }
 
     /**

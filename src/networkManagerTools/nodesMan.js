@@ -292,7 +292,6 @@ export default class NodesMan {
         const keys = Object.keys(node.explicit_community);
         for (let i = 0; i < keys.length; i++) {
             content += "<b>" + keys[i] + "</b> " + node.explicit_community[keys[i]] + "<br>";
-
         }
 
         return content;
@@ -306,11 +305,18 @@ export default class NodesMan {
         const color = this.explCommMan.getNodeBackgroundColor(node, value);
 
         node["color"] = {
-            background: color,
-            border: color
+            background: color
         }
+
         node.defaultColor = true;
     }
+
+    turnNodeBorderToDefault(node, value = null){
+        const color = this.explCommMan.getNodeBorderColor(node, value);
+
+        node["color"]["border"] = color;
+    }
+
 
     /** 
      * Change node colors to grey colors
@@ -324,6 +330,16 @@ export default class NodesMan {
             border: nodes.NoFocusColor.Border
         };
     }
+
+    removeAllCommunityCharacteristics(node){
+        node["color"] = {
+            background: nodes.NodeColor,
+            border: nodes.NodeColor
+        }
+
+        node["shape"] = nodes.NodeShape;
+    }
+
     /** 
      * Function executed when a node is selected that update the node visual attributes
      * @param {Object} values value of the parameters that will change

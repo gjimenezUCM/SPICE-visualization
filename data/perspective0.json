@@ -325,7 +325,8 @@
             "group": 3,
             "explicit_community": {
                 "ageGroup": "young",
-                "language": "HE"
+                "language": "HE",
+                "religion": "Judaism"
             }
         },
         {

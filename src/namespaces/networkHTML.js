@@ -7,6 +7,8 @@ export const networkHTML = {
 
     //ID of the container with the Select Algoritmh dropdown
     algorithmDropdownContainer: "algorithm_Dropdown",
+    //Id of the container with the Select filter attributes dropdown
+    filterDropdownContainer: "filter_Dropdown",
     //Id of the container with the control Panel.
     controlPanelParentContainer: "controlPanelContainer",
     //Id of the container with all the networks active in the html
