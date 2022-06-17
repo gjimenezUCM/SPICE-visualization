@@ -193,6 +193,12 @@ export default class ExplicitCommsMan {
         }
     }
 
+    /**
+     * Returns the border color for the requested node
+     * @param {Object} node requested node
+     * @param {String} value if we already know the value, we dont need to find it
+     * @returns {String} Returns a string in the format of "rbg(255,255,255, 1)""
+     */
     getNodeBorderColor(node, value) {
         if (this.commFilter !== null && this.commFilter.length >= 3) {
 

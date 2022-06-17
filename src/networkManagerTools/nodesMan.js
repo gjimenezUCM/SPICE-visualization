@@ -57,7 +57,7 @@ export default class NodesMan {
      * Create the Table/html with the data about the selected node. Its empty if none is selected
      */
     createNodesDataTable() {
-        
+
         const nExplCommunities = this.nExplCommunities;
         const nRow = nodes.NodesWantedAttr.length + nExplCommunities;
 
@@ -221,7 +221,7 @@ export default class NodesMan {
         const content = this.getTooltipContent(id);
 
         if (tooltip === null) {
-        
+
             //We use a bootstrap Popover as a tooltip
             const options = {
                 trigger: "manual",
@@ -298,7 +298,7 @@ export default class NodesMan {
     }
 
     /** 
-    * Turn node colors to default
+    * Turn node background color to default
     * @param {Object} node node that is going to be edited
     */
     turnNodeColorToDefault(node, value = null) {
@@ -311,7 +311,11 @@ export default class NodesMan {
         node.defaultColor = true;
     }
 
-    turnNodeBorderToDefault(node, value = null){
+    /** 
+    * Turn node border color to default
+    * @param {Object} node node that is going to be edited
+    */
+    turnNodeBorderToDefault(node, value = null) {
         const color = this.explCommMan.getNodeBorderColor(node, value);
 
         node["color"]["border"] = color;
@@ -331,7 +335,11 @@ export default class NodesMan {
         };
     }
 
-    removeAllCommunityCharacteristics(node){
+    /**
+     * Remove all characteristics related to communities and return them to default
+     * @param {Object} node node to be edited
+     */
+    removeAllCommunityCharacteristics(node) {
         node["color"] = {
             background: nodes.NodeColor,
             border: nodes.NodeColor

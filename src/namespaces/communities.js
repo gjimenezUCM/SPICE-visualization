@@ -90,6 +90,11 @@ const getShapeOfN = function (n) {
     return nodes.AvailableShapes[n];
 }
 
+/**
+ * Returns a color for a node border
+ * @param {Integer} n index of the returned color
+ * @returns {String} Returns aa string similar to "rgb(255, 0, 0, 1)"
+ */
 const getBorderOfN = function (n) {
     n = n % nodes.BoderColors.length;
 
