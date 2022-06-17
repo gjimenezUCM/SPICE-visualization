@@ -102,6 +102,7 @@ export default class NetworkMan {
                 },
                 font: {
                     vadjust: nodes.NodevOffset,
+                    size: nodes.LabelSize,
                 }
 
             },
@@ -237,6 +238,7 @@ export default class NetworkMan {
             if (selectedNodes.includes(node.id)) {
                 if (!node.defaultColor) {
                     this.nodesMan.turnNodeColorToDefault(node);
+                    this.nodesMan.turnNodeBorderToDefault(node);
                     newNodes.push(node);
                 }
 
@@ -277,6 +279,7 @@ export default class NetworkMan {
         this.data.nodes.forEach((node) => {
             if (!node.defaultColor) {
                 this.nodesMan.turnNodeColorToDefault(node)
+                this.nodesMan.turnNodeBorderToDefault(node);
                 newNodes.push(node);
             }
 

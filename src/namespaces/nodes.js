@@ -30,10 +30,11 @@ export const nodes = {
     NodeShape: "dot",
     //Default value for vAdjust label for the default shape,
     NodevOffset: -31,
+    
+    NodeBorderWidth: 3,
+    NodeBorderWidthSelected: 3,
 
-    NodeBorderWidth: 2,
-    NodeBorderWidthSelected: 4,
-
+    LabelSize: 13,
     //--- DataTable ---
 
     //Whitelist with the keys that will be shown in the selected Node Data Panel.
@@ -61,6 +62,13 @@ export const nodes = {
         "rgb(0, 255, 72, 1)", //Green
         "rgb(25, 166, 255, 1)", //Blue
         "rgb(255, 252, 25, 1)", //Yellow
+    ],
+
+    BoderColors:[
+        "rgb(128, 126, 13, 1)", //Yellow
+        "rgb(128, 0, 0, 1)", //Red
+        "rgb(0, 128, 36, 1)", //Green
+        "rgb(13, 84, 128, 1)", //Blue
     ],
 
     AvailableShapes: [

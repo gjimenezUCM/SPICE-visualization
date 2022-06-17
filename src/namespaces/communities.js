@@ -26,6 +26,7 @@ export const comms = {
     NodeAttr: {
         getColor: (n) => getColorOfN(n),
         getShape: (n) => getShapeOfN(n),
+        getBorder: (n) => getBorderOfN(n),
     },
 
     //--- Legends Helpers ---
@@ -88,6 +89,12 @@ const getShapeOfN = function (n) {
 
     return nodes.AvailableShapes[n];
 }
+
+const getBorderOfN = function (n) {
+    n = n % nodes.BoderColors.length;
+
+    return nodes.BoderColors[n];
+};
 
 /**
  * Updates the html to match the class that its n-shape should have

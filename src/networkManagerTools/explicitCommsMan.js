@@ -33,6 +33,10 @@ export default class ExplicitCommsMan {
             {
                 change: (node, val) => this.changeShape(node, val),
                 init: (values) => this.initShapesFilter(values)
+            },
+            {
+                change: (node, val) => this.changeBorder(node, val),
+                init: (values) => this.initBorderFilter(values)
             }
         ];
     }
@@ -86,7 +90,6 @@ export default class ExplicitCommsMan {
             const color = comms.NodeAttr.getColor(i);
             this.nodeColors.set(values[i], color);
         }
-
     }
 
     /**
@@ -99,6 +102,18 @@ export default class ExplicitCommsMan {
         for (let i = 0; i < values.length; i++) {
             const shape = comms.NodeAttr.getShape(i);
             this.nodeShapes.set(values[i], shape);
+        }
+    }
+    /**
+     * Init the map with the communityValue -> Border Color relationship
+     * @param {String[]} values values of the community that drives the node's border color
+     */
+    initBorderFilter(values) {
+        this.nodeBorders = new Map();
+
+        for (let i = 0; i < values.length; i++) {
+            const color = comms.NodeAttr.getBorder(i);
+            this.nodeBorders.set(values[i], color);
         }
     }
 
@@ -139,6 +154,16 @@ export default class ExplicitCommsMan {
     }
 
     /**
+     * Change the border color of the node to reflect its community
+     * @param {Object} node node that is going to be edited
+     * @param {String} value value of the node for this community
+     */
+    changeBorder(node, value) {
+        this.networkMan.nodesMan.turnNodeBorderToDefault(node, value);
+    }
+
+
+    /**
      * Returns the background color for the requested node
      * @param {Object} node requested node
      * @param {String} value if we already know the value, we dont need to find it
@@ -158,6 +183,23 @@ export default class ExplicitCommsMan {
         } else {
             //If we dont have a filter or we are not filtering colors, we return the default color
             return nodes.NodeColor;
+        }
+    }
+
+    getNodeBorderColor(node, value) {
+        if (this.commFilter !== null && this.commFilter.length >= 3) {
+
+            if (value !== null) {
+                return this.nodeBorders.get(value);
+            }
+
+            const nodeComms = node[comms.ExpUserKsonKey];
+            value = nodeComms[this.commFilter[2].key];
+
+            return this.nodeBorders.get(value);
+        } else {
+            //If we dont have a filter or we are not filtering border colors, we return the node's  color
+            return this.getNodeBackgroundColor(node, value);
         }
     }
 
@@ -183,7 +225,7 @@ export default class ExplicitCommsMan {
                     break;
                 }
             }
-            if(!isHidden){
+            if (!isHidden) {
                 this.networkMan.nodesMan.turnNodeColorToDefault(node);
             }
 
