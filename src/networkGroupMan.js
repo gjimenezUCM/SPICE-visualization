@@ -142,27 +142,6 @@ export default class NetworkGroupMan {
     }
 
     /**
-     * Save these communities as the selected communities for filtering
-     * @param {String} key key of the network
-     * @param {String[]} communities string with the name of the communities to select
-     */
-    selectCommunities(key, communities) {
-        const network = this.activesNetworksMap.get(key);
-
-        network.selectCommunities(communities);
-    }
-
-    /**
-     * Save in all networks's these communities as the selected communities for filtering
-     * @param {String[]} communities string with the name of the communities to select
-     */
-    selectCommunitiesALL(communities) {
-        this.activesNetworksArray.forEach((network) => {
-            this.selectCommunities(network.key, communities);
-        });
-    }
-
-    /**
      * Update node visuals of a network to match current blacklist filter
      * @param {String[]} filter string array with all values to hide
      */
@@ -198,19 +177,11 @@ export default class NetworkGroupMan {
     }
 
     /**
-     * Returns all detected Explicit Communities and the max size of our filter of the first network
-     * (All networks should have the same)
-     * @returns {Object} Object with the format of {data: {key: (string), values: (String[])}, filterSize: (int)}
+     * Returns the attributes that changes visualization
+     * @returns {Object} Object with the attributes that change visualization
+     * Format-> {attr: (string), vals: (string[], dimension: (string))}
      */
-    getExplicitCommunities() {
-        return this.activesNetworksArray[0].getExplicitCommunities();
-    }
-
-    /**
-     * Returns current selected communities used in filtering node visuals
-     * @returns {Object} Object with the format of {key: (string), values: (String[])}
-     */
-    getSelectedCommunities() {
-        return this.activesNetworksArray[0].getSelectedCommunities();
+     getVisualizationAttributes() {
+        return this.activesNetworksArray[0].getVisualizationAttributes();
     }
 }

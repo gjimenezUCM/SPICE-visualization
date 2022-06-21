@@ -13,8 +13,8 @@ export const nodes = {
     //--- Configuration Values ---
 
     //Sizes
-    DefaultSize: 15,
-    SelectedSize: 25,
+    DefaultSize: 20,
+    SelectedSize: 30,
 
     //Color when another node is being focused
     NoFocusColor: { Background: "rgba(155, 155, 155, 0.3)", Border: "rgba(100, 100, 100, 0.3)" },
@@ -31,8 +31,11 @@ export const nodes = {
     //Default value for vAdjust label for the default shape,
     NodevOffset: -31,
 
-    NodeBorderWidth: 4,
-    NodeBorderWidthSelected: 4,
+    NodeDefaultBorderWidth: 0,
+    NodeDefaultBorderWidthSelected: 0,
+
+    NodeWithBorderColorWidth: 4,
+    NodeWithBorderColorWidthSelected: 4,
 
     LabelSize: 13,
     //--- DataTable ---
@@ -55,6 +58,22 @@ export const nodes = {
 
     //--- Explicit Communities Variable Attributes ---
 
+    //KEYS
+    nodeColorKey: "color",
+    nodeShapeKey: "shape",
+    nodeBorderKey: "border",
+    
+    //Node attributes that change based on its explicit Community
+    NodeAttr: {
+        getColor: (n) => getColorOfN(n),
+        getShape: (n) => getShapeOfN(n),
+        getBorder: (n) => getBorderOfN(n),
+    },
+
+    //--- Legends Helpers ---
+
+    getShapehtml: (html, index) => getShapehtml(html, index),
+
     //Characteristics that change based on the explicit communities
 
     BackgroundColors: [
@@ -76,14 +95,57 @@ export const nodes = {
     ],
 
     AvailableShapes: [
-        { Shape: "dot", vOffset: -31, selOffset: -40 },
-        { Shape: "diamond", vOffset: -31, selOffset: -40 },
-        { Shape: "star", vOffset: -31, selOffset: -40 },
-        { Shape: "triangle", vOffset: -25, selOffset: -35 },
-        { Shape: "square", vOffset: -31, selOffset: -40 },
-        { Shape: "triangleDown", vOffset: -35, selOffset: -45 },
-        { Shape: "hexagon", vOffset: -31, selOffset: -40 },
+        { Shape: "dot", vOffset: -35, selOffset: -40 },
+        { Shape: "diamond", vOffset: -35, selOffset: -40 },
+        { Shape: "star", vOffset: -34, selOffset: -40 },
+        { Shape: "triangle", vOffset: -29, selOffset: -35 },
+        { Shape: "square", vOffset: -35, selOffset: -40 },
+        { Shape: "triangleDown", vOffset: -40, selOffset: -45 },
+        { Shape: "hexagon", vOffset: -35, selOffset: -40 },
     ],
 
 }
 
+/**
+ * Returns a color for a node background
+ * @param {Integer} n index of the returned color
+ * @returns {String} Returns aa string similar to "rgb(255, 0, 0, 1)"
+ */
+const getColorOfN = function (n) {
+    n = n % nodes.BackgroundColors.length;
+
+    return nodes.BackgroundColors[n];
+};
+
+/**
+ * Returns a shape and label offset for a node shape
+ * @param {Integer} n index of the returned shape
+ * @returns {Object} Returns an object in the format of { Shape: "dot", vOffset: -31, selOffset: -40 }
+ */
+const getShapeOfN = function (n) {
+    n = n % nodes.AvailableShapes.length;
+
+    return nodes.AvailableShapes[n];
+}
+
+/**
+ * Returns a color for a node border
+ * @param {Integer} n index of the returned color
+ * @returns {String} Returns aa string similar to "rgb(255, 0, 0, 1)"
+ */
+const getBorderOfN = function (n) {
+    n = n % nodes.BoderColors.length;
+
+    return nodes.BoderColors[n];
+};
+
+/**
+ * Updates the html to match the class that its n-shape should have
+ * @param {HTMLElement} html html to edit
+ * @param {Integer} n n of the shape
+ */
+const getShapehtml = function (html, n) {
+    let shape = getShapeOfN(n).Shape;
+
+    html.className = shape;
+}

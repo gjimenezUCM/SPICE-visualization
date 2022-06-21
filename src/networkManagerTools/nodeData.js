@@ -1,6 +1,5 @@
 /**
- * @fileoverview This Class Manage most things related to nodes. It reads the json and parse the data, 
- * create/update the table and tooltip that will show clicked node info.
+ * @fileoverview This class controls the visualization of the data of the nodes. The datatable and the tooltip
  * @package It requires vis-data package to be able to use vis-network datasets. 
  * @package It requires bootstrap to be able to draw popovers.
  * @author Marco Expósito Pérez
@@ -14,7 +13,7 @@ import { networkHTML } from "../namespaces/networkHTML.js";
 import { DataSet } from "vis-data/peer";
 import { Popover } from 'bootstrap';
 
-export default class NodesMan {
+export default class NodeData {
 
     /**
      * Constructor of the class
@@ -297,80 +296,5 @@ export default class NodesMan {
         return content;
     }
 
-    /** 
-    * Turn node background color to default
-    * @param {Object} node node that is going to be edited
-    */
-    turnNodeColorToDefault(node, value = null) {
-        const color = this.explCommMan.getNodeBackgroundColor(node, value);
-
-        node["color"] = {
-            background: color
-        }
-
-        node.defaultColor = true;
-    }
-
-    /** 
-    * Turn node border color to default
-    * @param {Object} node node that is going to be edited
-    */
-    turnNodeBorderToDefault(node, value = null) {
-        const color = this.explCommMan.getNodeBorderColor(node, value);
-
-        node["color"]["border"] = color;
-    }
-
-
-    /** 
-     * Change node colors to grey colors
-     * @param {Object} node edited node
-     */
-    turnNodeDark(node) {
-        node.defaultColor = false;
-
-        node["color"] = {
-            background: nodes.NoFocusColor.Background,
-            border: nodes.NoFocusColor.Border
-        };
-    }
-
-    /**
-     * Remove all characteristics related to communities and return them to default
-     * @param {Object} node node to be edited
-     */
-    removeAllCommunityCharacteristics(node) {
-        node["color"] = {
-            background: nodes.NodeColor,
-            border: nodes.NodeColor
-        }
-
-        node["shape"] = nodes.NodeShape;
-    }
-
-    /** 
-     * Function executed when a node is selected that update the node visual attributes
-     * @param {Object} values value of the parameters that will change
-     * @param {Integer} id id of the node (unused)
-     * @param {Boolean} selected Boolean that says if the node has been selected
-     * @param {Boolean} hovering Boolean that says if the node has been hovered (unused)
-     */
-    nodeChosen(values, id, selected, hovering) {
-        if (selected) {
-            values.size = nodes.SelectedSize;
-        }
-    }
-
-    /** 
-     * Function executed when a node is selected that update node's attributes of its label
-     * @param {Object} values label's parameters that will change
-     * @param {Integer} id id of the node (unused)
-     * @param {Boolean} selected Boolean that says if the node has been selected
-     * @param {Boolean} hovering Boolean that says if the node has been hovered (unused)
-     */
-    labelChosen(values, id, selected, hovering) {
-        if (selected) {
-            values.vadjust -= 10;
-        }
-    }
+    
 }

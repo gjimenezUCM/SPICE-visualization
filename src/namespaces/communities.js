@@ -20,18 +20,7 @@ export const comms = {
     //Currently the above key is "group". Thats a vis.js attribute and it needs to be changed. This is the new key
     ImplUserNewKey: "implicit_Comm",
 
-    //--- Explicit Communities ---
 
-    //Node attributes that change based on its explicit Community
-    NodeAttr: {
-        getColor: (n) => getColorOfN(n),
-        getShape: (n) => getShapeOfN(n),
-        getBorder: (n) => getBorderOfN(n),
-    },
-
-    //--- Legends Helpers ---
-
-    getShapehtml: (html, index) => getShapehtml(html, index),
 
     //--- DataTable ---
 
@@ -68,46 +57,3 @@ export const comms = {
 
 }
 
-/**
- * Returns a color for a node background
- * @param {Integer} n index of the returned color
- * @returns {String} Returns aa string similar to "rgb(255, 0, 0, 1)"
- */
-const getColorOfN = function (n) {
-    n = n % nodes.BackgroundColors.length;
-
-    return nodes.BackgroundColors[n];
-};
-
-/**
- * Returns a shape and label offset for a node shape
- * @param {Integer} n index of the returned shape
- * @returns {Object} Returns an object in the format of { Shape: "dot", vOffset: -31, selOffset: -40 }
- */
-const getShapeOfN = function (n) {
-    n = n % nodes.AvailableShapes.length;
-
-    return nodes.AvailableShapes[n];
-}
-
-/**
- * Returns a color for a node border
- * @param {Integer} n index of the returned color
- * @returns {String} Returns aa string similar to "rgb(255, 0, 0, 1)"
- */
-const getBorderOfN = function (n) {
-    n = n % nodes.BoderColors.length;
-
-    return nodes.BoderColors[n];
-};
-
-/**
- * Updates the html to match the class that its n-shape should have
- * @param {HTMLElement} html html to edit
- * @param {Integer} n n of the shape
- */
-const getShapehtml = function (html, n) {
-    let shape = getShapeOfN(n).Shape;
-
-    html.className = shape;
-}

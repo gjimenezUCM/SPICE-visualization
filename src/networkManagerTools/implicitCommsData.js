@@ -13,7 +13,7 @@ import { nodes } from "../namespaces/nodes.js";
 //packages
 import { Popover } from 'bootstrap';
 
-export default class ImplicitCommsMan {
+export default class ImplicitCommsData {
 
     /**
      * Constructor of the class

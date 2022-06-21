@@ -12,10 +12,10 @@ import { networkHTML } from "./namespaces/networkHTML.js";
 //Packages
 import { Network } from "vis-network/peer";
 //Local classes
-import ImplicitCommsMan from "./networkManagerTools/implicitCommsMan.js";
-import ExplicitCommsMan from "./networkManagerTools/explicitCommsMan.js";
-import NodesMan from "./networkManagerTools/nodesMan.js";
-import EdgesMan from "./networkManagerTools/edgesMan.js";
+import ImplicitCommsMan from "./networkManagerTools/implicitCommsData.js";
+import NodeVisuals from "./networkManagerTools/nodeVisuals.js";
+import NodeData from "./networkManagerTools/nodeData.js";
+import EdgeManager from "./networkManagerTools/edgeManager.js";
 
 export default class NetworkMan {
 
@@ -33,10 +33,10 @@ export default class NetworkMan {
         this.key = config.key;
 
         this.implCommMan = new ImplicitCommsMan(jsonInput, rightContainer, this);
-        this.explCommMan = new ExplicitCommsMan(this);
+        this.explCommMan = new NodeVisuals(this);
 
-        this.nodesMan = new NodesMan(this.explCommMan, rightContainer);
-        this.edgesMan = new EdgesMan(config);
+        this.nodesMan = new NodeData(this.explCommMan, rightContainer);
+        this.edgesMan = new EdgeManager(config);
 
         this.data =
         {
@@ -46,6 +46,8 @@ export default class NetworkMan {
 
         this.nodesMan.createNodesDataTable();
         this.implCommMan.createCommunityDataTable();
+        
+        this.explCommMan.createNodeDimensionStrategy(this);
 
         this.chooseOptions();
         this.drawNetwork();
@@ -86,15 +88,15 @@ export default class NetworkMan {
             },
             nodes: {
                 shape: nodes.NodeShape,
-                borderWidth: nodes.NodeBorderWidth,
-                borderWidthSelected: nodes.NodeBorderWidthSelected,
+                borderWidth: nodes.NodeDefaultBorderWidth,
+                borderWidthSelected: nodes.NodeDefaultBorderWidthSelected,
                 shapeProperties: {
                     interpolation: false
                 },
                 size: nodes.DefaultSize,
                 chosen: {
-                    node: this.nodesMan.nodeChosen.bind(this),
-                    label: this.nodesMan.labelChosen.bind(this),
+                    node: this.explCommMan.nodeChosen.bind(this),
+                    label: this.explCommMan.labelChosen.bind(this),
                 },
                 color: {
                     background: nodes.NodeColor,
@@ -296,41 +298,6 @@ export default class NetworkMan {
     }
 
     /**
-     * Save these communities as the selected communities for filtering and update all nodes visuals based 
-     * on the selected communities and node values for each of them 
-     * @param {String[]} communities string with the name of the communities to select
-     */
-    selectCommunities(communities) {
-        if (communities.length === 0) {
-            this.explCommMan.commFilter = new Array();
-
-            const newNodes = new Array();
-            this.data.nodes.forEach((node) => {
-
-                this.nodesMan.removeAllCommunityCharacteristics(node);
-                newNodes.push(node);
-
-            });
-            this.data.nodes.update(newNodes);
-
-        } else {
-
-            this.explCommMan.updateSelectedCommunities(communities);
-
-            const newNodes = new Array();
-            this.data.nodes.forEach((node) => {
-
-                this.nodesMan.removeAllCommunityCharacteristics(node);
-                this.explCommMan.updateNodeVisuals(node);
-                
-                newNodes.push(node);
-
-            });
-            this.data.nodes.update(newNodes);
-        }
-    }
-
-    /**
      * Update node visuals of all networks to match current filter
      * @param {String[]} filter string array with all values to hide
      */
@@ -339,19 +306,12 @@ export default class NetworkMan {
     }
 
     /**
-     * Returns all detected Explicit Communities and the max size of our filter
-     * @returns {Object} Object with the format of {data: {key: (string), values: (String[])}, filterSize: (int)}
+     * Returns the attributes that changes visualization
+     * @returns {Object} Object with the attributes that change visualization
+     * Format-> {attr: (string), vals: (string[], dimension: (string))}
      */
-    getExplicitCommunities() {
-        return this.explCommMan.getCommunitiesData();
-    }
-
-    /**
-     * Returns current selected communities used in filtering node visuals
-     * @returns {Object} Object with the format of {key: (string), values: (String[])}
-     */
-    getSelectedCommunities() {
-        return this.explCommMan.getSelectedCommunities();
+     getVisualizationAttributes() {
+        return this.explCommMan.getVisualizationAttributes();
     }
 }
 

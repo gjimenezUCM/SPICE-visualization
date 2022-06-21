@@ -10,7 +10,7 @@ import { edges } from "../namespaces/edges.js";
 //Packages
 import { DataSet } from "vis-data/peer";
 
-export default class EdgesMan {
+export default class EdgeManager {
 
     /**
      * Constructor of the class
