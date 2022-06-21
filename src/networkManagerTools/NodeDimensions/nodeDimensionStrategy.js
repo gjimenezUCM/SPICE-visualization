@@ -6,7 +6,7 @@
  */
 
 //Namespaces
-import { nodes } from "../../namespaces/nodes";
+import { nodes } from "../../constants/nodes";
 //Local classes
 import BorderStrategy from "./borderStrategy";
 import ColorStrategy from "./colorStrategy";

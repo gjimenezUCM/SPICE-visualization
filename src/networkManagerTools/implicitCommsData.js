@@ -7,9 +7,9 @@
  */
 
 //Namespaces
-import { comms } from "../namespaces/communities.js";
-import { networkHTML } from "../namespaces/networkHTML.js";
-import { nodes } from "../namespaces/nodes.js";
+import { comms } from "../constants/communities.js";
+import { networkHTML } from "../constants/networkHTML.js";
+import { nodes } from "../constants/nodes.js";
 //packages
 import { Popover } from 'bootstrap';
 

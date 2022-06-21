@@ -6,7 +6,7 @@
  */
 
 //Namespaces
-import { edges } from "../namespaces/edges.js";
+import { edges } from "../constants/edges.js";
 //Packages
 import { DataSet } from "vis-data/peer";
 

@@ -6,9 +6,9 @@
  */
 
 //Namespaces
-import { edges } from "./namespaces/edges.js";
-import { nodes } from "./namespaces/nodes.js";
-import { networkHTML } from "./namespaces/networkHTML.js";
+import { edges } from "./constants/edges.js";
+import { nodes } from "./constants/nodes.js";
+import { networkHTML } from "./constants/networkHTML.js";
 //Packages
 import { Network } from "vis-network/peer";
 //Local classes

@@ -4,8 +4,8 @@
  */
 
 //Namespaces
-import { nodes } from "../../namespaces/nodes";
-import { comms } from "../../namespaces/communities";
+import { nodes } from "../../constants/nodes";
+import { comms } from "../../constants/communities";
 
 export default class ColorStrategy {
 

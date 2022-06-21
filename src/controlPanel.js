@@ -6,8 +6,8 @@
  * @author Marco Expósito Pérez
  */
 //Namespaces
-import { networkHTML } from "./namespaces/networkHTML.js";
-import { nodes } from "./namespaces/nodes.js";
+import { networkHTML } from "./constants/networkHTML.js";
+import { nodes } from "./constants/nodes.js";
 //Packages
 import { Collapse } from 'bootstrap';
 import { Dropdown } from 'bootstrap';

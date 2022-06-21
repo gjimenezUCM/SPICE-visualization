@@ -6,9 +6,9 @@
  */
 
 //Namespaces
-import { nodes } from "../namespaces/nodes.js";
-import { comms } from "../namespaces/communities.js";
-import { networkHTML } from "../namespaces/networkHTML.js";
+import { nodes } from "../constants/nodes.js";
+import { comms } from "../constants/communities.js";
+import { networkHTML } from "../constants/networkHTML.js";
 //Packages
 import { DataSet } from "vis-data/peer";
 import { Popover } from 'bootstrap';

@@ -5,9 +5,9 @@
  */
 
 //Namespace
-import { networkHTML } from "./namespaces/networkHTML.js";
+import { networkHTML } from "./constants/networkHTML.js";
 //Local classes
-import NetworkMan from "./networkMan.js";
+import NetworkMan from "./networkManager.js";
 
 export default class NetworkGroupMan {
 

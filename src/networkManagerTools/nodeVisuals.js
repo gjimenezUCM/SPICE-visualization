@@ -5,8 +5,8 @@
  */
 
 //Namespaces
-import { comms } from "../namespaces/communities.js";
-import { nodes } from "../namespaces/nodes.js";
+import { comms } from "../constants/communities.js";
+import { nodes } from "../constants/nodes.js";
 import NodeDimensionStrategy from "./NodeDimensions/nodeDimensionStrategy.js";
 
 export default class NodeVisuals {

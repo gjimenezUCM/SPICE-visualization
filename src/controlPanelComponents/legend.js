@@ -1,5 +1,5 @@
-import { networkHTML } from "../namespaces/networkHTML";
-import { nodes } from "../namespaces/nodes";
+import { networkHTML } from "../constants/networkHTML";
+import { nodes } from "../constants/nodes";
 
 import { Collapse } from 'bootstrap';
 
