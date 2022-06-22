@@ -1,34 +1,27 @@
-
-
+/**
+ * @fileoverview This creates and update a html table with a tittle/label in the left column, 
+ * and its data/value in the right.
+ * @author Marco Expósito Pérez
+ */
 export default class dataTable {
 
+    /**
+     * Constructor of the class
+     * @param {HTMLElement} container container of the datatable
+     */
     constructor(container) {
         this.container = container;
 
         this.domParser = new DOMParser();
     }
 
-    updateDataTable(rowsData) {
-        for (let i = 0; i < this.htmlRows.length; i++) {
-            let key;
-            if (this.htmlRows[i].tittle.children.length === 1) {
-                key = this.htmlRows[i].tittle.children[0].innerText;
-            } else {
-                key = this.htmlRows[i].tittle.innerText;
-            }
-
-            const value = rowsData.get(key);
-            if (value !== undefined)
-                this.htmlRows[i].data.innerText = value;
-        }
-    }
-
-    clearDataTable() {
-        for (let i = 0; i < this.htmlRows.length; i++) {
-            this.htmlRows[i].data.innerText = "";
-        }
-    }
-
+    /**
+     * Create teh dataTable skeleton with empty values
+     * @param {Object[]} rowsData Array with the data to create every row of the dataTable.
+     * Format-> {tittle: (string), class: (string), data: (string))}
+     * @param {String} tittle Title of the dataTable
+     * @param {Boolean} drawLineAtTheEnd Boolean that defines if a line should be drawn after the datatable
+     */
     createDataTable(rowsData, tittle, drawLineAtTheEnd = true) {
         const body = this.contentTemplate(rowsData);
         const htmlString = this.datatableTemplate(tittle, body);
@@ -45,10 +38,44 @@ export default class dataTable {
 
         this.container.append(html);
 
-        if(drawLineAtTheEnd)
+        if (drawLineAtTheEnd)
             this.container.append(document.createElement("hr"));
     }
 
+    /**
+     * Update the dataTable with the new data for all rows
+     * @param {Map} rowsData map with the relationship between tittle -> new data value 
+     */
+    updateDataTable(rowsData) {
+        for (let i = 0; i < this.htmlRows.length; i++) {
+            let key;
+            if (this.htmlRows[i].tittle.children.length === 1) {
+                key = this.htmlRows[i].tittle.children[0].innerText;
+            } else {
+                key = this.htmlRows[i].tittle.innerText;
+            }
+
+            const value = rowsData.get(key);
+            if (value !== undefined)
+                this.htmlRows[i].data.innerText = value;
+        }
+    }
+
+    /**
+     * Remove all data from the dataTable
+     */
+    clearDataTable() {
+        for (let i = 0; i < this.htmlRows.length; i++) {
+            this.htmlRows[i].data.innerText = "";
+        }
+    }
+
+    /**
+     * Returns a Template of the datatable
+     * @param {String} tittle Title of the dataTable
+     * @param {String} body Body of the datatable
+     * @returns {String} returns a string with the template filled
+     */
     datatableTemplate(tittle, body) {
         const html = `
         <div class="border border-dark rounded">
@@ -60,6 +87,12 @@ export default class dataTable {
         return html;
     }
 
+    /**
+     * Returns a Template of the content of the datatable. The content is formado by rows
+     * @param {Object[]} rowsData Array with the data to create every row of the dataTable.
+     * Format-> {tittle: (string), class: (string), data: (string))}
+     * @returns {String} returns a string with the template filled
+     */
     contentTemplate(rowsData) {
         let html = "";
 
@@ -70,7 +103,13 @@ export default class dataTable {
         return html;
     }
 
-
+    /**
+     * Returns a Template of a single row of the datatable.
+     * @param {String} rowClass html class of the row
+     * @param {String} tittle title/label of the row. Goes in the left column
+     * @param {String} data data/value of the row, Goes in the right column
+     * @returns {String} returns a string with the template filled
+     */
     rowTemplate(rowClass, tittle, data) {
         const html = `
         <div class= "${rowClass}" >

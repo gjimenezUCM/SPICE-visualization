@@ -1,9 +1,19 @@
+/**
+ * @fileoverview This creates and update a tooltip with a tittle on top and some content below it.
+ * @package It requires bootstrap package to be able to use Popover objects. 
+ * @author Marco Expósito Pérez
+ */
+//Namespaces
 import { networkHTML } from "../constants/networkHTML";
-import { Popover } from 'bootstrap';
 import { nodes } from "../constants/nodes.js";
+//Packages
+import { Popover } from 'bootstrap';
 
 export default class Tooltip {
 
+    /**
+     * Constructor of the class
+     */
     constructor() {
         this.tooltip = null;
 
@@ -11,6 +21,12 @@ export default class Tooltip {
         document.body.append(this.container);
     }
 
+    /**
+     * Show a tooltip based on the tooltipManager data
+     * @param {NetworkManager} networkManager manager of the network where this tooltip is going to be drawn 
+     * @param {Object} event Click event that launched this function
+     * @param {Object} tooltipManager Class that holds the data that this tooltip will show
+     */
     showTooltip(networkManager, event, tooltipManager) {
         if (this.timer)
             clearTimeout(this.timer);
@@ -19,6 +35,13 @@ export default class Tooltip {
             nodes.ZoomDuration + nodes.TooltipSpawnTimer);
     }
 
+    /**
+     * Create a new tooltip from the start or only updates its position if update is true
+     * @param {NetworkManager} networkManager manager of the network where this tooltip is going to be drawn 
+     * @param {Object} event Click event that launched this function
+     * @param {Object} tooltipManager Class that holds the data that this tooltip will show
+     * @param {Boolean} update If true only the tooltip position will be updated, otherwise create a new tooltip
+     */
     createTooltip(networkManager, event, tooltipManager, update = false) {
         this.tooltipManager = tooltipManager;
         this.event = event;
@@ -26,7 +49,6 @@ export default class Tooltip {
         const spawnPoint = tooltipManager.calculateTooltipSpawn(networkManager, event, this.getElementPosition.bind(this));
 
         if (spawnPoint !== null && spawnPoint !== undefined) {
-
             if (!update) {
                 const html = this.tooltipTemplate();
 
@@ -50,7 +72,6 @@ export default class Tooltip {
                     '.popover-header': title,
                     '.popover-body': content
                 });
-
             }
 
             this.container.style.top = spawnPoint.y + "px";
@@ -83,15 +104,18 @@ export default class Tooltip {
         return { top: top, left: left };
     }
 
+    /**
+     * Update the position of the tooltip when the user is zooming in/out
+     * @param {NetworkManager} networkManager manager of the network where this tooltip is going to be updated 
+     */
     updatePosition(networkManager) {
         this.createTooltip(networkManager, this.event, this.tooltipManager, true)
     }
 
-
-    boundingBoxTooltip(networkManager, event) {
-        console.log("bounding box tooltip")
-    }
-
+    /**
+     * Returns the tooltip html template
+     * @returns {String} returns a string with the template
+     */
     tooltipTemplate() {
         const html = `
         <div class="popover node" role="tooltip">
@@ -103,10 +127,21 @@ export default class Tooltip {
         return html;
     }
 
+    /**
+     * Returns the tooltip tittle html template
+     * @param {String} tittle Text inside the tittle
+     * @returns {String} returns a string with the template
+     */
     titleTemplate(tittle) {
         return `<strong> ${tittle} </strong>`;
     }
 
+    /**
+     * Returns the tooltip content html template
+     * @param {Object[]} rowsData Array with the data for each row of the tooltip
+     * Format-> {tittle: (String), data: (String)}
+     * @returns {String} returns a string with the template
+     */
     contentTemplate(rowsData) {
         let html = "";
 
@@ -117,12 +152,21 @@ export default class Tooltip {
         return html;
     }
 
+    /**
+     * Returns a tooltip row html template
+     * @param {String} tittle Text at the left of the tooltip
+     * @param {String} data Text at the right of the tooltip
+     * @returns  {String} returns a string with the template
+     */
     rowTemplate(tittle, data) {
         const html = `<strong> ${tittle} </strong> ${data} <br>`;
 
         return html;
     }
 
+    /**
+     * Hide the current active tooltip if it exist
+     */
     hide() {
         if (this.tooltip !== null) {
             this.tooltip.hide();

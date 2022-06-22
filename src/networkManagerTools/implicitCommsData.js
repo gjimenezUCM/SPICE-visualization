@@ -1,8 +1,6 @@
 /**
- * @fileoverview This Class Manages everything related to implicit Communities. It reads the json, draw the 
- * bounding boxes behind the network that surround nodes of the same community and shows the info of the clicked
- * community in a table and in a tooltip.
- * @package It requires bootstrap to be able to draw popovers.
+ * @fileoverview This class holds the data of the implicit Communities and show that data using a tooltip 
+ * when a bounding box is clicked and also shows that data in a dataTable
  * @author Marco Expósito Pérez
  */
 
@@ -10,8 +8,8 @@
 import { comms } from "../constants/communities.js";
 import { networkHTML } from "../constants/networkHTML.js";
 import { nodes } from "../constants/nodes.js";
-//packages
-import { Popover } from 'bootstrap';
+
+//Local classes
 import dataTable from "./dataTable.js";
 
 export default class ImplicitCommsData {
@@ -19,26 +17,19 @@ export default class ImplicitCommsData {
     /**
      * Constructor of the class
      * @param {JSON} communityJson Json with the implicit community data
-     * @param {HTMLElement} container Container where the dataTable is going to be placed
-     * @param {NetworkMan} networkMan networkManager parent of this object
      */
-    constructor(communityJson, container, networkMan) {
+    constructor(communityJson) {
         //Data of all implicit communities
         this.implComms = communityJson[comms.ImplGlobalJsonKey];
-
-        this.container = container;
-
-        this.networkMan = networkMan;
     }
 
     /**
      * Draw the bounding boxes behind the network nodes
      * @param {CanvasRenderingContext2D} ctx Context of the canvas 
      * @param {DataSet} data Data of the nodes in the network
+     * @param {Network} network Network where the bounding boxes are being drawn on
      */
-    drawBoundingBoxes(ctx, data) {
-        const network = this.networkMan.network;
-
+    drawBoundingBoxes(ctx, data, network) {
         //Tracks the draw order of the bounding boxes
         this.bbOrder = new Array();
 
@@ -105,6 +96,8 @@ export default class ImplicitCommsData {
     /**
      * Check if the pointer is clicking inside a bounding box
      * @param {Object} event Data of the click event that trigered this function
+     * @returns {Integer} Returns the index of the bounding box that contains the click. 
+     * Returns undefined if the click hit none
      */
     checkBoundingBoxClick(event) {
         const x = event.pointer.canvas.x;
@@ -131,12 +124,16 @@ export default class ImplicitCommsData {
         return x > bb.left && x < bb.right && y > bb.top && y < bb.bottom;
     }
 
-    createCommunityDatatable() {
-        this.dataTable = new dataTable(this.container);
+    /**
+     * Create and empty dataTable with the community attributes we want to show
+     * @param {HTMLElement} container container of the dataTable
+     */
+    createCommunityDataTable(container) {
+        this.dataTable = new dataTable(container);
 
         const tittle = "Community Attributes";
 
-        //First we show the data that we want that is not from explicit communities
+        //We only include the data we want to show
         const rowsData = new Array();
         for (let i = 0; i < comms.ImplWantedAttr.length; i++) {
             rowsData.push({
@@ -152,27 +149,40 @@ export default class ImplicitCommsData {
         rowsData.push(lastMainrow);
 
         this.dataTable.createDataTable(rowsData, tittle, false)
-
-        return;
     }
 
-    updateDatatableFromClick(event) {
-        this.clearDataPanel();
+    /**
+     * Update the dataTable based on where the user clicked. 
+     * If the click didnt hit a bounding box, the function clears the dataTable
+     * @param {Object} event click event
+     */
+    updateDataTableFromClick(event) {
+        this.clearDataTable();
 
         let i = this.checkBoundingBoxClick(event);
         if (i !== undefined) {
-            this.updateDataPanel(i);
+            this.updateDataTable(i);
         }
     }
 
-    updateDatatableFromNodeId(id) {
-        let i = this.networkMan.data.nodes.get(id)[comms.ImplUserNewKey];
+    /**
+     * Update the dataTable based on what node the user clicked. 
+     * If the click didnt hit a bounding box, the function clears the dataTable
+     * @param {Object} event click event
+     */
+    updateDataTableFromNodeId(id, nodes) {
+        let i = nodes.get(id)[comms.ImplUserNewKey];
         if (i !== undefined) {
-            this.updateDataPanel(i);
+            this.updateDataTable(i);
         }
     }
 
-    updateDataPanel(i) {
+    /**
+     * Update the dataTable based on the index of the bounding box 
+     * that we want to represent in the dataTable. 
+     * @param {Integer} i index of the bounding box
+     */
+    updateDataTable(i) {
         const community = this.implComms[this.bbOrder[i]];
         const newRowData = new Map();
 
@@ -180,15 +190,24 @@ export default class ImplicitCommsData {
             newRowData.set(comms.ImplWantedAttr[i], community[comms.ImplWantedAttr[i]])
         }
 
-
         this.dataTable.updateDataTable(newRowData)
     }
 
-
-    clearDataPanel() {
+    /**
+     * Clears all data from the dataTable
+     */
+    clearDataTable() {
         this.dataTable.clearDataTable();
     }
 
+    /**
+     * Calculate the spawning point of the tooltip
+     * @param {NetworkManager} networkManager Manager of the network where the tooltip is going to be draw
+     * @param {Object} event Event with the location of the user click
+     * @param {Function} getElementPosition Function that returns the DOM position of a HTML element
+     * @returns {Object} returns an object with the spawn Point.
+     * Format-> { x: (integer), y: (integer) } 
+     */
     calculateTooltipSpawn(networkManager, event, getElementPosition) {
         //CHeck if the click hit a bounding box
         this.activeBBindex = this.checkBoundingBoxClick(event);
@@ -215,6 +234,13 @@ export default class ImplicitCommsData {
         return { x: clickX, y: clickY };
     }
 
+    /**
+     * Returns the Title of the tooltip
+     * @param {NetworkManager} networkManager (unused)
+     * @param {Object} event (unused)
+     * @param {Function} titleTemplate Function that returns the html template of the tooltip tittle
+     * @returns {String} String with the tootip tittle
+     */
     getTooltipTitle(networkManager, event, titleTemplate) {
         const communityClicked = this.implComms[this.bbOrder[this.activeBBindex]];
         const title = communityClicked.id;
@@ -222,7 +248,13 @@ export default class ImplicitCommsData {
         return titleTemplate(title);
     }
 
-
+    /**
+     * Returns the Content of the tooltip
+     * @param {NetworkManager} networkManager (unused)
+     * @param {Object} event (unused)
+     * @param {Function} contentTemplate Function that returns the html template of the tooltip content
+     * @returns {String} String with the tootip content
+     */
     getTooltipContent(networkManager, event, contentTemplate) {
         const communityClicked = this.implComms[this.bbOrder[this.activeBBindex]];
         const rowData = new Array();
@@ -233,6 +265,8 @@ export default class ImplicitCommsData {
 
         return contentTemplate(rowData);
     }
+
+
 
     //This is intended for debug purpouses
     getCommunityBBcolor(index) {

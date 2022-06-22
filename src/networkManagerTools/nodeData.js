@@ -1,7 +1,7 @@
 /**
- * @fileoverview This class controls the visualization of the data of the nodes. The datatable and the tooltip
+ * @fileoverview This class holds the data of the nodes and show that data using a tooltip 
+ * when a nodes is clicked and also shows that data in a dataTable
  * @package It requires vis-data package to be able to use vis-network datasets. 
- * @package It requires bootstrap to be able to draw popovers.
  * @author Marco Expósito Pérez
  */
 
@@ -11,31 +11,27 @@ import { comms } from "../constants/communities.js";
 import { networkHTML } from "../constants/networkHTML.js";
 //Packages
 import { DataSet } from "vis-data/peer";
-import { Popover } from 'bootstrap';
+//Local classes
 import dataTable from "./dataTable.js";
 
 export default class NodeData {
 
     /**
      * Constructor of the class
-     * @param {ExplicitCommsMan} explicitMan Explicit manager of the network
-     * @param {HTMLElement} container Container where the datatable will be placed
+     * @param {NodeVisuals} nodeVisuals Object that holds the visualization options for nodes
      */
-    constructor(explicitMan, container) {
-        this.explCommMan = explicitMan;
-        this.container = container;
-
-        this.tooltip = null;
+    constructor(nodeVisuals) {
+        this.nodeVisuals = nodeVisuals;
     }
 
     /**
-     * Parse the json into a proper nodes Dataset to use to draw the network
+     * Parse the json into a proper nodes Dataset used to draw the network
      * @param {Object} json json with the nodes data
      * @returns {DataSet} a vis.js DataSet with the nodes data ready to draw the network
      */
     parseNodes(json) {
         for (let node of json[nodes.UsersGlobalJsonKey]) {
-            this.explCommMan.findExplicitCommunities(node);
+            this.nodeVisuals.findExplicitCommunities(node);
 
             //The implicit community will be used for the bounding boxes
             node[comms.ImplUserNewKey] = parseInt(node[comms.ImplUserJsonKey]);
@@ -45,8 +41,6 @@ export default class NodeData {
                 delete node["group"];
 
             node["defaultColor"] = true;
-
-            this.nExplCommunities = Object.keys(node[comms.ExpUserKsonKey]).length;
         }
         this.nodes = new DataSet(json.users);
 
@@ -54,12 +48,14 @@ export default class NodeData {
     }
 
     /**
-     * Create the Table/html with the data about the selected node. Its empty if none is selected
+     * Create and empty dataTable with the user attributes we want to show and all of its explicit
+     * community attributes
+     * @param {HTMLElement} container container of the dataTable
      */
-    createNodeDataTable() {
-        this.dataTable = new dataTable(this.container);
+    createNodeDataTable(container) {
+        this.dataTable = new dataTable(container);
 
-        const tittle = "User Attributes";
+        const tittle = nodes.NodesTableTitle;
 
         //First we show the data that we want that is not from explicit communities
         const rowsData = new Array();
@@ -71,13 +67,13 @@ export default class NodeData {
             });
         }
 
-        //Change the border color to show the separation between "normaldata" and explicit communities
+        //Change the border color to show the separation between "normal data" and explicit communities
         let lastMainrow = rowsData.pop();
         lastMainrow.class = nodes.borderSeparatorHTMLrow;
         rowsData.push(lastMainrow);
 
         //Include communities data
-        const communities = this.explCommMan.communitiesData;
+        const communities = this.nodeVisuals.communitiesData;
         for (let i = 0; i < communities.length; i++) {
             rowsData.push({
                 class: nodes.borderHTMLrow,
@@ -92,23 +88,23 @@ export default class NodeData {
         rowsData.push(lastMainrow);
 
         this.dataTable.createDataTable(rowsData, tittle)
-
-        return;
     }
 
     /**
-     * Update the data panel to show a node's data
-     * @param {integer} id the id of the node
+     * Update the dataTable based on the id of a node 
+     * @param {Integer} id id of the node
      */
-    updateDataPanel(id) {
+    updateDataTable(id) {
         const node = this.nodes.get(id);
 
         const newRowData = new Map();
 
+        //First we include the wanted attributes
         for (let i = 0; i < nodes.NodesWantedAttr.length; i++) {
             newRowData.set(nodes.NodesWantedAttr[i], node[nodes.NodesWantedAttr[i]]);
         }
 
+        //Then we add the explicit community ones
         const communities = node[comms.ExpUserKsonKey];
         const keys = Object.keys(communities);
 
@@ -121,12 +117,20 @@ export default class NodeData {
 
 
     /**
-    * Clear all data from DataPanel while mantaining the important keys
-    */
-    clearDataPanel() {
+     * Clears all data from the dataTable
+     */
+    clearDataTable() {
         this.dataTable.clearDataTable();
     }
 
+    /**
+     * Calculate the spawning point of the tooltip
+     * @param {NetworkManager} networkManager Manager of the network where the tooltip is going to be draw
+     * @param {Object} event Event with the location of the user click
+     * @param {Function} getElementPosition Function that returns the DOM position of a HTML element
+     * @returns {Object} returns an object with the spawn Point.
+     * Format-> { x: (integer), y: (integer) } 
+     */
     calculateTooltipSpawn(networkManager, event, getElementPosition) {
         //Calculate the relative position of the click in the canvas
         const nodeInCanvasPosition = networkManager.network.getPosition(event.nodes[0]);
@@ -143,6 +147,13 @@ export default class NodeData {
         return { x: clickX, y: clickY };
     }
 
+    /**
+     * Returns the Title of the tooltip
+     * @param {NetworkManager} networkManager (unused)
+     * @param {Object} event Event with the node id that has been clicked
+     * @param {Function} titleTemplate Function that returns the html template of the tooltip tittle
+     * @returns {String} String with the tootip tittle
+     */
     getTooltipTitle(networkManager, event, titleTemplate) {
         const node = this.nodes.get(event.nodes[0]);
         const title = node.label;
@@ -151,7 +162,13 @@ export default class NodeData {
         return titleTemplate(title);
     }
 
-
+    /**
+     * Returns the Content of the tooltip
+     * @param {NetworkManager} networkManager (unused)
+     * @param {Object} event Event with the node id that has been clicked
+     * @param {Function} contentTemplate Function that returns the html template of the tooltip content
+     * @returns {String} String with the tootip content
+     */
     getTooltipContent(networkManager, event, contentTemplate) {
         const node = this.nodes.get(event.nodes[0]);
         const rowData = new Array();

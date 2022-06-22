@@ -32,7 +32,7 @@ export default class NetworkMan {
         this.groupManager = networkManager;
         this.key = config.key;
 
-        this.implCommMan = new ImplicitCommsMan(jsonInput, rightContainer, this);
+        this.implCommMan = new ImplicitCommsMan(jsonInput);
         this.nodeVisuals = new NodeVisuals(this);
 
         this.nodeData = new NodeData(this.nodeVisuals, rightContainer);
@@ -44,10 +44,10 @@ export default class NetworkMan {
             edges: this.edgesMan.parseEdges(jsonInput)
         };
 
-        this.nodeData.createNodeDataTable();
-        this.implCommMan.createCommunityDatatable();
+        this.nodeData.createNodeDataTable(rightContainer);
+        this.implCommMan.createCommunityDataTable(rightContainer);
 
-        this.nodeVisuals.createNodeDimensionStrategy(this);
+        this.nodeVisuals.createNodeDimensionStrategy(this.data.nodes);
 
         this.chooseOptions();
         this.drawNetwork();
@@ -163,15 +163,15 @@ export default class NetworkMan {
 
         if (event.nodes.length > 0) {
             this.nodeHasBeenClicked(event.nodes[0]);
-            
+
             this.groupManager.showTooltip(this, event, this.nodeData);
-            this.implCommMan.updateDatatableFromNodeId(event.nodes[0]);
+            this.implCommMan.updateDataTableFromNodeId(event.nodes[0], this.data.nodes);
 
         } else {
             this.noNodeIsClicked();
 
             this.groupManager.showTooltip(this, event, this.implCommMan);
-            this.implCommMan.updateDatatableFromClick(event);
+            this.implCommMan.updateDataTableFromClick(event);
         }
     }
 
@@ -200,7 +200,7 @@ export default class NetworkMan {
         this.network.selectNodes([id], true);
 
         //Update node data table
-        this.nodeData.updateDataPanel(id);
+        this.nodeData.updateDataTable(id);
 
         //Search for the nodes that are connected to the selected Node
         const selectedNodes = new Array();
@@ -266,7 +266,7 @@ export default class NetworkMan {
         }
         this.network.fit(fitOptions);
 
-        this.nodeData.clearDataPanel();
+        this.nodeData.clearDataTable();
 
         this.network.unselectAll();
 

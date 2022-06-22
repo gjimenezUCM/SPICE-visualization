@@ -1,12 +1,13 @@
 /**
- * @fileoverview This Class Manages everything related to explicit Communities. It reads the array with the keys
- * and change all nodes atributes based on their value of each of those explicit communities
+ * @fileoverview This class holds explicit community data and changes the node visuals to match its communities
+ * values depending on the attributes chosen
  * @author Marco Expósito Pérez
  */
 
 //Namespaces
 import { comms } from "../constants/communities.js";
 import { nodes } from "../constants/nodes.js";
+//Local classes
 import NodeDimensionStrategy from "./NodeDimensions/nodeDimensionStrategy.js";
 
 export default class NodeVisuals {
@@ -17,12 +18,11 @@ export default class NodeVisuals {
     constructor() {
         //Contains all explicit Communities with its values
         this.communitiesData = new Array();
-
     }
 
     /** 
-     * Execute while parsing nodes. It finds all explicit Community and all its values
-     * @param {Object} node node with the explicit Community
+     * Execute while parsing nodes. It finds all explicit Communities and all its values
+     * @param {Object} node node with the explicit Community attribute
      */
     findExplicitCommunities(node) {
         const explicitData = node[comms.ExpUserKsonKey];
@@ -45,7 +45,11 @@ export default class NodeVisuals {
         });
     }
 
-    createNodeDimensionStrategy(networkMan) {
+    /**
+     * Create the node Dimension Strategy object based on a attributes object
+     * @param {Dataset} nods Dataset with the data of all nodes of the network
+     */
+    createNodeDimensionStrategy(nods) {
         const attributes = [{
             attr: this.communitiesData[0].key,
             vals: this.communitiesData[0].values,
@@ -59,9 +63,13 @@ export default class NodeVisuals {
 
         this.nodeDimensionStrategy = new NodeDimensionStrategy(attributes);
 
-        this.updateNodeVisuals(networkMan.data.nodes);
+        this.updateNodeVisuals(nods);
     }
 
+    /**
+     * Update the visuals of all nodes to match the current node Dimension Strategy
+     * @param {Dataset} nodes Dataset with the data of all nodes of the network
+     */
     updateNodeVisuals(nodes) {
         const newNodes = new Array();
 
@@ -74,7 +82,7 @@ export default class NodeVisuals {
     }
 
     /**
-     * Returns the attributes that changes visualization
+     * Returns the attributes that change visualization
      * @returns {Object} Object with the attributes that change visualization
      * Format-> {attr: (string), vals: (string[], dimension: (string))}
      */
@@ -83,7 +91,7 @@ export default class NodeVisuals {
     }
 
     /**
-     * Hide all nodes that contain any of these filtered communities
+     * Hide all nodes that contain any of these filtered communities values
      * @param {String[]} filter Array with the name of all values to be hidden
      * @param {DataSet} nodes Dataset with the network's data of all nodes
      */
