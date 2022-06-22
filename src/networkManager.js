@@ -33,21 +33,21 @@ export default class NetworkMan {
         this.key = config.key;
 
         this.implCommMan = new ImplicitCommsMan(jsonInput, rightContainer, this);
-        this.explCommMan = new NodeVisuals(this);
+        this.nodeVisuals = new NodeVisuals(this);
 
-        this.nodesMan = new NodeData(this.explCommMan, rightContainer);
+        this.nodeData = new NodeData(this.nodeVisuals, rightContainer);
         this.edgesMan = new EdgeManager(config);
 
         this.data =
         {
-            nodes: this.nodesMan.parseNodes(jsonInput),
+            nodes: this.nodeData.parseNodes(jsonInput),
             edges: this.edgesMan.parseEdges(jsonInput)
         };
 
-        this.nodesMan.createNodesDataTable();
+        this.nodeData.createNodesDataTable();
         this.implCommMan.createCommunityDataTable();
-        
-        this.explCommMan.createNodeDimensionStrategy(this);
+
+        this.nodeVisuals.createNodeDimensionStrategy(this);
 
         this.chooseOptions();
         this.drawNetwork();
@@ -95,8 +95,8 @@ export default class NetworkMan {
                 },
                 size: nodes.DefaultSize,
                 chosen: {
-                    node: this.explCommMan.nodeChosen.bind(this),
-                    label: this.explCommMan.labelChosen.bind(this),
+                    node: this.nodeVisuals.nodeChosen.bind(this),
+                    label: this.nodeVisuals.labelChosen.bind(this),
                 },
                 color: {
                     background: nodes.NodeColor,
@@ -159,14 +159,18 @@ export default class NetworkMan {
      * @param {Object} event Click event
      */
     clickEvent(event) {
-        this.groupManager.hidePopover();
+        this.groupManager.hideTooltip();
 
         if (event.nodes.length > 0) {
             this.nodeHasBeenClicked(event.nodes[0]);
+
+
+            this.groupManager.showTooltip(this, event, this.nodeData);
         } else {
             this.noNodeIsClicked();
-            this.implCommMan.updateTooltipInfo(event);
-            this.implCommMan.updateCommunityInfoFromClick(event);
+
+            this.groupManager.showTooltip(this, event, this.implCommMan);
+            //this.implCommMan.updateCommunityInfoFromClick(event);
         }
     }
 
@@ -175,10 +179,7 @@ export default class NetworkMan {
      * @param {Object} event Zoom event
      */
     zoomEvent(event) {
-        const tooltip = this.groupManager.tooltip;
-
-        if (tooltip !== null)
-            tooltip.zoomUpdate();
+        this.groupManager.updateTooltipPosition(this);
     }
 
     /** 
@@ -190,9 +191,9 @@ export default class NetworkMan {
 
         //We only create the tooltip in this network
         //We need a timeout to print the tooltip once zoom has ended
-        setTimeout(function () {
-            this.nodesMan.updateTooltip(id, this);
-        }.bind(this), nodes.ZoomDuration + nodes.TooltipSpawnTimer);
+        // setTimeout(function () {
+        //     this.nodesMan.updateTooltip(id, this);
+        // }.bind(this), nodes.ZoomDuration + nodes.TooltipSpawnTimer);
     }
 
     /** 
@@ -204,9 +205,9 @@ export default class NetworkMan {
         this.network.selectNodes([id], true);
 
         //Update node data table
-        this.nodesMan.updateDataPanel(id);
+        this.nodeData.updateDataPanel(id);
         //Update community data table
-        this.implCommMan.updateCommunityInfoFromNodeId(id);
+        //this.implCommMan.updateCommunityInfoFromNodeId(id);
 
         //Search for the nodes that are connected to the selected Node
         const selectedNodes = new Array();
@@ -239,13 +240,12 @@ export default class NetworkMan {
         this.data.nodes.forEach((node) => {
             if (selectedNodes.includes(node.id)) {
                 if (!node.defaultColor) {
-                    this.nodesMan.turnNodeColorToDefault(node);
-                    this.nodesMan.turnNodeBorderToDefault(node);
+                    this.nodeVisuals.nodeDimensionStrategy.nodeColorToDefault(node);
                     newNodes.push(node);
                 }
 
             } else if (node.defaultColor) {
-                this.nodesMan.turnNodeDark(node);
+                this.nodeVisuals.nodeDimensionStrategy.nodeVisualsToColorless(node);
                 newNodes.push(node);
             }
         });
@@ -273,15 +273,14 @@ export default class NetworkMan {
         }
         this.network.fit(fitOptions);
 
-        this.nodesMan.clearDataPanel();
+        this.nodeData.clearDataPanel();
 
         this.network.unselectAll();
 
         const newNodes = new Array();
         this.data.nodes.forEach((node) => {
             if (!node.defaultColor) {
-                this.nodesMan.turnNodeColorToDefault(node)
-                this.nodesMan.turnNodeBorderToDefault(node);
+                this.nodeVisuals.nodeDimensionStrategy.nodeColorToDefault(node);
                 newNodes.push(node);
             }
 
@@ -302,7 +301,7 @@ export default class NetworkMan {
      * @param {String[]} filter string array with all values to hide
      */
     updateFilterActives(filter) {
-        this.explCommMan.updateFilterActives(filter, this.data.nodes);
+        this.nodeVisuals.updateFilterActives(filter, this.data.nodes);
     }
 
     /**
@@ -310,8 +309,8 @@ export default class NetworkMan {
      * @returns {Object} Object with the attributes that change visualization
      * Format-> {attr: (string), vals: (string[], dimension: (string))}
      */
-     getVisualizationAttributes() {
-        return this.explCommMan.getVisualizationAttributes();
+    getVisualizationAttributes() {
+        return this.nodeVisuals.getVisualizationAttributes();
     }
 }
 

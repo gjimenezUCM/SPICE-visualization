@@ -6,8 +6,10 @@
 
 //Namespace
 import { networkHTML } from "./constants/networkHTML.js";
+
 //Local classes
 import NetworkMan from "./networkManager.js";
+import Tooltip from "./networkManagerTools/tooltip.js";
 
 export default class NetworkGroupMan {
 
@@ -18,8 +20,7 @@ export default class NetworkGroupMan {
         this.activesNetworksMap = new Map();
         this.activesNetworksArray = new Array();
 
-        this.tooltip = null;
-        this.tooltipContainer = null;
+        this.tooltip = new Tooltip();
     }
 
     /** 
@@ -65,7 +66,6 @@ export default class NetworkGroupMan {
      * @param {Integer} id id of the selected node
      */
     nodeSelected(id) {
-        this.hidePopover();
         this.activesNetworksArray.forEach((network) => network.nodeSelected(id));
     }
 
@@ -73,7 +73,6 @@ export default class NetworkGroupMan {
      * Broadcast to all networks that no node was selected
      */
     nodeDeselected() {
-        this.hidePopover();
         this.activesNetworksArray.forEach((network) => network.nodeDeselected());
     }
 
@@ -164,10 +163,17 @@ export default class NetworkGroupMan {
     /**
      * Hide the current active popover
      */
-    hidePopover() {
-        if (this.tooltip !== null) { this.tooltip.hide(); }
+    hideTooltip() {
+        this.tooltip.hide();
     }
 
+    showTooltip(networkManager, event, tooltipManager) {
+        this.tooltip.showTooltip(networkManager, event, tooltipManager);
+    }
+
+    updateTooltipPosition(networkManager) {
+        this.tooltip.updatePosition(networkManager);
+    }
     /**
      * Returns the current number of active networks
      * @returns {Integer} Returns the number of active networks
@@ -181,7 +187,7 @@ export default class NetworkGroupMan {
      * @returns {Object} Object with the attributes that change visualization
      * Format-> {attr: (string), vals: (string[], dimension: (string))}
      */
-     getVisualizationAttributes() {
+    getVisualizationAttributes() {
         return this.activesNetworksArray[0].getVisualizationAttributes();
     }
 }

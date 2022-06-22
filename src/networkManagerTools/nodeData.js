@@ -186,115 +186,43 @@ export default class NodeData {
             this.tableHtmlRows[index].row.className = nodes.borderMainHTMLrow;
     }
 
-    /**
-     * Update or create the tooltip of a node
-     * @param {Integer} id id of the node
-     * @param {NetworkMan} networkMan networkManager where this tooltip is going to be drawn
-     * @param {Boolean} respawn Boolean saying if the tooltip should do the "spawn" animation
-     */
-    updateTooltip(id, networkMan, respawn = true) {
-        let tooltip = networkMan.groupManager.tooltip;
-        let container = networkMan.groupManager.tooltipContainer;
-
-        if (respawn) {
-            if (tooltip !== null) {
-                tooltip.hide();
-            }
-            tooltip = null;
-            if (container !== null)
-                container.remove();
-        }
-
-        const canvasPosition = this.getElementPosition(networkHTML.topCanvasContainer + networkMan.key)
-
-        const nodeCanvasPosition = networkMan.network.getPosition(id);
-        const nodePosition = networkMan.network.canvasToDOM(nodeCanvasPosition);
+    calculateTooltipSpawn(networkManager, event, getElementPosition) {
+        //Calculate the relative position of the click in the canvas
+        const nodeInCanvasPosition = networkManager.network.getPosition(event.nodes[0]);
+        const nodeInCanvasDOMposition = networkManager.network.canvasToDOM(nodeInCanvasPosition);
 
         //Depending on the zoom, we increase the offset
-        const xOffset = networkMan.network.getScale() * 40;
+        const xOffset = networkManager.network.getScale() * 40;
+
         //Calculate the real absolute click coordinates
-        const clickX = nodePosition.x + canvasPosition.left + xOffset;
-        const clickY = nodePosition.y + canvasPosition.top;
+        const networkCanvasPosition = getElementPosition(networkHTML.topCanvasContainer + networkManager.key)
+        const clickX = nodeInCanvasDOMposition.x + networkCanvasPosition.left + xOffset;
+        const clickY = nodeInCanvasDOMposition.y + networkCanvasPosition.top;
 
-        const title = "<h5> " + id + "</h5>";
-        const content = this.getTooltipContent(id);
-
-        if (tooltip === null) {
-
-            //We use a bootstrap Popover as a tooltip
-            const options = {
-                trigger: "manual",
-                placement: "right",
-                template: "<div class=\"popover node\" role=\"tooltip\"><div class=\"popover-arrow\"></div><h3 class=\"popover-header\"></h3><div class=\"popover-body\"></div></div>",
-                fallbackPlacements: ["right"],
-                content: " ",
-                offset: [0, 0],
-                html: true,
-            };
-
-            container = document.createElement("div");
-            document.body.append(container);
-
-            tooltip = new Popover(container, options);
-
-            tooltip.zoomUpdate = () => this.updateTooltip(id, networkMan, false);
-        }
-
-        container.style.top = clickY + "px";
-        container.style.left = clickX + "px";
-        container.style.position = "absolute";
-
-        if (respawn) {
-            tooltip.setContent({
-                '.popover-header': title,
-                '.popover-body': content
-            });
-            tooltip.show();
-        } else {
-            tooltip.update();
-        }
-
-        networkMan.groupManager.tooltip = tooltip;
-        networkMan.groupManager.tooltipContainer = container;
+        return { x: clickX, y: clickY };
     }
 
-    /** 
-     * Get the element position in the dom
-     * @param {Integer} id id of the element
-     * @returns {Object} Returns an object in the format of {top: (float), left: (float)}
-     */
-    getElementPosition(id) {
-        const element = document.getElementById(id);
-        const cs = window.getComputedStyle(element);
-        const marginTop = cs.getPropertyValue('margin-top');
-        const marginLeft = cs.getPropertyValue('margin-left');
+    getTooltipTitle(networkManager, event, titleTemplate) {
+        const node = this.nodes.get(event.nodes[0]);
+        const title = node.label;
 
-        const top = element.offsetTop - parseFloat(marginTop);
-        const left = element.offsetLeft - parseFloat(marginLeft);
 
-        return { top: top, left: left };
+        return titleTemplate(title);
     }
 
 
-    /** 
-     * Returns the tooltip content of a node
-     * @param {Integer} id id of the node
-     * @returns {String} Returns a string with the content
-     */
-    getTooltipContent(id) {
-        const node = this.nodes.get(id);
-        let content = "";
+    getTooltipContent(networkManager, event, contentTemplate) {
+        const node = this.nodes.get(event.nodes[0]);
+        const rowData = new Array();
 
-        content += "<b> label: </b> " + node["label"] + "<br>";
-        content += "<b> group: </b> " + node["implicit_Comm"] + "<br>";
+        rowData.push({ title: "Label", data: node.label });
+        rowData.push({ title: "Group", data: node[comms.ImplUserNewKey] });
 
-        const keys = Object.keys(node.explicit_community);
+        const keys = Object.keys(node[comms.ExpUserKsonKey]);
         for (let i = 0; i < keys.length; i++) {
-            content += "<b>" + keys[i] + "</b> " + node.explicit_community[keys[i]] + "<br>";
+            rowData.push({ title: keys[i], data: node[comms.ExpUserKsonKey][keys[i]] });
         }
 
-        return content;
+        return contentTemplate(rowData);
     }
-
-    
 }
