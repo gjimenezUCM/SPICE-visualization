@@ -12,6 +12,7 @@ import { networkHTML } from "../constants/networkHTML.js";
 //Packages
 import { DataSet } from "vis-data/peer";
 import { Popover } from 'bootstrap';
+import dataTable from "./dataTable.js";
 
 export default class NodeData {
 
@@ -55,51 +56,44 @@ export default class NodeData {
     /**
      * Create the Table/html with the data about the selected node. Its empty if none is selected
      */
-    createNodesDataTable() {
+    createNodeDataTable() {
+        this.dataTable = new dataTable(this.container);
 
-        const nExplCommunities = this.nExplCommunities;
-        const nRow = nodes.NodesWantedAttr.length + nExplCommunities;
+        const tittle = "User Attributes";
 
-        const dataContainer = document.createElement('div');
-        dataContainer.className = "border border-dark rounded";
-
-        const titleContainer = document.createElement('h5');
-        titleContainer.className = "middle attributes border-bottom border-dark";
-        titleContainer.textContent = nodes.NodesTableTitle;
-
-        dataContainer.appendChild(titleContainer);
-
-        this.tableHtmlRows = new Array();
-        for (let i = 0; i < nRow; i++) {
-
-            const row = document.createElement('div');
-            row.className = nodes.borderMainHTMLrow;
-
-            //If its the last row with data, we remove the border
-            if (i >= nodes.NodesWantedAttr.length - 1)
-                row.className = nodes.borderlessHTMLrow;
-
-            const colLeft = document.createElement("div");
-            colLeft.className = "col-6 ";
-            colLeft.innerHTML = "";
-
-            //If we are writing a wantedNodeAttrb, we want to show the key of it in the table
-            if (i < nodes.NodesWantedAttr.length)
-                colLeft.innerHTML = "<b>" + nodes.NodesWantedAttr[i] + "</b>";
-
-            const colRight = document.createElement("div");
-            colRight.className = "col-6 ";
-            colRight.innerHTML = "";
-
-            this.tableHtmlRows.push({ left: colLeft, right: colRight, row: row });
-
-            row.appendChild(colLeft);
-            row.appendChild(colRight);
-            dataContainer.appendChild(row);
+        //First we show the data that we want that is not from explicit communities
+        const rowsData = new Array();
+        for (let i = 0; i < nodes.NodesWantedAttr.length; i++) {
+            rowsData.push({
+                class: nodes.borderMainHTMLrow,
+                title: `<strong> ${nodes.NodesWantedAttr[i]} </strong>`,
+                data: ""
+            });
         }
 
-        this.container.appendChild(dataContainer);
-        this.container.appendChild(document.createElement("hr"));
+        //Change the border color to show the separation between "normaldata" and explicit communities
+        let lastMainrow = rowsData.pop();
+        lastMainrow.class = nodes.borderSeparatorHTMLrow;
+        rowsData.push(lastMainrow);
+
+        //Include communities data
+        const communities = this.explCommMan.communitiesData;
+        for (let i = 0; i < communities.length; i++) {
+            rowsData.push({
+                class: nodes.borderHTMLrow,
+                title: communities[i].key,
+                data: ""
+            });
+        }
+
+        //Remove the border of the last row
+        lastMainrow = rowsData.pop();
+        lastMainrow.class = nodes.borderlessHTMLrow;
+        rowsData.push(lastMainrow);
+
+        this.dataTable.createDataTable(rowsData, tittle)
+
+        return;
     }
 
     /**
@@ -109,42 +103,20 @@ export default class NodeData {
     updateDataPanel(id) {
         const node = this.nodes.get(id);
 
-        this.clearDataPanel();
+        const newRowData = new Map();
 
-        let lastImportantRowIndex;
-        let rowIndex = 0;
-
-        //Add the important attributes in their fixed order
         for (let i = 0; i < nodes.NodesWantedAttr.length; i++) {
-            const currentKey = nodes.NodesWantedAttr[i];
-
-            this.updateDataPanelRow(rowIndex, currentKey, node[currentKey], true, false);
-
-            lastImportantRowIndex = rowIndex;
-            rowIndex++;
+            newRowData.set(nodes.NodesWantedAttr[i], node[nodes.NodesWantedAttr[i]]);
         }
 
-        let lastRowIndex = lastImportantRowIndex;
+        const communities = node[comms.ExpUserKsonKey];
+        const keys = Object.keys(communities);
 
-        const keys = Object.keys(node[comms.ExpUserKsonKey]);
-
-        //We only want to show explicit community info from the unimportant attributes
         for (let i = 0; i < keys.length; i++) {
-            const currentKey = keys[i];
-
-            //We change the border between the last wanted attribute and the explicit Community attributes
-            if (lastImportantRowIndex !== null) {
-                this.tableHtmlRows[lastImportantRowIndex].row.className = nodes.borderSeparatorHTMLrow;
-                lastImportantRowIndex = null;
-            }
-
-            this.updateDataPanelRow(rowIndex, currentKey, node[comms.ExpUserKsonKey][currentKey], true, true);
-
-            lastRowIndex = rowIndex;
-            rowIndex++;
+            newRowData.set(keys[i], communities[keys[i]]);
         }
 
-        this.tableHtmlRows[lastRowIndex].row.className = nodes.borderlessHTMLrow;
+        this.dataTable.updateDataTable(newRowData)
     }
 
 
@@ -152,38 +124,7 @@ export default class NodeData {
     * Clear all data from DataPanel while mantaining the important keys
     */
     clearDataPanel() {
-        for (let i = 0; i < this.tableHtmlRows.length; i++) {
-            let hasBottomBorder = true;
-            let keyName = "";
-
-            if (i >= nodes.NodesWantedAttr.length - 1)
-                hasBottomBorder = false;
-
-            if (i < nodes.NodesWantedAttr.length)
-                keyName = nodes.NodesWantedAttr[i];
-
-            this.updateDataPanelRow(i, keyName, "", hasBottomBorder);
-        }
-    }
-
-    /** 
-     * Update a dataPanel row 
-     * @param {integer} index index of the row to update
-     * @param {String} key new Text in the left column
-     * @param {String} value new Text in the right column
-     * @param {Boolean} bottomBorder Boolean indicating if the row should have bottom Border
-     * @param {Boolean} greyBorder Boolean indicating if the row should have grey Border
-     */
-    updateDataPanelRow(index, key, value, bottomBorder, greyBorder) {
-        this.tableHtmlRows[index].left.innerHTML = "<b>" + key + "</b>";
-        this.tableHtmlRows[index].right.innerHTML = value;
-
-        if (!bottomBorder) {
-            this.tableHtmlRows[index].row.className = nodes.borderlessHTMLrow;
-        } else if (greyBorder) {
-            this.tableHtmlRows[index].row.className = nodes.borderHTMLrow;
-        } else
-            this.tableHtmlRows[index].row.className = nodes.borderMainHTMLrow;
+        this.dataTable.clearDataTable();
     }
 
     calculateTooltipSpawn(networkManager, event, getElementPosition) {
@@ -215,12 +156,12 @@ export default class NodeData {
         const node = this.nodes.get(event.nodes[0]);
         const rowData = new Array();
 
-        rowData.push({ title: "Label", data: node.label });
-        rowData.push({ title: "Group", data: node[comms.ImplUserNewKey] });
+        rowData.push({ tittle: "Label", data: node.label });
+        rowData.push({ tittle: "Group", data: node[comms.ImplUserNewKey] });
 
         const keys = Object.keys(node[comms.ExpUserKsonKey]);
         for (let i = 0; i < keys.length; i++) {
-            rowData.push({ title: keys[i], data: node[comms.ExpUserKsonKey][keys[i]] });
+            rowData.push({ tittle: keys[i], data: node[comms.ExpUserKsonKey][keys[i]] });
         }
 
         return contentTemplate(rowData);

@@ -12,6 +12,7 @@ import { networkHTML } from "../constants/networkHTML.js";
 import { nodes } from "../constants/nodes.js";
 //packages
 import { Popover } from 'bootstrap';
+import dataTable from "./dataTable.js";
 
 export default class ImplicitCommsData {
 
@@ -25,61 +26,9 @@ export default class ImplicitCommsData {
         //Data of all implicit communities
         this.implComms = communityJson[comms.ImplGlobalJsonKey];
 
-        this.tableContainer = container;
+        this.container = container;
 
         this.networkMan = networkMan;
-        this.tooltip = null;
-    }
-
-    /**
-     * Create the Table/html with the data about the selected Implicit Community. Its empty if none is selected
-     */
-    createCommunityDataTable() {
-        const tableContainer = document.createElement('div');
-        tableContainer.className = "border border-dark rounded";
-
-        const titleContainer = document.createElement('h5');
-        titleContainer.className = "middle attributes border-bottom border-dark";
-        titleContainer.textContent = comms.ImplTableTitle;
-        tableContainer.appendChild(titleContainer);
-
-        this.tableHtmlRows = new Array();
-        const nRow = comms.ImplWantedAttr.length;
-
-        for (let i = 0; i < nRow; i++) {
-            this.addTableRow(i, nRow, tableContainer);
-        }
-
-        this.tableContainer.appendChild(tableContainer);
-    }
-
-    /**
-     * Add a row to the community table
-     * @param {integer} i index of the new row
-     * @param {integer} nRow max number of rows
-     * @param {HTMLElement} tableContainer html container of the table
-     */
-    addTableRow(i, nRow, tableContainer) {
-        const row = document.createElement('div');
-        row.className = comms.borderTMLrow;
-
-        if (i === nRow - 1)
-            row.className = comms.borderlessHTMLrow;
-
-        const colLeft = document.createElement("div");
-        colLeft.className = "col-6 ";
-        colLeft.innerHTML = "<b>" + comms.ImplWantedAttr[i] + "</b>";
-
-
-        const colRight = document.createElement("div");
-        colRight.className = "col-6 ";
-        colRight.innerHTML = "";
-
-        this.tableHtmlRows.push({ left: colLeft, right: colRight, row: row });
-
-        row.appendChild(colLeft);
-        row.appendChild(colRight);
-        tableContainer.appendChild(row);
     }
 
     /**
@@ -182,41 +131,62 @@ export default class ImplicitCommsData {
         return x > bb.left && x < bb.right && y > bb.top && y < bb.bottom;
     }
 
-    /**
-     * Update the Table with the data of a community based on what bounding box was clicked
-     * @param {Object} event Data of the click event that trigered this function
-     */
-    updateCommunityInfoFromClick(event) {
-        this.clearCommunityInfo();
+    createCommunityDatatable() {
+        this.dataTable = new dataTable(this.container);
+
+        const tittle = "Community Attributes";
+
+        //First we show the data that we want that is not from explicit communities
+        const rowsData = new Array();
+        for (let i = 0; i < comms.ImplWantedAttr.length; i++) {
+            rowsData.push({
+                class: nodes.borderMainHTMLrow,
+                title: `<strong> ${comms.ImplWantedAttr[i]} </strong>`,
+                data: ""
+            });
+        }
+
+        //Remove the border of the last row
+        let lastMainrow = rowsData.pop();
+        lastMainrow.class = nodes.borderlessHTMLrow;
+        rowsData.push(lastMainrow);
+
+        this.dataTable.createDataTable(rowsData, tittle, false)
+
+        return;
+    }
+
+    updateDatatableFromClick(event) {
+        this.clearDataPanel();
 
         let i = this.checkBoundingBoxClick(event);
         if (i !== undefined) {
-            const newComm = this.implComms[this.bbOrder[i]];
-            for (let i = 0; i < this.tableHtmlRows.length; i++) {
-                this.tableHtmlRows[i].right.innerText = newComm[comms.ImplWantedAttr[i]];
-            }
+            this.updateDataPanel(i);
         }
     }
 
-    /**
-     * Update the Table with the data of a community based on the id of the node clicked
-     * @param {Integer} id 
-     */
-    updateCommunityInfoFromNodeId(id) {
+    updateDatatableFromNodeId(id) {
         let i = this.networkMan.data.nodes.get(id)[comms.ImplUserNewKey];
-        const newComm = this.implComms[i];
-        for (let i = 0; i < this.tableHtmlRows.length; i++) {
-            this.tableHtmlRows[i].right.innerText = newComm[comms.ImplWantedAttr[i]];
+        if (i !== undefined) {
+            this.updateDataPanel(i);
         }
     }
 
-    /**
-     * Clear all the data from the table
-     */
-    clearCommunityInfo() {
-        for (let i = 0; i < this.tableHtmlRows.length; i++) {
-            this.tableHtmlRows[i].right.innerText = "";
+    updateDataPanel(i) {
+        const community = this.implComms[this.bbOrder[i]];
+        const newRowData = new Map();
+
+        for (let i = 0; i < comms.ImplWantedAttr.length; i++) {
+            newRowData.set(comms.ImplWantedAttr[i], community[comms.ImplWantedAttr[i]])
         }
+
+
+        this.dataTable.updateDataTable(newRowData)
+    }
+
+
+    clearDataPanel() {
+        this.dataTable.clearDataTable();
     }
 
     calculateTooltipSpawn(networkManager, event, getElementPosition) {
@@ -225,9 +195,6 @@ export default class ImplicitCommsData {
 
         if (this.activeBBindex === undefined)
             return this.activeBBindex;
-
-        console.log(this.bb)
-        console.log(this.activeBBindex);
 
         //Get the position of the bounding box in the canvas DOM
         const bbLeft = networkManager.network.canvasToDOM({
@@ -252,7 +219,6 @@ export default class ImplicitCommsData {
         const communityClicked = this.implComms[this.bbOrder[this.activeBBindex]];
         const title = communityClicked.id;
 
-
         return titleTemplate(title);
     }
 
@@ -262,7 +228,7 @@ export default class ImplicitCommsData {
         const rowData = new Array();
 
         for (let i = 0; i < comms.ImplWantedAttr.length; i++) {
-            rowData.push({ title: comms.ImplWantedAttr[i], data: communityClicked[comms.ImplWantedAttr[i]] });
+            rowData.push({ tittle: comms.ImplWantedAttr[i], data: communityClicked[comms.ImplWantedAttr[i]] });
         }
 
         return contentTemplate(rowData);

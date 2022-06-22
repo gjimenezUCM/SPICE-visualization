@@ -23,15 +23,15 @@ export default class Tooltip {
         this.tooltipManager = tooltipManager;
         this.event = event;
 
-        const spawnPoint = tooltipManager.calculateTooltipSpawn(networkManager, event, this.getElementPosition);
+        const spawnPoint = tooltipManager.calculateTooltipSpawn(networkManager, event, this.getElementPosition.bind(this));
 
         if (spawnPoint !== null && spawnPoint !== undefined) {
 
             if (!update) {
                 const html = this.tooltipTemplate();
 
-                const title = tooltipManager.getTooltipTitle(networkManager, event, this.titleTemplate);
-                const content = tooltipManager.getTooltipContent(networkManager, event, this.contentTemplate);
+                const title = tooltipManager.getTooltipTitle(networkManager, event, this.titleTemplate.bind(this));
+                const content = tooltipManager.getTooltipContent(networkManager, event, this.contentTemplate.bind(this));
 
                 const options = {
                     trigger: "manual",
@@ -93,7 +93,7 @@ export default class Tooltip {
     }
 
     tooltipTemplate() {
-        var html = `
+        const html = `
         <div class="popover node" role="tooltip">
             <div class="popover-arrow"></div>
             <h3 class="popover-header"></h3>
@@ -108,11 +108,17 @@ export default class Tooltip {
     }
 
     contentTemplate(rowsData) {
-        let html = ""
+        let html = "";
 
         for (let i = 0; i < rowsData.length; i++) {
-            html += `<strong> ${rowsData[i].title} </strong> ${rowsData[i].data} <br>`;
+            html += this.rowTemplate(rowsData[i].tittle, rowsData[i].data);
         }
+
+        return html;
+    }
+
+    rowTemplate(tittle, data) {
+        const html = `<strong> ${tittle} </strong> ${data} <br>`;
 
         return html;
     }

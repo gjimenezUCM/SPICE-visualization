@@ -44,8 +44,8 @@ export default class NetworkMan {
             edges: this.edgesMan.parseEdges(jsonInput)
         };
 
-        this.nodeData.createNodesDataTable();
-        this.implCommMan.createCommunityDataTable();
+        this.nodeData.createNodeDataTable();
+        this.implCommMan.createCommunityDatatable();
 
         this.nodeVisuals.createNodeDimensionStrategy(this);
 
@@ -163,14 +163,15 @@ export default class NetworkMan {
 
         if (event.nodes.length > 0) {
             this.nodeHasBeenClicked(event.nodes[0]);
-
-
+            
             this.groupManager.showTooltip(this, event, this.nodeData);
+            this.implCommMan.updateDatatableFromNodeId(event.nodes[0]);
+
         } else {
             this.noNodeIsClicked();
 
             this.groupManager.showTooltip(this, event, this.implCommMan);
-            //this.implCommMan.updateCommunityInfoFromClick(event);
+            this.implCommMan.updateDatatableFromClick(event);
         }
     }
 
@@ -188,12 +189,6 @@ export default class NetworkMan {
     */
     nodeHasBeenClicked(id) {
         this.groupManager.nodeSelected(id);
-
-        //We only create the tooltip in this network
-        //We need a timeout to print the tooltip once zoom has ended
-        // setTimeout(function () {
-        //     this.nodesMan.updateTooltip(id, this);
-        // }.bind(this), nodes.ZoomDuration + nodes.TooltipSpawnTimer);
     }
 
     /** 
@@ -206,8 +201,6 @@ export default class NetworkMan {
 
         //Update node data table
         this.nodeData.updateDataPanel(id);
-        //Update community data table
-        //this.implCommMan.updateCommunityInfoFromNodeId(id);
 
         //Search for the nodes that are connected to the selected Node
         const selectedNodes = new Array();
