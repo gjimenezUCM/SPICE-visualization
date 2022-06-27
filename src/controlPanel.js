@@ -9,6 +9,7 @@
 import { networkHTML } from "./constants/networkHTML.js";
 //Packages
 import Legend from "./controlPanelComponents/legend.js";
+import ThresholdSlider from "./controlPanelComponents/thresholdSlider.js";
 
 export default class ControlPanel {
 
@@ -47,73 +48,17 @@ export default class ControlPanel {
         const inputTitle = document.createElement("h5");
         inputTitle.innerHTML = "Control Panel";
 
-        const sliderContainer = this.createThresholdSliderContainer();
         const checkboxContainer = this.createVariableEdgeCheckBoxContainer();
 
         this.container.appendChild(inputTitle);
-        this.container.appendChild(sliderContainer);
+        new ThresholdSlider(this.container, this.networkManager);
         this.container.appendChild(checkboxContainer);
         new Legend(this.container, this.networkManager);
 
         this.container.append(document.createElement("br"));
     }
 
-    /** 
-     * Create a container with a slider that controls the minimum similarity Threshold 
-     * for edges to be visible in the network
-     * @returns {HTMLElement} Container with the slider
-     */
-    createThresholdSliderContainer() {
-        const sliderContainer = document.createElement('div');
-        sliderContainer.className = "middle";
-
-        const slider = document.createElement('input');
-        slider.type = 'range';
-        slider.min = "0.0";
-        slider.max = "1.0";
-        slider.step = "0.1";
-        slider.value = networkHTML.sliderThresholdInitialValue;
-        slider.id = "thresholdSlider";
-
-        slider.onchange = () => this.thresholdChange(slider);
-
-
-        const text = document.createElement('span');
-        text.innerHTML = "Minimum Similarity: ";
-
-        const value = document.createElement('span');
-        value.id = "thresholdSliderValue";
-        value.innerHTML = networkHTML.sliderThresholdInitialValue;
-
-        slider.oninput = () => this.updateSliderText(slider, value);
-
-        sliderContainer.appendChild(slider);
-        sliderContainer.appendChild(text);
-        sliderContainer.appendChild(value);
-
-        return sliderContainer;
-    }
-
-    /** 
-     *  Update all networks with the new threshold value. Updates the label with the value too
-     */
-    thresholdChange(slider) {
-        let newValue = slider.value;
-
-        this.networkManager.thresholdChangeALL(newValue);
-    }
-
-    /**
-     * Update the text nearby the slider to show the new values
-     */
-    updateSliderText(slider, text) {
-        let newValue = slider.value;
-
-        if (newValue === "0") newValue = "0.0";
-        if (newValue === "1") newValue = "1.0";
-
-        text.innerHTML = newValue;
-    }
+    
 
 
     /** 

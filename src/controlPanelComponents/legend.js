@@ -1,16 +1,14 @@
 import { networkHTML } from "../constants/networkHTML";
 import { nodes } from "../constants/nodes";
 
-import { Collapse } from 'bootstrap';
-
 export default class Legend {
 
-    constructor(container, networksGroups) {
+    constructor(container, networkGroup) {
         this.domParser = new DOMParser();
         this.filterValuesToHide = new Array();
-        this.networksGroups = networksGroups;
+        this.networksGroups = networkGroup;
 
-        const attributes = networksGroups.getVisualizationAttributes();
+        const attributes = networkGroup.getVisualizationAttributes();
 
         container.append(this.createLegendContainer(attributes));
 
@@ -139,9 +137,8 @@ export default class Legend {
         
         for (let i = 0; i < attributes.length; i++) {
             const values = attributes[i].vals;
+            
             for(let j = 0; j < values.length; j++){
-                
-                console.log(`legendButton${values[j]}`);
                 const button = document.getElementById(`legendButton${values[j]}`);
                 
                 button.onclick = () => this.filterButtonClick(values[j], button);
