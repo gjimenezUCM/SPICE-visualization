@@ -3,9 +3,6 @@
  * @author Marco Expósito Pérez
  */
 
-//Namespaces
-import { nodes } from "./nodes.js";
-
 export const comms = {
 
     //--- Json Keys ---

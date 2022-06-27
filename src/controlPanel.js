@@ -7,10 +7,7 @@
  */
 //Namespaces
 import { networkHTML } from "./constants/networkHTML.js";
-import { nodes } from "./constants/nodes.js";
 //Packages
-import { Collapse } from 'bootstrap';
-import { Dropdown } from 'bootstrap';
 import Legend from "./controlPanelComponents/legend.js";
 
 export default class ControlPanel {
@@ -45,6 +42,8 @@ export default class ControlPanel {
         this.container = document.createElement("div");
         this.container.className = "middle";
 
+        document.getElementById(networkHTML.controlPanelParentContainer).appendChild(this.container);
+
         const inputTitle = document.createElement("h5");
         inputTitle.innerHTML = "Control Panel";
 
@@ -57,9 +56,6 @@ export default class ControlPanel {
         new Legend(this.container, this.networkManager);
 
         this.container.append(document.createElement("br"));
-
-        document.getElementById(networkHTML.controlPanelParentContainer).appendChild(this.container);
-
     }
 
     /** 

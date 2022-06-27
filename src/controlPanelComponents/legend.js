@@ -6,11 +6,15 @@ import { Collapse } from 'bootstrap';
 export default class Legend {
 
     constructor(container, networksGroups) {
+        this.domParser = new DOMParser();
+        this.filterValuesToHide = new Array();
+        this.networksGroups = networksGroups;
+
         const attributes = networksGroups.getVisualizationAttributes();
 
         container.append(this.createLegendContainer(attributes));
-        this.filterValuesToHide = new Array();
-        this.networksGroups = networksGroups
+
+        this.addButtonLegendOnClick(attributes);
     }
 
     /**
@@ -21,117 +25,50 @@ export default class Legend {
      * @returns {HTMLElement} returns the container with the legend/filter
      */
     createLegendContainer(attributes) {
-        const innerAcoordionArray = [];
+        let topBody = "";
         for (let i = 0; i < attributes.length; i++) {
-            const div = this.createFilterButtons(attributes[i].vals, attributes[i].dimension);
-            const innerAcord = this.createAccordion(attributes[i].attr, attributes[i].attr, [div]);
+            const buttonsDiv = this.filterButtonsTemplate(attributes[i].vals, attributes[i].dimension);
 
-            innerAcoordionArray.push(innerAcord);
+            const htmlString = this.accordionTemplate(attributes[i].attr, attributes[i].attr, buttonsDiv);
+
+            topBody += htmlString;
         }
 
-        let acoordion = this.createAccordion("topId", "Legend", innerAcoordionArray, true);
+        const topAcoordion = this.accordionTemplate("top", "Legend", topBody);
 
-        return acoordion;
+        const html = this.domParser.parseFromString(topAcoordion, "text/html").body.firstChild;
+
+        return html;
     }
 
-    /**
-     * Create a accordion using bootstrap collapse class
-     * @param {String} id id of the accordion. All acordions with the same id will be closed 
-     * and opened at the same time 
-     * @param {String} buttonName Inner text of the accordion button
-     * @param {HTMLElement[]} collapsable Array of html elements to be collapsed inside this accordion
-     * @param {Boolean} topAccord Indicates if its the top accordion in a nested structure
-     * @returns {HTMLElement} returns a container with the accordion
-     */
-    createAccordion(id, buttonName, collapsable, topAccord = false) {
-        const topAccordion = document.createElement("div");
-        topAccordion.className = "accordion";
-
-        if (topAccord)
-            topAccordion.className = "top " + topAccordion.className;
-
-        const topItem = document.createElement("div");
-        topItem.className = "accordion-item";
-        topAccordion.append(topItem);
-
-        const topHeader = document.createElement("h2");
-        topHeader.className = "accordion-header";
-        topItem.append(topHeader);
-
-        const topButton = document.createElement("button");
-        topButton.className = "accordion-button collapsed";
-        topButton.type = "button";
-        topButton.innerText = buttonName;
-        topButton.setAttribute("data-bs-toggle", "collapse");
-        topButton.setAttribute("data-bs-target", "#" + id);
-
-        topHeader.append(topButton);
-
-        const colOne = document.createElement("div");
-        colOne.className = "accordion-collapse collapse";
-        colOne.id = id;
-        topItem.append(colOne);
-
-        const colOneBody = document.createElement("div");
-        colOneBody.className = "accordion-body";
-        colOne.append(colOneBody);
-
-
-        for (let i = 0; i < collapsable.length; i++) {
-            colOneBody.append(collapsable[i]);
-        }
-
-        new Collapse(colOne, { toggle: false });
-        colOne.addEventListener("show.bs.collapse", (event) => {
-
-            if (event.target.id === id)
-                topButton.className = "accordion-button";
-        });
-        colOne.addEventListener("hide.bs.collapse", (event) => {
-            if (event.target.id === id)
-                topButton.className = "accordion-button collapsed";
-        });
-
-
-        return topAccordion;
-
-    }
-
-    createFilterButtons(values, dimension) {
-        const container = document.createElement("div");
+    filterButtonsTemplate(values, dimension) {
+        let html = "<div>";
 
         for (let i = 0; i < values.length; i++) {
             let value = values[i];
             if (value == "") value = "\"\"";
 
-            const topRow = document.createElement("div");
-            topRow.className = "row align-items-left"
-            container.append(topRow);
+            const rightCol = this.getCommunityValueIndicator(dimension, i);;
 
-            const newButton = document.createElement("Button");
-            newButton.className = networkHTML.legendButtonClass + " active";
-            newButton.onclick = () => this.filterButtonClick(values[i], newButton);
-            topRow.append(newButton);
-
-            const rowContainer = document.createElement("div");
-            rowContainer.className = "row align-items-center"
-            newButton.append(rowContainer)
-
-            const leftContainer = document.createElement("div");
-            leftContainer.className = "col value";
-            leftContainer.innerText = value;
-            rowContainer.append(leftContainer);
-
-            const rightContainer = document.createElement("div");
-            rightContainer.className = "col";
-            this.getCommunityValueIndicator(rightContainer, dimension, i);
-            rowContainer.append(rightContainer);
+            html += `
+            <div class="row align-items-left">
+                <button type="button" class="legend btn btn-outline-primary active" id="legendButton${values[i]}">
+                    <div class="row align-items-center">
+                        <div class="col value">    
+                            ${value}
+                        </div>
+                        <div class="col">    
+                            ${rightCol}
+                        </div>
+                    </div>
+                </button>
+            </div>`;
         }
 
-        return container;
+        return html;
     }
 
-    getCommunityValueIndicator(container, dimension, valueIndex) {
+    getCommunityValueIndicator(dimension, valueIndex) {
         let output = document.createElement("div");
 
         switch (dimension) {
@@ -151,7 +88,7 @@ export default class Legend {
                 break;
         }
 
-        container.append(output);
+        return output.outerHTML;
     }
 
     filterButtonClick(value, button) {
@@ -176,6 +113,41 @@ export default class Legend {
         }
 
         this.networksGroups.updateFilterActivesALL(this.filterValuesToHide);
+
+    }
+
+
+    accordionTemplate(id, buttonText, body) {
+        const html = `
+        <div class="accordion${id}">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading${id}">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${id}" aria-expanded="true" aria-controls="collapse${id}">
+                        ${buttonText}
+                    </button>
+                </h2>
+                <div id="collapse${id}" class="accordion-collapse collapse" aria-labelledby="heading${id}" data-bs-parent="#accordion${id}">
+                    ${body}
+                </div>
+            </div>
+        </div>`;
+
+        return html;
+    }
+
+    addButtonLegendOnClick(attributes) {
+        
+        for (let i = 0; i < attributes.length; i++) {
+            const values = attributes[i].vals;
+            for(let j = 0; j < values.length; j++){
+                
+                console.log(`legendButton${values[j]}`);
+                const button = document.getElementById(`legendButton${values[j]}`);
+                
+                button.onclick = () => this.filterButtonClick(values[j], button);
+
+            }
+        }
 
     }
 }

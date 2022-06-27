@@ -4,7 +4,6 @@
  * @author Marco Expósito Pérez
  */
 //Namespaces
-import { networkHTML } from "../constants/networkHTML";
 import { nodes } from "../constants/nodes.js";
 //Packages
 import { Popover } from 'bootstrap';
