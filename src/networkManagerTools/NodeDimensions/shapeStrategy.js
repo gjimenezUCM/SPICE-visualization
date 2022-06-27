@@ -1,5 +1,5 @@
 /**
- * @fileoverview This File controls the Shape and label vertical offset of all nodes.
+ * @fileoverview This class controls the Shape and label vertical offset of all nodes.
  * @author Marco Expósito Pérez
  */
 

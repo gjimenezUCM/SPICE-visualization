@@ -1,5 +1,5 @@
 /**
- * @fileoverview This File controls the Background color of all nodes.
+ * @fileoverview This class controls the Background color of all nodes.
  * @author Marco Expósito Pérez
  */
 

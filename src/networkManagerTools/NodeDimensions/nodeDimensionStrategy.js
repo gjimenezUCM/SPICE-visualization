@@ -1,6 +1,5 @@
-
 /**
- * @fileoverview This File controls the dimensions strategy of all nodes. It changes its visual values to meet
+ * @fileoverview This class controls the dimensions strategy of all nodes. It changes its visual values to meet
  * the chosen strat.
  * @author Marco Expósito Pérez
  */

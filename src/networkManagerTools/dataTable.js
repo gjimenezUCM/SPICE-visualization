@@ -1,5 +1,5 @@
 /**
- * @fileoverview This creates and update a html table with a tittle/label in the left column, 
+ * @fileoverview This class creates and update a html table with a tittle/label in the left column, 
  * and its data/value in the right.
  * @author Marco Expósito Pérez
  */

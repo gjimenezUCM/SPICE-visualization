@@ -1,8 +1,18 @@
+/**
+ * @fileoverview This class creates a slider that changes the minimum similarity required for edges to be visible.
+ * @author Marco Expósito Pérez
+ */
 
+//Namespaces
 import { networkHTML } from "../constants/networkHTML";
 
 export default class ThresholdSlider {
 
+    /**
+     * Constructor of the class
+     * @param {HTMLElement} container html container where the slider will be appended
+     * @param {NetworksGroup} networksGroup  group of all networks that will see their edges altered by the slider
+     */
     constructor(container, networkGroup) {
         this.domParser = new DOMParser();
         this.networksGroups = networkGroup;
@@ -15,9 +25,13 @@ export default class ThresholdSlider {
 
         container.append(html);
 
-        this.addSliderFunction();
+        this.addSliderOnchange();
     }
 
+    /**
+     * Function that returns a html string with the slider
+     * @returns {String} returns the html string
+     */
     thresholdSliderTemplate() {
         const html = `
         <div>
@@ -29,7 +43,10 @@ export default class ThresholdSlider {
         return html;
     }
 
-    addSliderFunction() {
+    /**
+     * Add onchange and oninput functions to the slider
+     */
+    addSliderOnchange() {
         const slider = document.getElementById(this.sliderId);
         const text = document.getElementById(this.textId);
 
@@ -38,7 +55,7 @@ export default class ThresholdSlider {
     }
 
     /** 
-     *  Update all networks with the new threshold value. Updates the label with the value too
+     *  Update all networks with the new threshold value.
      */
     thresholdChange(slider) {
         let newValue = slider.value;
@@ -47,7 +64,7 @@ export default class ThresholdSlider {
     }
 
     /**
-     * Update the text nearby the slider to show the new values
+     * Update the slider text to show the new values
      */
     updateSliderText(slider, text) {
         let newValue = slider.value;

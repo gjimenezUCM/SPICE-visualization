@@ -1,5 +1,5 @@
 /**
- * @fileoverview This Class draw the network based on the inputJson, manages all network-related events and
+ * @fileoverview This class draw the network based on the inputJson, manages all network-related events and
  * edit the network or the shown info based on the user inputs.
  * @package It requires vis-Network package to be able to use the Network Class. 
  * @author Marco Expósito Pérez

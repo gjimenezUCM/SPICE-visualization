@@ -1,5 +1,5 @@
 /**
- * @fileoverview This Class Controls all GET petitions to obtain the json files with the networks data.
+ * @fileoverview This class Controls all GET petitions to obtain the json files with the networks data.
  * @package Requires Axios package to be able to send the GET petitions.  
  * @author Marco Expósito Pérez
  */
@@ -24,8 +24,8 @@ export default class RequestManager {
      * @param {String} directory Optional parameter to change the target directory
      * @returns 
      */
-    getFile(name, directory = "./") {
-        return this.axios.get(directory + name, {
+    getFile(name) {
+        return this.axios.get(name, {
             params: {}
         })
             .then((response) => {
@@ -34,5 +34,13 @@ export default class RequestManager {
             .catch((error) => {
                 return error;
             });
+    }
+
+    /**
+     * Update the baseURL of the requestManager
+     * @param {String} newURL the new url
+     */
+    changeBaseURL(newURL) {
+        this.axios.defaults.baseURL = newURL;
     }
 }

@@ -1,5 +1,5 @@
 /**
- * @fileoverview This File Manages most things related to edges. It reads the json and parse the data, 
+ * @fileoverview This class Manages most things related to edges. It reads the json and parse the data, 
  * and changes edges atributes based on the control panel inputs.
  * @package Requires vis-data package to be able to use vis-network datasets. 
  * @author Marco Expósito Pérez

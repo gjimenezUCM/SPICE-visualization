@@ -1,5 +1,5 @@
 /**
- * @fileoverview This creates and update a tooltip with a tittle on top and some content below it.
+ * @fileoverview This class creates and update a tooltip with a tittle on top and some content below it.
  * @package It requires bootstrap package to be able to use Popover objects. 
  * @author Marco Expósito Pérez
  */
@@ -103,7 +103,8 @@ export default class Tooltip {
      * @param {NetworkManager} networkManager manager of the network where this tooltip is going to be updated 
      */
     updatePosition(networkManager) {
-        this.createTooltip(networkManager, this.event, this.tooltipManager, true)
+        if (this.tooltip !== null)
+            this.createTooltip(networkManager, this.event, this.tooltipManager, true)
     }
 
     /**

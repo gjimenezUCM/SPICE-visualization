@@ -1,5 +1,5 @@
 /**
- * @fileoverview This Class works as a controler between user input and all active networks.It also works
+ * @fileoverview This class works as a controler between user input and all active networks.It also works
  * to broadcast and manage events between diferent networks. 
  * @author Marco Expósito Pérez
  */
@@ -11,7 +11,7 @@ import { networkHTML } from "./constants/networkHTML.js";
 import NetworkMan from "./networkManager.js";
 import Tooltip from "./networkManagerTools/tooltip.js";
 
-export default class NetworkGroupMan {
+export default class NetworksGroup {
 
     /**
      * Constructor of the class
@@ -61,6 +61,12 @@ export default class NetworkGroupMan {
         networkContainer.removeChild(divToDelete);
     }
 
+    removeAllnetworks() {
+        this.activesNetworksArray.forEach((network) => {
+            this.removeNetwork(network.key);
+        });
+    }
+    
     /** 
      * Broadcast to all networks that node id has been selected
      * @param {Integer} id id of the selected node
