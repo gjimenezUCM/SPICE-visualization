@@ -6,11 +6,11 @@
  */
 
 //Namespaces
-import { networkHTML } from "./namespaces/networkHTML.js";
+import { networkHTML } from "./constants/networkHTML.js";
 //Packages
 import { Dropdown } from 'bootstrap';
 //Local classes
-import NetworkGroupMan from "./networkGroupMan.js";
+import NetworkGroupMan from "./groupNetwork.js";
 import RequestManager from "./requestManager.js";
 import ControlPanel from "./controlPanel.js";
 
@@ -21,7 +21,7 @@ export default class CreateVisualization {
      */
     constructor() {
         //TODO this should be editable
-        const baseURL = "https://raw.githubusercontent.com/gjimenezUCM/SPICE-visualization/main/data/";
+        const baseURL = "https://raw.githubusercontent.com/gjimenezUCM/SPICE-visualization/develop/data/";
         this.dataDirectory = "./";
 
         this.requestManager = new RequestManager(baseURL);

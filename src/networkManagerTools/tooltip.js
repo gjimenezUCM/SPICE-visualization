@@ -60,18 +60,13 @@ export default class Tooltip {
                     placement: "right",
                     template: html,
                     content: content,
-                    tittle: content,
+                    title: title,
                     fallbackPlacements: ["right"],
                     offset: [0, 0],
                     html: true,
                 };
 
                 this.tooltip = new Popover(this.container, options);
-
-                this.tooltip.setContent({
-                    '.popover-header': title,
-                    '.popover-body': content
-                });
             }
 
             this.container.style.top = spawnPoint.y + "px";

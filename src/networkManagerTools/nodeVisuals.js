@@ -97,7 +97,6 @@ export default class NodeVisuals {
      */
     updateFilterActives(filter, nodes) {
         const newNodes = new Array();
-        console.log(filter);
 
         nodes.forEach((node) => {
             const explComms = node[comms.ExpUserKsonKey];
