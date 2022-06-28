@@ -18,9 +18,11 @@ export default class ImplicitCommsData {
      * Constructor of the class
      * @param {JSON} communityJson Json with the implicit community data
      */
-    constructor(communityJson) {
+    constructor(communityJson, clustering = false) {
         //Data of all implicit communities
         this.implComms = communityJson[comms.ImplGlobalJsonKey];
+
+        this.clustering = clustering;
     }
 
     /**
@@ -216,20 +218,22 @@ export default class ImplicitCommsData {
      * Format-> { x: (integer), y: (integer) } 
      */
     calculateTooltipSpawn(networkManager, event, getElementPosition) {
+        if(this.clustering){
+            return this.clusterTooltipSpawn(networkManager, event, getElementPosition);
+        }
         //CHeck if the click hit a bounding box
-        this.activeBBindex = this.checkBoundingBoxClick(event);
+        const activeBBindex = this.checkBoundingBoxClick(event);
 
-        if (this.activeBBindex === undefined)
-            return this.activeBBindex;
+        this.activeCommunity = this.implComms[this.bbOrder[activeBBindex]];
 
         //Get the position of the bounding box in the canvas DOM
         const bbLeft = networkManager.network.canvasToDOM({
-            x: this.bb[this.activeBBindex].left,
-            y: this.bb[this.activeBBindex].top
+            x: this.bb[activeBBindex].left,
+            y: this.bb[activeBBindex].top
         });
         const bbRight = networkManager.network.canvasToDOM({
-            x: this.bb[this.activeBBindex].right,
-            y: this.bb[this.activeBBindex].bottom
+            x: this.bb[activeBBindex].right,
+            y: this.bb[activeBBindex].bottom
         });
 
         //Calculate the real absolute click coordinates
@@ -237,6 +241,25 @@ export default class ImplicitCommsData {
 
         const clickX = bbLeft.x + (bbRight.x - bbLeft.x) / 2 + networkCanvasPosition.left;
         const clickY = bbLeft.y + (bbRight.y - bbLeft.y) / 2 + networkCanvasPosition.top;
+
+        return { x: clickX, y: clickY };
+    }
+
+    clusterTooltipSpawn(networkManager, event, getElementPosition){
+        //Calculate the relative position of the click in the canvas
+        const nodeInCanvasPosition = networkManager.network.getPosition(event.nodes[0]);
+        const nodeInCanvasDOMposition = networkManager.network.canvasToDOM(nodeInCanvasPosition);
+
+        //Depending on the zoom, we increase the offset
+        const xOffset = networkManager.network.getScale() * 40;
+
+        //Calculate the real absolute click coordinates
+        const networkCanvasPosition = getElementPosition(`${networkHTML.topCanvasContainer}cluster${networkManager.key}`);
+        const clickX = nodeInCanvasDOMposition.x + networkCanvasPosition.left + xOffset;
+        const clickY = nodeInCanvasDOMposition.y + networkCanvasPosition.top;
+
+        const idArray = event.nodes[0].split("_");
+        this.activeCommunity = this.implComms[idArray[1]];
 
         return { x: clickX, y: clickY };
     }
@@ -249,8 +272,7 @@ export default class ImplicitCommsData {
      * @returns {String} String with the tootip tittle
      */
     getTooltipTitle(networkManager, event, titleTemplate) {
-        const communityClicked = this.implComms[this.bbOrder[this.activeBBindex]];
-        const title = communityClicked.id;
+        const title = this.activeCommunity.id;
 
         return titleTemplate(title);
     }
@@ -263,11 +285,10 @@ export default class ImplicitCommsData {
      * @returns {String} String with the tootip content
      */
     getTooltipContent(networkManager, event, contentTemplate) {
-        const communityClicked = this.implComms[this.bbOrder[this.activeBBindex]];
         const rowData = new Array();
 
         for (let i = 0; i < comms.ImplWantedAttr.length; i++) {
-            rowData.push({ tittle: comms.ImplWantedAttr[i], data: communityClicked[comms.ImplWantedAttr[i]] });
+            rowData.push({ tittle: comms.ImplWantedAttr[i], data: this.activeCommunity[comms.ImplWantedAttr[i]] });
         }
 
         return contentTemplate(rowData);
