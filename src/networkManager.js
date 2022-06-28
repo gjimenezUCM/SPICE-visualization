@@ -34,10 +34,11 @@ export default class NetworkMan {
         this.key = config.key;
         this.clustering = clustering;
 
-        this.implCommMan = new ImplicitCommsMan(jsonInput);
-        this.nodeVisuals = new NodeVisuals(this);
+        this.implCommMan = new ImplicitCommsMan(jsonInput, clustering);
+        this.nodeVisuals = new NodeVisuals();
 
-        this.nodeData = new NodeData(this.nodeVisuals, rightContainer);
+
+        this.nodeData = new NodeData(this.nodeVisuals, rightContainer, clustering);
         this.edgesMan = new EdgeManager(config);
 
         this.data =
@@ -46,10 +47,12 @@ export default class NetworkMan {
             edges: this.edgesMan.parseEdges(jsonInput)
         };
 
-        this.nodeData.createNodeDataTable(rightContainer);
-        this.implCommMan.createCommunityDataTable(rightContainer);
+        if (!this.clustering) {
+            this.nodeData.createNodeDataTable(rightContainer);
+            this.nodeVisuals.createNodeDimensionStrategy(this.data.nodes);
+        }
 
-        this.nodeVisuals.createNodeDimensionStrategy(this.data.nodes);
+        this.implCommMan.createCommunityDataTable(rightContainer);
 
         this.chooseOptions();
         this.drawNetwork();
@@ -203,7 +206,7 @@ export default class NetworkMan {
             if (!this.clustering) {
                 this.groupManager.showTooltip(this, event, this.implCommMan);
                 this.implCommMan.updateDataTableFromClick(event);
-            }else{
+            } else {
                 this.implCommMan.clearDataTable();
             }
         }
@@ -263,22 +266,24 @@ export default class NetworkMan {
         }
         this.network.fit(fitOptions);
 
-        //Update all nodes color acording to their selected status
-        const newNodes = new Array();
-        this.data.nodes.forEach((node) => {
-            if (selectedNodes.includes(node.id)) {
-                if (!node.defaultColor) {
-                    this.nodeVisuals.nodeDimensionStrategy.nodeColorToDefault(node);
+        if (!this.clustering) {
+            //Update all nodes color acording to their selected status
+            const newNodes = new Array();
+            this.data.nodes.forEach((node) => {
+                if (selectedNodes.includes(node.id)) {
+                    if (!node.defaultColor) {
+                        this.nodeVisuals.nodeDimensionStrategy.nodeColorToDefault(node);
+                        newNodes.push(node);
+                    }
+
+                } else if (node.defaultColor) {
+                    this.nodeVisuals.nodeDimensionStrategy.nodeVisualsToColorless(node);
                     newNodes.push(node);
                 }
+            });
 
-            } else if (node.defaultColor) {
-                this.nodeVisuals.nodeDimensionStrategy.nodeVisualsToColorless(node);
-                newNodes.push(node);
-            }
-        });
-
-        this.data.nodes.update(newNodes);
+            this.data.nodes.update(newNodes);
+        }
     }
 
     /** 
@@ -307,16 +312,18 @@ export default class NetworkMan {
 
         this.network.unselectAll();
 
-        const newNodes = new Array();
-        this.data.nodes.forEach((node) => {
-            if (!node.defaultColor) {
-                this.nodeVisuals.nodeDimensionStrategy.nodeColorToDefault(node);
-                newNodes.push(node);
-            }
+        if (!this.clustering) {
+            const newNodes = new Array();
+            this.data.nodes.forEach((node) => {
+                if (!node.defaultColor) {
+                    this.nodeVisuals.nodeDimensionStrategy.nodeColorToDefault(node);
+                    newNodes.push(node);
+                }
 
-        });
+            });
 
-        this.data.nodes.update(newNodes);
+            this.data.nodes.update(newNodes);
+        }
     }
 
     /**
