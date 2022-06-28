@@ -161,7 +161,7 @@ export default class ImplicitCommsData {
 
         let i = this.checkBoundingBoxClick(event);
         if (i !== undefined) {
-            this.updateDataTable(i);
+            this.updateDataTable(this.implComms[this.bbOrder[i]]);
         }
     }
 
@@ -171,9 +171,15 @@ export default class ImplicitCommsData {
      * @param {Object} event click event
      */
     updateDataTableFromNodeId(id, nodes) {
-        let i = nodes.get(id)[comms.ImplUserNewKey];
-        if (i !== undefined) {
-            this.updateDataTable(i);
+        const idArray = id.split("_");
+        
+        if (idArray.length === 1) {
+            let i = nodes.get(id)[comms.ImplUserNewKey];
+            if (i !== undefined) {
+                this.updateDataTable(this.implComms[this.bbOrder[i]]);
+            }
+        } else {
+            this.updateDataTable(this.implComms[idArray[1]]);
         }
     }
 
@@ -182,8 +188,9 @@ export default class ImplicitCommsData {
      * that we want to represent in the dataTable. 
      * @param {Integer} i index of the bounding box
      */
-    updateDataTable(i) {
-        const community = this.implComms[this.bbOrder[i]];
+    updateDataTable(community) {
+        
+        //const community = this.implComms[this.bbOrder[i]];
         const newRowData = new Map();
 
         for (let i = 0; i < comms.ImplWantedAttr.length; i++) {

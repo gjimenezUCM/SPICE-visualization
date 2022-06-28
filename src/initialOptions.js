@@ -117,7 +117,6 @@ export default class InitialOptions {
         let child = parent.firstChild;
 
         while (child) {
-            console.log(child);
             child.remove();
             child = parent.firstChild;
         }
