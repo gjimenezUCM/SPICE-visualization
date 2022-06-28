@@ -9,7 +9,7 @@ import { networkHTML } from "./constants/networkHTML.js";
 
 //Local classes
 import NetworkMan from "./networkManager.js";
-import Tooltip from "./networkManagerTools/tooltip.js";
+import Tooltip from "./networkManagerTools/uiComponents/tooltip.js";
 
 export default class NetworksGroup {
 
@@ -30,10 +30,10 @@ export default class NetworksGroup {
      * @param {HTMLElement} leftContainer Container where the network will be placed
      * @param {HTMLElement} rightContainer Container where the network data will be placed
      */
-    addNetwork(file, leftContainer, rightContainer, config) {
+    addNetwork(file, leftContainer, rightContainer, clusterContainer, config) {
         try {
             const jsonFile = JSON.parse(file);
-            const network = new NetworkMan(jsonFile, leftContainer, rightContainer, this, config);
+            const network = new NetworkMan(jsonFile, leftContainer, rightContainer, clusterContainer, this, config);
 
             this.activesNetworksMap.set(config.key, network);
             this.activesNetworksArray.push(network);

@@ -10,7 +10,7 @@ import { networkHTML } from "../constants/networkHTML.js";
 import { nodes } from "../constants/nodes.js";
 
 //Local classes
-import dataTable from "./dataTable.js";
+import dataTable from "./uiComponents/dataTable.js";
 
 export default class ImplicitCommsData {
 
@@ -172,7 +172,7 @@ export default class ImplicitCommsData {
      */
     updateDataTableFromNodeId(id, nodes) {
         const idArray = id.split("_");
-        
+
         if (idArray.length === 1) {
             let i = nodes.get(id)[comms.ImplUserNewKey];
             if (i !== undefined) {
@@ -189,7 +189,7 @@ export default class ImplicitCommsData {
      * @param {Integer} i index of the bounding box
      */
     updateDataTable(community) {
-        
+
         //const community = this.implComms[this.bbOrder[i]];
         const newRowData = new Map();
 

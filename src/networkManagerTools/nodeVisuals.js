@@ -8,7 +8,7 @@
 import { comms } from "../constants/communities.js";
 import { nodes } from "../constants/nodes.js";
 //Local classes
-import NodeDimensionStrategy from "./NodeDimensions/nodeDimensionStrategy.js";
+import NodeDimensionStrategy from "./nodeDimensions/nodeDimensionStrategy.js";
 
 export default class NodeVisuals {
 
