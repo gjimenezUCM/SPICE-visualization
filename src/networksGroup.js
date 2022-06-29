@@ -128,6 +128,27 @@ export default class NetworksGroup {
         });
     }
 
+    /** 
+     * Change the network hideUnselectedEdges value
+     * @param {String} key Key of the network
+     * @param {Boolean} newBool New hideUnselectedEdges value
+     */
+    hideUnselectedEdges(key, newBool) {
+        const network = this.activesNetworksMap.get(key);
+
+        network.edgesMan.hideUnselectedEdges(network, newBool);
+    }
+
+    /**
+     * Broadcast the new hideUnselectedEdges value to all networks
+     * @param {Float} newValue New hideUnselectedEdges value
+     */
+    hideUnselectedEdgesALL(newBool){
+        this.activesNetworksArray.forEach((network) => {
+            this.hideUnselectedEdges(network.key, newBool);
+        });
+    }
+
     /**
      * Update node visuals of a network to match current blacklist filter
      * @param {String[]} filter string array with all values to hide
@@ -172,7 +193,7 @@ export default class NetworksGroup {
     updateTooltipPosition(networkManager) {
         this.tooltip.updatePosition(networkManager);
     }
-    
+
     /**
      * Returns the current number of active networks
      * @returns {Integer} Returns the number of active networks

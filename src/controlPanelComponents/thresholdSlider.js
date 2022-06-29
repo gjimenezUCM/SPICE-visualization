@@ -16,6 +16,7 @@ export default class ThresholdSlider {
     constructor(container, networkGroup) {
         this.domParser = new DOMParser();
         this.networksGroups = networkGroup;
+        this.value = networkHTML.sliderThresholdInitialValue;
 
         this.sliderId = "tresholdSlider";
         this.textId = "tresholdSliderText";
@@ -35,9 +36,9 @@ export default class ThresholdSlider {
     thresholdSliderTemplate() {
         const html = `
         <div>
-            <input type="range" min="0.0" max="1.0" step="0.1" value="${networkHTML.sliderThresholdInitialValue}" id="${this.sliderId}"></input>
+            <input type="range" min="0.0" max="1.0" step="0.1" value="${this.value}" id="${this.sliderId}"></input>
             <span> Minimum Similarity: </span>
-            <span id="${this.textId}"> ${networkHTML.sliderThresholdInitialValue} </span>
+            <span id="${this.textId}"> ${this.value} </span>
         </div>`;
 
         return html;
@@ -58,9 +59,9 @@ export default class ThresholdSlider {
      *  Update all networks with the new threshold value.
      */
     thresholdChange(slider) {
-        let newValue = slider.value;
+        this.value = slider.value;
 
-        this.networksGroups.thresholdChangeALL(newValue);
+        this.networksGroups.thresholdChangeALL(this.value);
     }
 
     /**
@@ -73,5 +74,13 @@ export default class ThresholdSlider {
         if (newValue === "1") newValue = "1.0";
 
         text.innerHTML = newValue;
+    }
+
+    /**
+     * Returns the current value of the threshold Slider
+     * @returns {Float} returns the value of the slider
+     */
+    getThreshold(){
+        return this.value;
     }
 }

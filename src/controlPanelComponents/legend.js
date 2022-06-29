@@ -184,11 +184,6 @@ export default class Legend {
 
         this.networksGroup.updateFilterActivesALL(this.filterValuesToHide);
     }
-
-
-
-
-
 }
 
 

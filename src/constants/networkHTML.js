@@ -26,7 +26,8 @@ export const networkHTML = {
 
     sliderThresholdInitialValue: 0.5,
     variableEdgeInitialValue: false,
-
+    unselectedEdgesInitialValue: false,
+    
     //--- Legend HTML
     legendButtonClass: "legend btn btn-outline-primary",
 }

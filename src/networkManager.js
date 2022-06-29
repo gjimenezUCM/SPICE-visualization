@@ -54,6 +54,8 @@ export default class NetworkMan {
 
         this.chooseOptions();
         this.drawNetwork();
+
+        this.updateFilterActives(config.valuesToHide);
     }
 
     /**
@@ -140,7 +142,6 @@ export default class NetworkMan {
      */
     drawNetwork() {
         this.network = new Network(this.container, this.data, this.options);
-        //this.network.stabilize();   //In case physics are active, we stop them just in case nodes start to "boing"
 
         this.container.firstChild.id = networkHTML.topCanvasContainer + this.key;
 

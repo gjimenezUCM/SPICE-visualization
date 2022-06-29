@@ -6,6 +6,7 @@
  */
 
 //Namespaces
+import { networkHTML } from "../constants/networkHTML.js";
 import { edges } from "../constants/edges.js";
 //Packages
 import { DataSet } from "vis-data/peer";
@@ -21,6 +22,8 @@ export default class EdgeManager {
         this.edgeValueThreshold = config.edgeThreshold;
         //Dictates if the edge width should change with the similarity value "strength"
         this.variableEdge = config.variableEdge;
+        //Dictates if All edges that are not currently selected, should be hidden
+        this.hideUnselected = config.hideUnselected;
     }
 
     /**
@@ -132,5 +135,10 @@ export default class EdgeManager {
 
         //Update all edges with the new options
         this.edges.update(this.edges);
+    }
+
+
+    hideUnselectedEdges(network, newBool) {
+        console.log("hello")
     }
 }

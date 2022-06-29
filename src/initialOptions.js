@@ -254,8 +254,10 @@ export default class InitialOptions {
         const rightContainer = document.getElementById(`rightCol_${key}`);
 
         const config = {
-            edgeThreshold: networkHTML.sliderThresholdInitialValue,
-            variableEdge: networkHTML.variableEdgeInitialValue,
+            edgeThreshold: this.controlPanel.getSliderThreshold(),
+            variableEdge: this.controlPanel.getVariableEdgeValue(),
+            hideUnselected: this.controlPanel.getUnselectedEdgesValue(),
+            valuesToHide: this.controlPanel.getValuesToHide(),
             key: key
         };
 
