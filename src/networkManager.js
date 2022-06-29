@@ -6,7 +6,6 @@
  */
 
 //Namespaces
-import { comms } from "./constants/communities.js";
 import { edges } from "./constants/edges.js";
 import { nodes } from "./constants/nodes.js";
 import { networkHTML } from "./constants/networkHTML.js";
@@ -28,11 +27,10 @@ export default class NetworkMan {
      * @param {NetworkGroupManager} networkManager manager of all active networks
      * @param {Object} config config options for edges
      */
-    constructor(jsonInput, container, rightContainer, networkManager, config, clustering = true) {
+    constructor(jsonInput, container, rightContainer, networkManager, config) {
         this.container = container;
         this.groupManager = networkManager;
         this.key = config.key;
-        this.clustering = clustering;
 
         this.implCommMan = new ImplicitCommsMan(jsonInput);
         this.nodeVisuals = new NodeVisuals(this);
@@ -114,7 +112,13 @@ export default class NetworkMan {
                 useDefaultGroups: false
             },
             physics: {
-                enabled: true,
+                enabled: false,
+                //Avoid overlap between nodes, but enable physics. Leaving this here in case we need it in the future
+                /* barnesHut: {
+                    springConstant: 0,
+                    avoidOverlap: 0.1
+                }*/
+
             },
             interaction: {
                 zoomView: true,
@@ -124,7 +128,6 @@ export default class NetworkMan {
             },
             layout: {
                 improvedLayout: true,
-                clusterThreshold: 150,
             }
         };
     }
@@ -134,10 +137,7 @@ export default class NetworkMan {
      */
     drawNetwork() {
         this.network = new Network(this.container, this.data, this.options);
-        this.network.stabilize();   //In case physics are active, we stop them just in case nodes start to "boing"
-
-        if (this.clustering)
-            this.clusterNetwork();
+        //this.network.stabilize();   //In case physics are active, we stop them just in case nodes start to "boing"
 
         this.container.firstChild.id = networkHTML.topCanvasContainer + this.key;
 
@@ -146,39 +146,12 @@ export default class NetworkMan {
         this.network.on("zoom", (event) => this.zoomEvent(event));
     }
 
-    clusterNetwork() {
-
-        for (let i = 0; i < 5; i++) {
-            const colors = comms.Bb.Color[i];
-
-            const clusterOptions = {
-                joinCondition: function (childOptions) {
-                    return childOptions[comms.ImplUserNewKey] == i;
-                },
-                clusterNodeProperties: {
-                    id: `cluster_${this.implCommMan.implComms[i].id}`,
-                    label: this.implCommMan.implComms[i].name,
-                    shape: "database",
-                    color: {
-                        border: colors.Border,
-                        background: colors.Color,
-                    },
-                    borderWidth: 2,
-                    explanation: this.implCommMan.implComms[i].explanation,
-                    allowSingleNodeCluster: true
-                },
-            }
-
-            this.network.cluster(clusterOptions);
-        }
-    }
-
     /** 
      * Function executed when "beforeDrawing" event is launched. Happens before drawing the network
      * @param {CanvasRenderingContext2D} ctx Context object necesary to draw in the network canvas
      */
     preDrawEvent(ctx) {
-        //this.implCommMan.drawBoundingBoxes(ctx, this.data.nodes, this.network);
+        this.implCommMan.drawBoundingBoxes(ctx, this.data.nodes, this.network);
     }
 
     /** 
@@ -191,21 +164,14 @@ export default class NetworkMan {
         if (event.nodes.length > 0) {
             this.nodeHasBeenClicked(event.nodes[0]);
 
-            if (!this.clustering) {
-                this.groupManager.showTooltip(this, event, this.nodeData);
-            }
-
+            this.groupManager.showTooltip(this, event, this.nodeData);
             this.implCommMan.updateDataTableFromNodeId(event.nodes[0], this.data.nodes);
 
         } else {
             this.noNodeIsClicked();
 
-            if (!this.clustering) {
-                this.groupManager.showTooltip(this, event, this.implCommMan);
-                this.implCommMan.updateDataTableFromClick(event);
-            }else{
-                this.implCommMan.clearDataTable();
-            }
+            this.groupManager.showTooltip(this, event, this.implCommMan);
+            this.implCommMan.updateDataTableFromClick(event);
         }
     }
 
@@ -233,9 +199,8 @@ export default class NetworkMan {
     nodeSelected(id) {
         this.network.selectNodes([id], true);
 
-        if (!this.clustering) {
-            this.nodeData.updateDataTable(id);
-        }
+        //Update node data table
+        this.nodeData.updateDataTable(id);
 
         //Search for the nodes that are connected to the selected Node
         const selectedNodes = new Array();
@@ -301,9 +266,7 @@ export default class NetworkMan {
         }
         this.network.fit(fitOptions);
 
-        if (!this.clustering) {
-            this.nodeData.clearDataTable();
-        }
+        this.nodeData.clearDataTable();
 
         this.network.unselectAll();
 
