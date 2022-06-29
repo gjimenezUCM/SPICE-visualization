@@ -61,6 +61,9 @@ export default class NetworksGroup {
         networkContainer.removeChild(divToDelete);
     }
 
+    /**
+     * Remove all networks of the visualization
+     */
     removeAllnetworks() {
         this.activesNetworksArray.forEach((network) => {
             this.removeNetwork(network.key);
@@ -126,27 +129,6 @@ export default class NetworksGroup {
     }
 
     /**
-     * Highlight all nodes that contains selectedCommunities key and values
-     * @param {String} key Key of the network
-     * @param {Object} selectedCommunities Object with the format of {key: (string), values: (String[])}
-     */
-    highlightCommunity(key, selectedCommunities) {
-        const network = this.activesNetworksMap.get(key);
-
-        network.highlightCommunity(selectedCommunities);
-    }
-
-    /**
-     * Broadcast the highglight a selected community to all networks
-     * @param {Object} selectedCommunities Object with the format of {key: (string), values: (String[])}
-     */
-    highlightCommunityALL(selectedCommunities) {
-        this.activesNetworksArray.forEach((network) => {
-            this.highlightCommunity(network.key, selectedCommunities);
-        });
-    }
-
-    /**
      * Update node visuals of a network to match current blacklist filter
      * @param {String[]} filter string array with all values to hide
      */
@@ -173,13 +155,24 @@ export default class NetworksGroup {
         this.tooltip.hide();
     }
 
+    /**
+     * Show a new tooltip
+     * @param {NetworkManager} networkManager networkManager where the tooltip is going to be draw
+     * @param {Object} event Event that trigered the tooltip
+     * @param {Object} tooltipManager Object that will manage the tooltip creation
+     */
     showTooltip(networkManager, event, tooltipManager) {
         this.tooltip.showTooltip(networkManager, event, tooltipManager);
     }
 
+    /**
+     * Updates a tooltip position
+     * @param {NetworkManager} networkManager networkManager where the tooltip is going to be updated
+     */
     updateTooltipPosition(networkManager) {
         this.tooltip.updatePosition(networkManager);
     }
+    
     /**
      * Returns the current number of active networks
      * @returns {Integer} Returns the number of active networks
