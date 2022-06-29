@@ -23,11 +23,10 @@ export default class Legend {
         this.networksGroup = networksGroup;
 
         const attributes = networksGroup.getVisualizationAttributes();
-        if (attributes !== null && attributes !== undefined) {
 
-            container.append(this.createLegendContainer(attributes));
-            this.addButtonLegendOnclick(attributes);
-        }
+        container.append(this.createLegendContainer(attributes));
+
+        this.addButtonLegendOnclick(attributes);
     }
 
     /**

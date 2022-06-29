@@ -18,7 +18,6 @@ export default class NodeVisuals {
     constructor() {
         //Contains all explicit Communities with its values
         this.communitiesData = new Array();
-
     }
 
     /** 
@@ -88,10 +87,7 @@ export default class NodeVisuals {
      * Format-> {attr: (string), vals: (string[], dimension: (string))}
      */
     getVisualizationAttributes() {
-        if(this.nodeDimensionStrategy !== undefined)
-            return this.nodeDimensionStrategy.attributes;
-        else
-            return null;
+        return this.nodeDimensionStrategy.attributes;
     }
 
     /**
