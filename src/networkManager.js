@@ -13,6 +13,7 @@ import { networkHTML } from "./constants/networkHTML.js";
 //Packages
 import { Network } from "vis-network/peer";
 //Local classes
+import ImplicitCommsMan from "./networkManagerTools/implicitCommsData.js";
 import NodeVisuals from "./networkManagerTools/nodeVisuals.js";
 import NodeData from "./networkManagerTools/nodeData.js";
 import EdgeManager from "./networkManagerTools/edgeManager.js";
@@ -200,7 +201,7 @@ export default class NetworkMan {
         this.network.selectNodes([id], true);
 
         this.nodeData.updateDataTable(id);
-
+        
 
         //Search for the nodes that are connected to the selected Node
         const selectedNodes = new Array();
@@ -245,7 +246,7 @@ export default class NetworkMan {
         });
 
         this.data.nodes.update(newNodes);
-
+        
     }
 
     /** 
@@ -269,7 +270,7 @@ export default class NetworkMan {
         this.network.fit(fitOptions);
 
         this.nodeData.clearDataTable();
-
+        
         this.network.unselectAll();
 
         const newNodes = new Array();
@@ -282,37 +283,7 @@ export default class NetworkMan {
         });
 
         this.data.nodes.update(newNodes);
-
-    }
-
-    clusterNodeHasBeenClicked(community) {
-        const selectedNodes = new Array();
-        //Update the visuals of the nodes and check what nodes are in the cluster
-        const newNodes = new Array();
-        this.data.nodes.forEach((node) => {
-            if (node[comms.ImplUserNewKey] === community) {
-                if (!node.defaultColor) {
-                    this.nodeVisuals.nodeDimensionStrategy.nodeColorToDefault(node);
-                    newNodes.push(node);
-                }
-                selectedNodes.push(node.id);
-            } else if (node.defaultColor) {
-                this.nodeVisuals.nodeDimensionStrategy.nodeVisualsToColorless(node);
-                newNodes.push(node);
-            }
-        });
-        this.data.nodes.update(newNodes);
-
-
-        //Move the "camera" to focus on these nodes
-        const fitOptions = {
-            nodes: selectedNodes,
-            animation: {
-                duration: nodes.ZoomDuration,
-            },
-        }
-
-        this.network.fit(fitOptions);
+        
     }
 
     /**

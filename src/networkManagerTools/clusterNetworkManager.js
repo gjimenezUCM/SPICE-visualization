@@ -28,10 +28,8 @@ export default class ClusterNetworkManager {
     constructor(container, rightContainer, networkManager, data) {
         this.container = container;
         this.networkManager = networkManager;
-        this.key = networkManager.key;
-        this.implCommMan = new ImplicitCommsData(data.json, true);
 
-        this.nClusters = this.implCommMan.implComms.length;
+        this.implCommMan = new ImplicitCommsData(data.json);
 
         this.data =
         {
@@ -39,7 +37,7 @@ export default class ClusterNetworkManager {
             edges: data.edges
         };
         this.options = data.options;
-
+        
         this.implCommMan.createCommunityDataTable(rightContainer);
 
         this.drawNetwork();
@@ -54,7 +52,7 @@ export default class ClusterNetworkManager {
 
         this.clusterNetwork();
 
-        this.container.firstChild.id = `${networkHTML.topCanvasContainer}cluster${this.key}`;
+        this.container.firstChild.id = `${networkHTML.topCanvasContainer}cluster${this.networkManager.key}`;
 
         this.network.on("click", (event) => this.clickEvent(event));
         this.network.on("zoom", (event) => this.zoomEvent(event));
@@ -64,7 +62,7 @@ export default class ClusterNetworkManager {
      * Make cluster of all nodes with the same implicit Community value
      */
     clusterNetwork() {
-        for (let i = 0; i < this.nClusters; i++) {
+        for (let i = 0; i < 5; i++) {
             const colors = comms.Bb.Color[i];
 
             const clusterOptions = {
@@ -72,7 +70,7 @@ export default class ClusterNetworkManager {
                     return childOptions[comms.ImplUserNewKey] == i;
                 },
                 clusterNodeProperties: {
-                    id: `${nodes.ClusterNodeId}_${this.implCommMan.implComms[i].id}`,
+                    id: `cluster_${this.implCommMan.implComms[i].id}`,
                     label: this.implCommMan.implComms[i].name,
                     shape: "database",
                     color: {
@@ -101,7 +99,7 @@ export default class ClusterNetworkManager {
 
             //Show the cluster information in the table
             this.implCommMan.updateDataTableFromNodeId(event.nodes[0], this.data.nodes);
-            this.networkManager.groupManager.showTooltip(this, event, this.implCommMan);
+            //this.groupManager.showTooltip(this, event, this.implCommMan);
         } else {
             this.noNodeIsClicked();
 
@@ -114,7 +112,7 @@ export default class ClusterNetworkManager {
      * @param {Object} event Zoom event
      */
     zoomEvent(event) {
-        this.networkManager.groupManager.updateTooltipPosition(this);
+        //this.groupManager.updateTooltipPosition(this);
     }
 
     /** 
@@ -122,9 +120,7 @@ export default class ClusterNetworkManager {
     * @param {*} id id of the node 
     */
     nodeHasBeenClicked(id) {
-        const idArray = id.split("_");
-        this.networkManager.clusterNodeHasBeenClicked(parseInt(idArray[1]));
-
+        //this.groupManager.nodeSelected(id);
         this.nodeSelected(id);
     }
 
@@ -162,22 +158,13 @@ export default class ClusterNetworkManager {
         }
         this.network.fit(fitOptions);
 
-        for(let i = 0; i < this.nClusters; i++){
-            const clusterKey = `${nodes.ClusterNodeId}_${this.implCommMan.implComms[i].id}`;
-
-            if(clusterKey === id)
-                this.clusterColorToDefault(clusterKey);
-            else
-                this.clusterVisualsToColorless(clusterKey);
-        }
     }
 
     /** 
      * Function executed only when this was the network that received the click event but no nodes was clicked
      */
     noNodeIsClicked() {
-        this.networkManager.nodeDeselected();
-
+        //this.groupManager.nodeDeselected();
         this.nodeDeselected();
     }
 
@@ -195,12 +182,6 @@ export default class ClusterNetworkManager {
         this.network.fit(fitOptions);
 
         this.network.unselectAll();
-
-        for(let i = 0; i < this.nClusters; i++){
-            const clusterKey = `${nodes.ClusterNodeId}_${this.implCommMan.implComms[i].id}`;
-
-            this.clusterColorToDefault(clusterKey);
-        }
     }
 
     /**
@@ -208,32 +189,6 @@ export default class ClusterNetworkManager {
      */
     clearNetwork() {
         this.network.destroy();
-    }
-
-
-    clusterVisualsToColorless(clusterId) {
-        const options = {
-            color: {
-                background: nodes.NoFocusColor.Background,
-                border: nodes.NoFocusColor.Border
-            }
-        }
-
-        this.network.updateClusteredNode(clusterId, options);
-    }
-
-    clusterColorToDefault(clusterId) {
-        const idArray = clusterId.split("_");
-        const colors = comms.Bb.Color[idArray[1]];
-
-        const options = {
-            color: {
-                border: colors.Border,
-                background: colors.Color,
-            },
-        }
-
-        this.network.updateClusteredNode(clusterId, options);
     }
 }
 

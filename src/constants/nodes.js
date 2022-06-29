@@ -10,8 +10,6 @@ export const nodes = {
     //Key used to know where all the users data is stored
     UsersGlobalJsonKey: "users",
 
-    //Key added to cluster nodes id
-    ClusterNodeId:"Cluster",
     //--- Configuration Values ---
 
     //Sizes
