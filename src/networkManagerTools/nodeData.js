@@ -12,7 +12,7 @@ import { networkHTML } from "../constants/networkHTML.js";
 //Packages
 import { DataSet } from "vis-data/peer";
 //Local classes
-import dataTable from "./uiComponents/dataTable.js";
+import dataTable from "./dataTable.js";
 
 export default class NodeData {
 
@@ -20,8 +20,9 @@ export default class NodeData {
      * Constructor of the class
      * @param {NodeVisuals} nodeVisuals Object that holds the visualization options for nodes
      */
-    constructor(nodeVisuals) {
+    constructor(nodeVisuals, clustering) {
         this.nodeVisuals = nodeVisuals;
+        this.clustering = clustering;
     }
 
     /**
@@ -31,8 +32,10 @@ export default class NodeData {
      */
     parseNodes(json) {
         for (let node of json[nodes.UsersGlobalJsonKey]) {
-            this.nodeVisuals.findExplicitCommunities(node);
             
+            if (!this.clustering) {
+                this.nodeVisuals.findExplicitCommunities(node);
+            }
             //The implicit community will be used for the bounding boxes
             node[comms.ImplUserNewKey] = parseInt(node[comms.ImplUserJsonKey]);
 
@@ -87,7 +90,7 @@ export default class NodeData {
         lastMainrow.class = nodes.borderlessHTMLrow;
         rowsData.push(lastMainrow);
 
-        this.dataTable.createDataTable(rowsData, tittle, false);
+        this.dataTable.createDataTable(rowsData, tittle)
     }
 
     /**

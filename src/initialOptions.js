@@ -243,10 +243,6 @@ export default class InitialOptions {
                 <div class="col-sm-8 network" id="leftCol_${key}"> </div>
                 <div class="col-sm-4"id="rightCol_${key}"> </div>
             </div>
-            <div class="row">
-                <div class="col-sm-8 clusterNetwork" id="leftCol_cluster${key}"> </div>
-                <div class="col-sm-4"id="rightCol_cluster${key}"> </div>
-            </div>           
         </div>`;
 
         const html = this.domParser.parseFromString(htmlString, "text/html").body.firstChild;
@@ -256,10 +252,6 @@ export default class InitialOptions {
 
         const leftContainer = document.getElementById(`leftCol_${key}`);
         const rightContainer = document.getElementById(`rightCol_${key}`);
-        const clusterContainer = {
-            left: document.getElementById(`leftCol_cluster${key}`),
-            right: document.getElementById(`rightCol_cluster${key}`)
-        }
 
         const config = {
             edgeThreshold: networkHTML.sliderThresholdInitialValue,
@@ -267,8 +259,7 @@ export default class InitialOptions {
             key: key
         };
 
-
-        this.networkManager.addNetwork(file, leftContainer, rightContainer, clusterContainer, config)
+        this.networkManager.addNetwork(file, leftContainer, rightContainer, config)
 
         this.controlPanel.createControlPanel()
     }

@@ -28,15 +28,9 @@ canvas {
 }
 
 .col-sm-8.network {
-  height: 30em;
+  height: 40em;
   border-style: dotted;
-  margin-bottom: 0.5%;
-}
-
-.col-sm-8.clusterNetwork {
-  height: 15em;
-  border-style: dotted;
-  margin-top: 0.5%;
+  margin-bottom: 1%;
 }
 
 .container {
