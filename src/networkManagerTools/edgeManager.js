@@ -59,6 +59,13 @@ export default class EdgeManager {
                     } else
                         edge["hidden"] = false;
 
+                    //Hide unselected
+                    const color = edges.EdgeDefaultColor;
+                    if (this.hideUnselected)
+                        edge.color = { color: `${color}00` };
+                    else
+                        edge.color = { color: `${color}` };
+
                     newEdges.push(edge);
                 }
             }
@@ -137,8 +144,25 @@ export default class EdgeManager {
         this.edges.update(this.edges);
     }
 
+    /**
+     * Change base edge color based on the value of hideUnselected
+     * @param {Bool} newBool new value of hideUnselected
+     */
+    hideUnselectedEdges(newBool) {
+        this.hideUnselected = newBool;
 
-    hideUnselectedEdges(network, newBool) {
-        console.log("hello")
+        const newEdges = new Array();
+
+        this.edges.forEach((edge) => {
+
+            if (this.hideUnselected)
+                edge.color = { color: `${edges.EdgeDefaultColor}00` };
+            else
+                edge.color = { color: edges.EdgeDefaultColor };
+
+            newEdges.push(edge);
+        })
+
+        this.edges.update(newEdges);
     }
 }

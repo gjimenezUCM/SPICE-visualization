@@ -73,7 +73,6 @@ export default class NetworkMan {
                     }
                 },
                 color: {
-                    color: edges.EdgeDefaultColor,
                     highlight: edges.EdgeSelectedColor
                 },
                 chosen: {
@@ -118,12 +117,6 @@ export default class NetworkMan {
             },
             physics: {
                 enabled: false,
-                //Avoid overlap between nodes, but enable physics. Leaving this here in case we need it in the future
-                /* barnesHut: {
-                    springConstant: 0,
-                    avoidOverlap: 0.1
-                }*/
-
             },
             interaction: {
                 zoomView: true,

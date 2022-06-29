@@ -136,7 +136,7 @@ export default class NetworksGroup {
     hideUnselectedEdges(key, newBool) {
         const network = this.activesNetworksMap.get(key);
 
-        network.edgesMan.hideUnselectedEdges(network, newBool);
+        network.edgesMan.hideUnselectedEdges(newBool);
     }
 
     /**
