@@ -24,7 +24,7 @@ export const edges = {
     EdgeMaxWidth: 10,
 
     //Default color of the edge when is not selected
-    EdgeDefaultColor: "#848484",
+    EdgeDefaultColor: "#A4A4A4",
     //Color when the edge is being selected
     EdgeSelectedColor: "#000000",
 

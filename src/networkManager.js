@@ -16,6 +16,7 @@ import ImplicitCommsMan from "./networkManagerTools/implicitCommsData.js";
 import NodeVisuals from "./networkManagerTools/nodeVisuals.js";
 import NodeData from "./networkManagerTools/nodeData.js";
 import EdgeManager from "./networkManagerTools/edgeManager.js";
+import nodeLocationSetter from "./networkManagerTools/nodeLocationSetter.js";
 
 export default class NetworkMan {
 
@@ -43,6 +44,8 @@ export default class NetworkMan {
             nodes: this.nodeData.parseNodes(jsonInput),
             edges: this.edgesMan.parseEdges(jsonInput)
         };
+        
+        new nodeLocationSetter(this.data.nodes, this.implCommMan.implComms.length);
 
         this.nodeData.createNodeDataTable(rightContainer);
         this.implCommMan.createCommunityDataTable(rightContainer);
@@ -127,7 +130,7 @@ export default class NetworkMan {
                 hoverConnectedEdges: false,
             },
             layout: {
-                improvedLayout: true,
+                improvedLayout: false,
             }
         };
     }

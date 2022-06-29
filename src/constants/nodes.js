@@ -10,6 +10,9 @@ export const nodes = {
     //Key used to know where all the users data is stored
     UsersGlobalJsonKey: "users",
 
+    //--- Location Values ---
+    nodeGroupsBaseDistance: 100,
+    
     //--- Configuration Values ---
 
     //Sizes
