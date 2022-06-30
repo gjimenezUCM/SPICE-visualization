@@ -37,8 +37,8 @@ export default class ThresholdSlider {
         const html = `
         <div>
             <input type="range" min="0.0" max="1.0" step="0.1" value="${this.value}" id="${this.sliderId}"></input>
-            <span> Minimum Similarity: </span>
-            <span id="${this.textId}"> ${this.value} </span>
+            <span class="unselectable"> Minimum Similarity: </span>
+            <span class="unselectable" id="${this.textId}"> ${this.value} </span>
         </div>`;
 
         return html;

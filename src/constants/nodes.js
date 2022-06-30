@@ -87,10 +87,10 @@ export const nodes = {
 
     BoderColors: [
         "rgb(128, 126, 13, 1)", //Yellow
-        "rgb(62, 6, 116, 1)", //Purple
+        "rgb(0, 128, 36, 1)", //Green
         "rgb(13, 84, 128, 1)", //Blue
         "rgb(128, 0, 0, 1)", //Red
-        "rgb(0, 128, 36, 1)", //Green
+        "rgb(62, 6, 116, 1)", //Purple
         "rgb(13, 84, 128, 1)", //Blue
     ],
 

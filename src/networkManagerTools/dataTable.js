@@ -78,7 +78,7 @@ export default class dataTable {
      */
     datatableTemplate(tittle, body) {
         const html = `
-        <div class="border border-dark rounded">
+        <div class="dataTable border border-dark rounded">
             <h5 class="middle attributes border-bottom border-dark">${tittle}</h5>
             ${body}
         </div>

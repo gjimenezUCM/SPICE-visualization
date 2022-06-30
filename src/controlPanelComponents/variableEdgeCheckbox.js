@@ -39,7 +39,7 @@ export default class VariableEdgeCheckbox {
 
         let html = `
         <div> 
-            <span> Variable edge width: </span>
+            <label class="unselectable" for="${this.checkboxId}"> Variable edge width:  </label>
             <input type="checkbox" ${checked} id="${this.checkboxId}"></input>
         </div>`;
         return html;

@@ -56,7 +56,7 @@ export default class NetworksGroup {
         network.clearNetwork();
 
         const networkContainer = document.getElementById(networkHTML.networksParentContainer);
-        const divToDelete = document.getElementById(networkHTML.topNetworkContainer + key);
+        const divToDelete = document.getElementById(`${networkHTML.topNetworkContainer}${key}`);
 
         networkContainer.removeChild(divToDelete);
     }

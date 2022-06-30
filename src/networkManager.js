@@ -33,6 +33,7 @@ export default class NetworkMan {
         this.container = container;
         this.groupManager = networkManager;
         this.key = config.key;
+        this.valuesToHide = config.valuesToHide;
 
         this.implCommMan = new ImplicitCommsMan(jsonInput);
         this.nodeVisuals = new NodeVisuals(this);
@@ -56,7 +57,7 @@ export default class NetworkMan {
         this.chooseOptions();
         this.drawNetwork();
 
-        this.updateFilterActives(config.valuesToHide);
+        this.updateFilterActives(this.valuesToHide);
     }
 
     /**
@@ -137,7 +138,7 @@ export default class NetworkMan {
     drawNetwork() {
         this.network = new Network(this.container, this.data, this.options);
 
-        this.container.firstChild.id = networkHTML.topCanvasContainer + this.key;
+        this.container.firstChild.id = `${networkHTML.topCanvasContainer}${this.key}`;
 
         this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
         this.network.on("click", (event) => this.clickEvent(event));
@@ -291,16 +292,7 @@ export default class NetworkMan {
 
         this.network.unselectAll();
 
-        const newNodes = new Array();
-        this.data.nodes.forEach((node) => {
-            if (!node.defaultColor) {
-                this.nodeVisuals.nodeDimensionStrategy.nodeColorToDefault(node);
-                newNodes.push(node);
-            }
-
-        });
-
-        this.data.nodes.update(newNodes);
+        this.updateFilterActives(this.valuesToHide);
     }
 
     /**
@@ -316,6 +308,7 @@ export default class NetworkMan {
      */
     updateFilterActives(filter) {
         this.nodeVisuals.updateFilterActives(filter, this.data.nodes);
+        this.valuesToHide = filter;
     }
 
     /**

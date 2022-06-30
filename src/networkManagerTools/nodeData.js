@@ -140,7 +140,7 @@ export default class NodeData {
         const xOffset = networkManager.network.getScale() * 40;
 
         //Calculate the real absolute click coordinates
-        const networkCanvasPosition = getElementPosition(networkHTML.topCanvasContainer + networkManager.key)
+        const networkCanvasPosition = getElementPosition(`${networkHTML.topCanvasContainer}${networkManager.key}`)
         const clickX = nodeInCanvasDOMposition.x + networkCanvasPosition.left + xOffset;
         const clickY = nodeInCanvasDOMposition.y + networkCanvasPosition.top;
 

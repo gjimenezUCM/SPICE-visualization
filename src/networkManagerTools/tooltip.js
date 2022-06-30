@@ -55,8 +55,8 @@ export default class Tooltip {
                 this.tooltip = new Popover(this.container, options);
             }
 
-            this.container.style.top = spawnPoint.y + "px";
-            this.container.style.left = spawnPoint.x + "px";
+            this.container.style.top = `${spawnPoint.y}px`;
+            this.container.style.left = `${spawnPoint.x}px`;
             this.container.style.position = "absolute";
 
             if (update)

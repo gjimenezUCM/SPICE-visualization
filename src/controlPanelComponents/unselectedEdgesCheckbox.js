@@ -39,7 +39,7 @@ export default class UnselectedEdgesCheckbox {
 
         let html = `
         <div> 
-            <span> Hide edges not selected: </span>
+            <label class="unselectable" for="${this.checkboxId}"> Hide edges not selected: </label>
             <input type="checkbox" ${checked} id="${this.checkboxId}"></input>
         </div>`;
         return html;

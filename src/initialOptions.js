@@ -43,11 +43,11 @@ export default class InitialOptions {
         const html = `
             <div>
                 <input type="radio" name="source" value="local" checked="true" id="radioLocal">
-                <label for="radioLocal">Local files </label>
+                <label class="unselectable" for="radioLocal">Local files </label>
             </div>
             <div>
                 <input type="radio" name="source" value="githubMain" id="radioGithubMain">
-                <label for="radioGithubMain"> Github Main </label>
+                <label class="unselectable" for="radioGithubMain"> Github Main </label>
             </div>
         `;
 
@@ -152,7 +152,7 @@ export default class InitialOptions {
             const key = headersFile.files[i].name;
             content += `
                 <li>
-                    <a class="dropdown-item" id="dropdownOption${key}">
+                    <a class="dropdown-item unselectable" id="dropdownOption${key}">
                         ${key}
                     </a>
                 </li>`;
@@ -203,7 +203,7 @@ export default class InitialOptions {
 
         if (isActive === "active") {
             //Turn the className into the Inactive class name
-            dropdownOption.className = "dropdown-item";
+            dropdownOption.className = "dropdown-item unselectable";
             this.networkManager.removeNetwork(key);
 
             if (this.networkManager.getNnetworks() === 0) {
@@ -216,7 +216,7 @@ export default class InitialOptions {
                 .then((file) => {
                     this.createNetwork(key, file);
                     //Turn the className into the active class name
-                    dropdownOption.className = "dropdown-item active";
+                    dropdownOption.className = "dropdown-item unselectable active";
                 })
                 .catch((error) => {
                     console.log(error);
