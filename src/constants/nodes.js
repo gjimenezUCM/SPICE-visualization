@@ -11,8 +11,9 @@ export const nodes = {
     UsersGlobalJsonKey: "users",
 
     //--- Location Values ---
-    nodeGroupsBaseDistance: 100,
+    nodeGroupsBaseDistance: 75,
     
+    nodeBetweenNodesDistance: 8,
     //--- Configuration Values ---
 
     //Sizes

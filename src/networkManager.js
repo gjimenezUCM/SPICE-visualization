@@ -6,6 +6,7 @@
  */
 
 //Namespaces
+import { comms } from "./constants/communities.js";
 import { edges } from "./constants/edges.js";
 import { nodes } from "./constants/nodes.js";
 import { networkHTML } from "./constants/networkHTML.js";
@@ -44,7 +45,7 @@ export default class NetworkMan {
             nodes: this.nodeData.parseNodes(jsonInput),
             edges: this.edgesMan.parseEdges(jsonInput)
         };
-        
+
         new nodeLocationSetter(this.data.nodes, this.implCommMan.implComms.length);
 
         this.nodeData.createNodeDataTable(rightContainer);
@@ -165,7 +166,7 @@ export default class NetworkMan {
             this.implCommMan.updateDataTableFromNodeId(event.nodes[0], this.data.nodes);
 
         } else {
-            this.noNodeIsClicked();
+            this.noNodeIsClicked(event);
 
             this.groupManager.showTooltip(this, event, this.implCommMan);
             this.implCommMan.updateDataTableFromClick(event);
@@ -246,23 +247,38 @@ export default class NetworkMan {
     /** 
      * Function executed only when this was the network that received the click event but no nodes was clicked
      */
-    noNodeIsClicked() {
-        this.groupManager.nodeDeselected();
+    noNodeIsClicked(event) {
+        const index = this.implCommMan.checkBoundingBoxClick(event);
+
+        this.groupManager.nodeDeselected(index);
     }
 
     /**
      * Restore the network to the original deselected state
      */
-    nodeDeselected() {
-        //Return to fit all nodes into the "camera"
+    nodeDeselected(boundingBoxId) {
         const fitOptions = {
             animation: true,
             animation: {
                 duration: nodes.ZoomDuration,
             },
         }
-        this.network.fit(fitOptions);
 
+        
+        if (boundingBoxId !== undefined) {
+
+            const nodesInsideBoundingBox = new Array();
+            this.data.nodes.forEach((node) => {
+                if (node[comms.ImplUserNewKey] === boundingBoxId) {
+                    nodesInsideBoundingBox.push(node.id);
+                }
+            });
+
+            fitOptions["nodes"] = nodesInsideBoundingBox;
+        }
+
+        this.network.fit(fitOptions);
+        
         this.nodeData.clearDataTable();
 
         this.network.unselectAll();

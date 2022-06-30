@@ -81,8 +81,8 @@ export default class NetworksGroup {
     /** 
      * Broadcast to all networks that no node was selected
      */
-    nodeDeselected() {
-        this.activesNetworksArray.forEach((network) => network.nodeDeselected());
+    nodeDeselected(event) {
+        this.activesNetworksArray.forEach((network) => network.nodeDeselected(event));
     }
 
 

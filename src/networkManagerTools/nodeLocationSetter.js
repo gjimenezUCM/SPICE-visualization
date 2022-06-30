@@ -103,8 +103,8 @@ export default class nodeLocationSetter {
         let targetAngle = angleSlice * nodeGroup.nodes.indexOf(nodeId);
 
         const output = {
-            x: center.x + Math.cos(targetAngle * (Math.PI / 180)) * size * 19,
-            y: center.y + Math.sin(targetAngle * (Math.PI / 180)) * size * 10
+            x: center.x + Math.cos(targetAngle * (Math.PI / 180)) * size * nodes.nodeBetweenNodesDistance,
+            y: center.y + Math.sin(targetAngle * (Math.PI / 180)) * size * nodes.nodeBetweenNodesDistance
         };
 
         return output;
