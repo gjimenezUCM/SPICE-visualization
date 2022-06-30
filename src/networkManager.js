@@ -142,6 +142,14 @@ export default class NetworkMan {
         this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
         this.network.on("click", (event) => this.clickEvent(event));
         this.network.on("zoom", (event) => this.zoomEvent(event));
+        this.network.on("animationFinished", () => this.animationFinishEvent());
+    }
+
+    /**
+     * Function executed when a zooming animation ends. Shows the tooltip if the tooltip exists
+     */
+    animationFinishEvent(){
+        this.groupManager.showTooltip();
     }
 
     /** 
@@ -162,13 +170,13 @@ export default class NetworkMan {
         if (event.nodes.length > 0) {
             this.nodeHasBeenClicked(event.nodes[0]);
 
-            this.groupManager.showTooltip(this, event, this.nodeData);
+            this.groupManager.createTooltip(this, event, this.nodeData);
             this.implCommMan.updateDataTableFromNodeId(event.nodes[0], this.data.nodes);
 
         } else {
             this.noNodeIsClicked(event);
 
-            this.groupManager.showTooltip(this, event, this.implCommMan);
+            this.groupManager.createTooltip(this, event, this.implCommMan);
             this.implCommMan.updateDataTableFromClick(event);
         }
     }
@@ -177,8 +185,8 @@ export default class NetworkMan {
      * Function executed when "zoom" event is launched. Happens when the user zooms-in in the canvas
      * @param {Object} event Zoom event
      */
-    zoomEvent(event) {
-        this.groupManager.updateTooltipPosition(this);
+    zoomEvent() {
+        this.groupManager.updateTooltipPosition();
     }
 
     /** 

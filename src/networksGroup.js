@@ -69,7 +69,7 @@ export default class NetworksGroup {
             this.removeNetwork(network.key);
         });
     }
-    
+
     /** 
      * Broadcast to all networks that node id has been selected
      * @param {Integer} id id of the selected node
@@ -143,7 +143,7 @@ export default class NetworksGroup {
      * Broadcast the new hideUnselectedEdges value to all networks
      * @param {Float} newValue New hideUnselectedEdges value
      */
-    hideUnselectedEdgesALL(newBool){
+    hideUnselectedEdgesALL(newBool) {
         this.activesNetworksArray.forEach((network) => {
             this.hideUnselectedEdges(network.key, newBool);
         });
@@ -177,21 +177,27 @@ export default class NetworksGroup {
     }
 
     /**
-     * Show a new tooltip
+     * Create a new tooltip
      * @param {NetworkManager} networkManager networkManager where the tooltip is going to be draw
      * @param {Object} event Event that trigered the tooltip
      * @param {Object} tooltipManager Object that will manage the tooltip creation
      */
-    showTooltip(networkManager, event, tooltipManager) {
-        this.tooltip.showTooltip(networkManager, event, tooltipManager);
+    createTooltip(networkManager, event, tooltipManager) {
+        this.tooltip.createTooltip(networkManager, event, tooltipManager);
+    }
+
+    /**
+     * Show a tooltip previously created
+     */
+    showTooltip() {
+        this.tooltip.show();
     }
 
     /**
      * Updates a tooltip position
-     * @param {NetworkManager} networkManager networkManager where the tooltip is going to be updated
      */
-    updateTooltipPosition(networkManager) {
-        this.tooltip.updatePosition(networkManager);
+    updateTooltipPosition() {
+        this.tooltip.updatePosition();
     }
 
     /**
