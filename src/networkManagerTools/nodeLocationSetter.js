@@ -12,11 +12,14 @@ export default class nodeLocationSetter {
 
     /**
      * Constructor of the class
-     * @param {DataSet} nodes nodes whose position will change
+     * @param {DataSet} nodeData nodes whose position will change
      * @param {Integer} n number of node groups / number of areas to set nodes to
      */
-    constructor(nodes, n) {
-        this.setNodeLocation(nodes, n);
+    constructor(nodeData, n) {
+        this.mode = nodes.nodeGroupsViewMode;
+        console.log(this.mode);
+
+        this.setNodeLocation(nodeData, n);
     }
 
     /**
@@ -67,23 +70,39 @@ export default class nodeLocationSetter {
      * Format-> { x: (Integer), y: (Integer) }
      */
     createNetworkPartitions(nNodes, nAreas) {
-        const partitionsDistance = nodes.nodeGroupsBaseDistance * nNodes / 45;
         const partitions = {};
+        const partitionsDistance = nodes.nodeGroupsBaseDistance * nNodes / 45;
 
-        //Separate the network area in as many angle slices as necesary
-        const angleSlice = 360 / nAreas;
-        let targetAngle = 0;
+        if (this.mode === "circle") {
+            const pi2 = (2 * Math.PI);
+            //Separate the network area in as many angle slices as necesary
+            const angleSlice = pi2 / nAreas;
+            let targetAngle = 0;
 
-        //Increase the target angle for every group, and set the location of the partition
-        for (let i = 0; targetAngle < 360; i++) {
-            partitions[i] = {
-                x: Math.cos(targetAngle * (Math.PI / 180)) * (partitionsDistance * nAreas),
-                y: Math.sin(targetAngle * (Math.PI / 180)) * (partitionsDistance * nAreas)
-            };
+            //Increase the target angle for every group, and set the location of the partition
+            for (let i = 0; targetAngle < pi2; i++) {
+                partitions[i] = {
+                    x: Math.cos(targetAngle) * (partitionsDistance * nAreas),
+                    y: Math.sin(targetAngle) * (partitionsDistance * nAreas)
+                };
 
-            targetAngle += angleSlice;
+                targetAngle += angleSlice;
+            }
         }
+        else {
+            const rows = parseInt(Math.sqrt(nAreas));
 
+            let j = 0;
+            for (let i = 0; i < nAreas; i++) {
+                const cellSize = partitionsDistance * nAreas * 2;
+
+                if (i % rows == 0) j++;
+                partitions[i] = {
+                    x: (i % rows) * cellSize,
+                    y: j * cellSize
+                };
+            }
+        }
         return partitions;
     }
 
@@ -98,15 +117,25 @@ export default class nodeLocationSetter {
     getNodePos(nodeGroup, nodeId) {
         const size = nodeGroup.partition.size;
         const center = nodeGroup.partition.center;
+        const nodeIndex = nodeGroup.nodes.indexOf(nodeId);;
 
-        const angleSlice = 360 / size;
-        let targetAngle = angleSlice * nodeGroup.nodes.indexOf(nodeId);
+        const output = { x: 0, y: 0 };
 
-        const output = {
-            x: center.x + Math.cos(targetAngle * (Math.PI / 180)) * size * nodes.nodeBetweenNodesDistance,
-            y: center.y + Math.sin(targetAngle * (Math.PI / 180)) * size * nodes.nodeBetweenNodesDistance
-        };
+        if (this.mode === "circle") {
+            const angleSlice = (2 * Math.PI) / size;
+            let targetAngle = angleSlice * nodeIndex;
 
+            output.x = center.x + Math.cos(targetAngle) * size * nodes.nodeBetweenNodesDistance;
+            output.y = center.y + Math.sin(targetAngle) * size * nodes.nodeBetweenNodesDistance;
+
+        } else {
+            const rows = parseInt(Math.sqrt(size));
+            const xIndex = nodeIndex % rows;
+            const yIndex = parseInt(nodeIndex / rows);
+
+            output.x = center.x + xIndex * 45;
+            output.y = center.y + yIndex * 45;
+        }
         return output;
     }
 }

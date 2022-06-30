@@ -156,6 +156,9 @@ export default class Tooltip {
         }
     }
 
+    /**
+     * Show the current active tooltip if it exist
+     */
     show() {
         if (this.tooltip !== null) {
             this.tooltip.show();

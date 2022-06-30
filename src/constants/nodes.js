@@ -12,8 +12,9 @@ export const nodes = {
 
     //--- Location Values ---
     nodeGroupsBaseDistance: 75,
-    
     nodeBetweenNodesDistance: 8,
+
+    nodeGroupsViewMode: "circle", //"circle" to see nodes in a circle, "square" to see them in a square
     //--- Configuration Values ---
 
     //Sizes
