@@ -6,6 +6,7 @@
  */
 
 //Namespaces
+import { comms } from "./constants/communities.js";
 import { edges } from "./constants/edges.js";
 import { nodes } from "./constants/nodes.js";
 import { networkHTML } from "./constants/networkHTML.js";
@@ -16,6 +17,7 @@ import ImplicitCommsMan from "./networkManagerTools/implicitCommsData.js";
 import NodeVisuals from "./networkManagerTools/nodeVisuals.js";
 import NodeData from "./networkManagerTools/nodeData.js";
 import EdgeManager from "./networkManagerTools/edgeManager.js";
+import nodeLocationSetter from "./networkManagerTools/nodeLocationSetter.js";
 
 export default class NetworkMan {
 
@@ -31,6 +33,7 @@ export default class NetworkMan {
         this.container = container;
         this.groupManager = networkManager;
         this.key = config.key;
+        this.valuesToHide = config.valuesToHide;
 
         this.implCommMan = new ImplicitCommsMan(jsonInput);
         this.nodeVisuals = new NodeVisuals(this);
@@ -44,6 +47,8 @@ export default class NetworkMan {
             edges: this.edgesMan.parseEdges(jsonInput)
         };
 
+        new nodeLocationSetter(this.data.nodes, this.implCommMan.implComms.length);
+
         this.nodeData.createNodeDataTable(rightContainer);
         this.implCommMan.createCommunityDataTable(rightContainer);
 
@@ -51,6 +56,8 @@ export default class NetworkMan {
 
         this.chooseOptions();
         this.drawNetwork();
+
+        this.updateFilterActives(this.valuesToHide);
     }
 
     /**
@@ -68,7 +75,6 @@ export default class NetworkMan {
                     }
                 },
                 color: {
-                    color: edges.EdgeDefaultColor,
                     highlight: edges.EdgeSelectedColor
                 },
                 chosen: {
@@ -113,12 +119,6 @@ export default class NetworkMan {
             },
             physics: {
                 enabled: false,
-                //Avoid overlap between nodes, but enable physics. Leaving this here in case we need it in the future
-                /* barnesHut: {
-                    springConstant: 0,
-                    avoidOverlap: 0.1
-                }*/
-
             },
             interaction: {
                 zoomView: true,
@@ -127,7 +127,7 @@ export default class NetworkMan {
                 hoverConnectedEdges: false,
             },
             layout: {
-                improvedLayout: true,
+                improvedLayout: false,
             }
         };
     }
@@ -137,13 +137,20 @@ export default class NetworkMan {
      */
     drawNetwork() {
         this.network = new Network(this.container, this.data, this.options);
-        //this.network.stabilize();   //In case physics are active, we stop them just in case nodes start to "boing"
 
-        this.container.firstChild.id = networkHTML.topCanvasContainer + this.key;
+        this.container.firstChild.id = `${networkHTML.topCanvasContainer}${this.key}`;
 
         this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
         this.network.on("click", (event) => this.clickEvent(event));
         this.network.on("zoom", (event) => this.zoomEvent(event));
+        this.network.on("animationFinished", () => this.animationFinishEvent());
+    }
+
+    /**
+     * Function executed when a zooming animation ends. Shows the tooltip if the tooltip exists
+     */
+    animationFinishEvent(){
+        this.groupManager.showTooltip();
     }
 
     /** 
@@ -164,13 +171,13 @@ export default class NetworkMan {
         if (event.nodes.length > 0) {
             this.nodeHasBeenClicked(event.nodes[0]);
 
-            this.groupManager.showTooltip(this, event, this.nodeData);
+            this.groupManager.createTooltip(this, event, this.nodeData);
             this.implCommMan.updateDataTableFromNodeId(event.nodes[0], this.data.nodes);
 
         } else {
-            this.noNodeIsClicked();
+            this.noNodeIsClicked(event);
 
-            this.groupManager.showTooltip(this, event, this.implCommMan);
+            this.groupManager.createTooltip(this, event, this.implCommMan);
             this.implCommMan.updateDataTableFromClick(event);
         }
     }
@@ -179,8 +186,8 @@ export default class NetworkMan {
      * Function executed when "zoom" event is launched. Happens when the user zooms-in in the canvas
      * @param {Object} event Zoom event
      */
-    zoomEvent(event) {
-        this.groupManager.updateTooltipPosition(this);
+    zoomEvent() {
+        this.groupManager.updateTooltipPosition();
     }
 
     /** 
@@ -249,37 +256,43 @@ export default class NetworkMan {
     /** 
      * Function executed only when this was the network that received the click event but no nodes was clicked
      */
-    noNodeIsClicked() {
-        this.groupManager.nodeDeselected();
+    noNodeIsClicked(event) {
+        const index = this.implCommMan.checkBoundingBoxClick(event);
+
+        this.groupManager.nodeDeselected(index);
     }
 
     /**
      * Restore the network to the original deselected state
      */
-    nodeDeselected() {
-        //Return to fit all nodes into the "camera"
+    nodeDeselected(boundingBoxId) {
         const fitOptions = {
             animation: true,
             animation: {
                 duration: nodes.ZoomDuration,
             },
         }
-        this.network.fit(fitOptions);
 
+        
+        if (boundingBoxId !== undefined) {
+
+            const nodesInsideBoundingBox = new Array();
+            this.data.nodes.forEach((node) => {
+                if (node[comms.ImplUserNewKey] === boundingBoxId) {
+                    nodesInsideBoundingBox.push(node.id);
+                }
+            });
+
+            fitOptions["nodes"] = nodesInsideBoundingBox;
+        }
+
+        this.network.fit(fitOptions);
+        
         this.nodeData.clearDataTable();
 
         this.network.unselectAll();
 
-        const newNodes = new Array();
-        this.data.nodes.forEach((node) => {
-            if (!node.defaultColor) {
-                this.nodeVisuals.nodeDimensionStrategy.nodeColorToDefault(node);
-                newNodes.push(node);
-            }
-
-        });
-
-        this.data.nodes.update(newNodes);
+        this.updateFilterActives(this.valuesToHide);
     }
 
     /**
@@ -295,6 +308,7 @@ export default class NetworkMan {
      */
     updateFilterActives(filter) {
         this.nodeVisuals.updateFilterActives(filter, this.data.nodes);
+        this.valuesToHide = filter;
     }
 
     /**

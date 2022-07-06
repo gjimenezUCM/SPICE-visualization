@@ -21,20 +21,6 @@ export default class Tooltip {
     }
 
     /**
-     * Show a tooltip based on the tooltipManager data
-     * @param {NetworkManager} networkManager manager of the network where this tooltip is going to be drawn 
-     * @param {Object} event Click event that launched this function
-     * @param {Object} tooltipManager Class that holds the data that this tooltip will show
-     */
-    showTooltip(networkManager, event, tooltipManager) {
-        if (this.timer)
-            clearTimeout(this.timer);
-
-        this.timer = setTimeout(() => this.createTooltip(networkManager, event, tooltipManager),
-            nodes.ZoomDuration + nodes.TooltipSpawnTimer);
-    }
-
-    /**
      * Create a new tooltip from the start or only updates its position if update is true
      * @param {NetworkManager} networkManager manager of the network where this tooltip is going to be drawn 
      * @param {Object} event Click event that launched this function
@@ -44,6 +30,7 @@ export default class Tooltip {
     createTooltip(networkManager, event, tooltipManager, update = false) {
         this.tooltipManager = tooltipManager;
         this.event = event;
+        this.networkManager = networkManager;
 
         const spawnPoint = tooltipManager.calculateTooltipSpawn(networkManager, event, this.getElementPosition.bind(this));
 
@@ -68,15 +55,12 @@ export default class Tooltip {
                 this.tooltip = new Popover(this.container, options);
             }
 
-            this.container.style.top = spawnPoint.y + "px";
-            this.container.style.left = spawnPoint.x + "px";
+            this.container.style.top = `${spawnPoint.y}px`;
+            this.container.style.left = `${spawnPoint.x}px`;
             this.container.style.position = "absolute";
 
-            if (!update)
-                this.tooltip.show();
-            else {
+            if (update)
                 this.tooltip.update();
-            }
 
         }
     }
@@ -102,9 +86,9 @@ export default class Tooltip {
      * Update the position of the tooltip when the user is zooming in/out
      * @param {NetworkManager} networkManager manager of the network where this tooltip is going to be updated 
      */
-    updatePosition(networkManager) {
+    updatePosition() {
         if (this.tooltip !== null)
-            this.createTooltip(networkManager, this.event, this.tooltipManager, true)
+            this.createTooltip(this.networkManager, this.event, this.tooltipManager, true)
     }
 
     /**
@@ -165,9 +149,20 @@ export default class Tooltip {
     hide() {
         if (this.tooltip !== null) {
             this.tooltip.hide();
+            this.tooltip = null;
 
             if (this.timer)
                 clearTimeout(this.timer);
+        }
+    }
+
+    /**
+     * Show the current active tooltip if it exist
+     */
+    show() {
+        if (this.tooltip !== null) {
+            this.tooltip.show();
+            this.createTooltip(this.networkManager, this.event, this.tooltipManager, true)
         }
     }
 }

@@ -56,17 +56,20 @@ export default class NetworksGroup {
         network.clearNetwork();
 
         const networkContainer = document.getElementById(networkHTML.networksParentContainer);
-        const divToDelete = document.getElementById(networkHTML.topNetworkContainer + key);
+        const divToDelete = document.getElementById(`${networkHTML.topNetworkContainer}${key}`);
 
         networkContainer.removeChild(divToDelete);
     }
 
+    /**
+     * Remove all networks of the visualization
+     */
     removeAllnetworks() {
         this.activesNetworksArray.forEach((network) => {
             this.removeNetwork(network.key);
         });
     }
-    
+
     /** 
      * Broadcast to all networks that node id has been selected
      * @param {Integer} id id of the selected node
@@ -78,8 +81,8 @@ export default class NetworksGroup {
     /** 
      * Broadcast to all networks that no node was selected
      */
-    nodeDeselected() {
-        this.activesNetworksArray.forEach((network) => network.nodeDeselected());
+    nodeDeselected(event) {
+        this.activesNetworksArray.forEach((network) => network.nodeDeselected(event));
     }
 
 
@@ -125,24 +128,24 @@ export default class NetworksGroup {
         });
     }
 
-    /**
-     * Highlight all nodes that contains selectedCommunities key and values
+    /** 
+     * Change the network hideUnselectedEdges value
      * @param {String} key Key of the network
-     * @param {Object} selectedCommunities Object with the format of {key: (string), values: (String[])}
+     * @param {Boolean} newBool New hideUnselectedEdges value
      */
-    highlightCommunity(key, selectedCommunities) {
+    hideUnselectedEdges(key, newBool) {
         const network = this.activesNetworksMap.get(key);
 
-        network.highlightCommunity(selectedCommunities);
+        network.edgesMan.hideUnselectedEdges(newBool);
     }
 
     /**
-     * Broadcast the highglight a selected community to all networks
-     * @param {Object} selectedCommunities Object with the format of {key: (string), values: (String[])}
+     * Broadcast the new hideUnselectedEdges value to all networks
+     * @param {Float} newValue New hideUnselectedEdges value
      */
-    highlightCommunityALL(selectedCommunities) {
+    hideUnselectedEdgesALL(newBool) {
         this.activesNetworksArray.forEach((network) => {
-            this.highlightCommunity(network.key, selectedCommunities);
+            this.hideUnselectedEdges(network.key, newBool);
         });
     }
 
@@ -173,13 +176,30 @@ export default class NetworksGroup {
         this.tooltip.hide();
     }
 
-    showTooltip(networkManager, event, tooltipManager) {
-        this.tooltip.showTooltip(networkManager, event, tooltipManager);
+    /**
+     * Create a new tooltip
+     * @param {NetworkManager} networkManager networkManager where the tooltip is going to be draw
+     * @param {Object} event Event that trigered the tooltip
+     * @param {Object} tooltipManager Object that will manage the tooltip creation
+     */
+    createTooltip(networkManager, event, tooltipManager) {
+        this.tooltip.createTooltip(networkManager, event, tooltipManager);
     }
 
-    updateTooltipPosition(networkManager) {
-        this.tooltip.updatePosition(networkManager);
+    /**
+     * Show a tooltip previously created
+     */
+    showTooltip() {
+        this.tooltip.show();
     }
+
+    /**
+     * Updates a tooltip position
+     */
+    updateTooltipPosition() {
+        this.tooltip.updatePosition();
+    }
+
     /**
      * Returns the current number of active networks
      * @returns {Integer} Returns the number of active networks

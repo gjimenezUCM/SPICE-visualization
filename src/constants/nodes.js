@@ -10,6 +10,11 @@ export const nodes = {
     //Key used to know where all the users data is stored
     UsersGlobalJsonKey: "users",
 
+    //--- Location Values ---
+    nodeGroupsBaseDistance: 75,
+    nodeBetweenNodesDistance: 8,
+
+    nodeGroupsViewMode: "circle", //"circle" to see nodes in a circle, "square" to see them in a square
     //--- Configuration Values ---
 
     //Sizes
@@ -18,11 +23,6 @@ export const nodes = {
 
     //Color when another node is being focused
     NoFocusColor: { Background: "rgba(155, 155, 155, 0.3)", Border: "rgba(100, 100, 100, 0.3)" },
-
-    //Zoom duration when a node is clicked
-    ZoomDuration: 1000,
-    //When zoom ends, tooltip will spawn when this ms have pased
-    TooltipSpawnTimer: 500,
 
     //Default value for a background color when the explicit community doesnt change it
     NodeColor: "#D2C7F9",
@@ -87,10 +87,10 @@ export const nodes = {
 
     BoderColors: [
         "rgb(128, 126, 13, 1)", //Yellow
-        "rgb(62, 6, 116, 1)", //Purple
+        "rgb(0, 128, 36, 1)", //Green
         "rgb(13, 84, 128, 1)", //Blue
         "rgb(128, 0, 0, 1)", //Red
-        "rgb(0, 128, 36, 1)", //Green
+        "rgb(62, 6, 116, 1)", //Purple
         "rgb(13, 84, 128, 1)", //Blue
     ],
 
