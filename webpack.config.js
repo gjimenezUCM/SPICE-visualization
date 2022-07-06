@@ -1,3 +1,4 @@
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 
 module.exports = {
@@ -22,4 +23,10 @@ module.exports = {
         },
         port: 1234
     },
+	plugins: [
+        new HtmlWebpackPlugin({
+            template: './index.html',
+            publicPath: "./"
+        })
+    ]
 };
