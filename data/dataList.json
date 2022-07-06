@@ -1,9 +1,10 @@
 {
-	"files": [{
-		"name": "agglomerativeClusteringGAM"
-	}, {
-		"name": "agglomerativeClusteringGAM2"
-	}, {
-		"name": "agglomerativeClusteringGAM&Bounding"
-	}]
+	"files": [
+		{
+			"name": "perspective0"
+		},
+		{
+			"name": "perspective1"
+		}
+	]
 }

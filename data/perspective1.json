@@ -2,6 +2,7 @@
     "communities": [
         {
             "community-type": "implicit",
+            "id": "0",
             "name": "Community 0",
             "explanation": "Similar dominant emotions while interacting with the following artworks: {'Asfissia! (parte sinistra)': 'sadness'; 'Marina': 'joy'}",
             "users": [
@@ -44,6 +45,7 @@
         },
         {
             "community-type": "implicit",
+            "id": "1",
             "name": "Community 1",
             "explanation": "Similar dominant emotions while interacting with the following artworks: {'Asfissia! (parte sinistra)': 'anticipation'}",
             "users": [
@@ -97,6 +99,7 @@
         },
         {
             "community-type": "implicit",
+            "id": "2",
             "name": "Community 2",
             "explanation": "Users without community",
             "users": [
@@ -105,6 +108,7 @@
         },
         {
             "community-type": "implicit",
+            "id": "3",
             "name": "Community 3",
             "explanation": "Similar dominant emotions while interacting with the following artworks: {'Aprile': 'sadness'; 'Aracne': 'sadness'; 'La Sirena (Sirena) (Abisso verde)': 'sadness'}",
             "users": [
@@ -115,6 +119,7 @@
         },
         {
             "community-type": "implicit",
+            "id": "4",
             "name": "Community 4",
             "explanation": "Similar dominant emotions while interacting with the following artworks: {'Aracne': 'sadness'; 'La Sirena (Sirena) (Abisso verde)': 'joy'; 'Marina': 'disgust'}",
             "users": [
@@ -137,7 +142,7 @@
         {
             "id": "5",
             "label": "5",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -146,7 +151,7 @@
         {
             "id": "6",
             "label": "6",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -155,7 +160,7 @@
         {
             "id": "7",
             "label": "7",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -164,7 +169,7 @@
         {
             "id": "8",
             "label": "8",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "",
                 "language": "EN"
@@ -173,7 +178,7 @@
         {
             "id": "9",
             "label": "9",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -182,7 +187,7 @@
         {
             "id": "11",
             "label": "11",
-            "group": 4,
+            "group": "4",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -191,7 +196,7 @@
         {
             "id": "12",
             "label": "12",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -200,7 +205,7 @@
         {
             "id": "13",
             "label": "13",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -209,7 +214,7 @@
         {
             "id": "14",
             "label": "14",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "EN"
@@ -218,7 +223,7 @@
         {
             "id": "15",
             "label": "15",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "EN"
@@ -227,7 +232,7 @@
         {
             "id": "16",
             "label": "16",
-            "group": 4,
+            "group": "4",
             "explicit_community": {
                 "ageGroup": "elderly",
                 "language": "EN"
@@ -236,7 +241,7 @@
         {
             "id": "17",
             "label": "17",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -245,7 +250,7 @@
         {
             "id": "18",
             "label": "18",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -254,7 +259,7 @@
         {
             "id": "19",
             "label": "19",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -263,7 +268,7 @@
         {
             "id": "20",
             "label": "20",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -272,7 +277,7 @@
         {
             "id": "21",
             "label": "21",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -281,7 +286,7 @@
         {
             "id": "23",
             "label": "23",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "EN"
@@ -290,7 +295,7 @@
         {
             "id": "24",
             "label": "24",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -299,7 +304,7 @@
         {
             "id": "25",
             "label": "25",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -308,7 +313,7 @@
         {
             "id": "26",
             "label": "26",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -317,7 +322,7 @@
         {
             "id": "27",
             "label": "27",
-            "group": 3,
+            "group": "3",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -326,7 +331,7 @@
         {
             "id": "28",
             "label": "28",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -335,7 +340,7 @@
         {
             "id": "29",
             "label": "29",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -344,7 +349,7 @@
         {
             "id": "30",
             "label": "30",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -353,7 +358,7 @@
         {
             "id": "31",
             "label": "31",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "",
                 "language": "EN"
@@ -362,7 +367,7 @@
         {
             "id": "32",
             "label": "32",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -371,7 +376,7 @@
         {
             "id": "34",
             "label": "34",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -380,7 +385,7 @@
         {
             "id": "35",
             "label": "35",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -389,7 +394,7 @@
         {
             "id": "36",
             "label": "36",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "EN"
@@ -398,7 +403,7 @@
         {
             "id": "37",
             "label": "37",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "ES"
@@ -407,7 +412,7 @@
         {
             "id": "39",
             "label": "39",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "ES"
@@ -416,7 +421,7 @@
         {
             "id": "41",
             "label": "41",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "ES"
@@ -425,7 +430,7 @@
         {
             "id": "44",
             "label": "44",
-            "group": 4,
+            "group": "4",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "ES"
@@ -434,7 +439,7 @@
         {
             "id": "45",
             "label": "45",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "ES"
@@ -443,7 +448,7 @@
         {
             "id": "54",
             "label": "54",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "FI"
@@ -452,7 +457,7 @@
         {
             "id": "58",
             "label": "58",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "FI"
@@ -461,7 +466,7 @@
         {
             "id": "61",
             "label": "61",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "",
                 "language": "FI"
@@ -470,7 +475,7 @@
         {
             "id": "63",
             "label": "63",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE"
@@ -479,7 +484,7 @@
         {
             "id": "64",
             "label": "64",
-            "group": 4,
+            "group": "4",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE"
@@ -488,7 +493,7 @@
         {
             "id": "65",
             "label": "65",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE"
@@ -497,7 +502,7 @@
         {
             "id": "66",
             "label": "66",
-            "group": 4,
+            "group": "4",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE"
@@ -506,7 +511,7 @@
         {
             "id": "67",
             "label": "67",
-            "group": 4,
+            "group": "4",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE"
@@ -515,7 +520,7 @@
         {
             "id": "68",
             "label": "68",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "elderly",
                 "language": "HE"
@@ -524,7 +529,7 @@
         {
             "id": "69",
             "label": "69",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "HE"
@@ -533,7 +538,7 @@
         {
             "id": "70",
             "label": "70",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE"
@@ -542,7 +547,7 @@
         {
             "id": "71",
             "label": "71",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE"
@@ -551,7 +556,7 @@
         {
             "id": "72",
             "label": "72",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "HE"
@@ -560,7 +565,7 @@
         {
             "id": "73",
             "label": "73",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE"
@@ -569,7 +574,7 @@
         {
             "id": "74",
             "label": "74",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE"
@@ -578,7 +583,7 @@
         {
             "id": "75",
             "label": "75",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "elderly",
                 "language": "HE"
@@ -587,7 +592,7 @@
         {
             "id": "76",
             "label": "76",
-            "group": 4,
+            "group": "4",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE"
@@ -596,7 +601,7 @@
         {
             "id": "77",
             "label": "77",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "HE"
@@ -605,7 +610,7 @@
         {
             "id": "78",
             "label": "78",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "HE"
@@ -614,7 +619,7 @@
         {
             "id": "79",
             "label": "79",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "HE"
@@ -623,7 +628,7 @@
         {
             "id": "80",
             "label": "80",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "HE"
@@ -632,7 +637,7 @@
         {
             "id": "81",
             "label": "81",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE"
@@ -641,7 +646,7 @@
         {
             "id": "82",
             "label": "82",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE"
@@ -650,7 +655,7 @@
         {
             "id": "84",
             "label": "84",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE"
@@ -659,7 +664,7 @@
         {
             "id": "85",
             "label": "85",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE"
@@ -668,7 +673,7 @@
         {
             "id": "87",
             "label": "87",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE"
@@ -677,7 +682,7 @@
         {
             "id": "88",
             "label": "88",
-            "group": 3,
+            "group": "3",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "HE"
@@ -686,7 +691,7 @@
         {
             "id": "89",
             "label": "89",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE"
@@ -695,7 +700,7 @@
         {
             "id": "90",
             "label": "90",
-            "group": 4,
+            "group": "4",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "HE"
@@ -704,7 +709,7 @@
         {
             "id": "91",
             "label": "91",
-            "group": 2,
+            "group": "2",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "HE"
@@ -713,7 +718,7 @@
         {
             "id": "92",
             "label": "92",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "HE"
@@ -722,7 +727,7 @@
         {
             "id": "93",
             "label": "93",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -731,7 +736,7 @@
         {
             "id": "94",
             "label": "94",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "IT"
@@ -740,7 +745,7 @@
         {
             "id": "95",
             "label": "95",
-            "group": 3,
+            "group": "3",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -749,7 +754,7 @@
         {
             "id": "96",
             "label": "96",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -758,7 +763,7 @@
         {
             "id": "97",
             "label": "97",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -767,7 +772,7 @@
         {
             "id": "98",
             "label": "98",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -776,7 +781,7 @@
         {
             "id": "99",
             "label": "99",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -785,7 +790,7 @@
         {
             "id": "101",
             "label": "101",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "IT"
@@ -794,7 +799,7 @@
         {
             "id": "102",
             "label": "102",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "elderly",
                 "language": "IT"
@@ -803,7 +808,7 @@
         {
             "id": "103",
             "label": "103",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -812,7 +817,7 @@
         {
             "id": "104",
             "label": "104",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -821,7 +826,7 @@
         {
             "id": "105",
             "label": "105",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -830,7 +835,7 @@
         {
             "id": "106",
             "label": "106",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -839,7 +844,7 @@
         {
             "id": "107",
             "label": "107",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "IT"
@@ -848,7 +853,7 @@
         {
             "id": "108",
             "label": "108",
-            "group": 4,
+            "group": "4",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -857,7 +862,7 @@
         {
             "id": "109",
             "label": "109",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "IT"
@@ -866,7 +871,7 @@
         {
             "id": "110",
             "label": "110",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -875,7 +880,7 @@
         {
             "id": "111",
             "label": "111",
-            "group": 4,
+            "group": "4",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -884,7 +889,7 @@
         {
             "id": "112",
             "label": "112",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -893,7 +898,7 @@
         {
             "id": "113",
             "label": "113",
-            "group": 4,
+            "group": "4",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "IT"
@@ -902,7 +907,7 @@
         {
             "id": "114",
             "label": "114",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "IT"
@@ -911,7 +916,7 @@
         {
             "id": "115",
             "label": "115",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -920,7 +925,7 @@
         {
             "id": "116",
             "label": "116",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -929,7 +934,7 @@
         {
             "id": "117",
             "label": "117",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -938,7 +943,7 @@
         {
             "id": "118",
             "label": "118",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "elderly",
                 "language": "IT"
@@ -947,7 +952,7 @@
         {
             "id": "119",
             "label": "119",
-            "group": 4,
+            "group": "4",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -956,7 +961,7 @@
         {
             "id": "120",
             "label": "120",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "IT"
@@ -965,7 +970,7 @@
         {
             "id": "121",
             "label": "121",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -974,7 +979,7 @@
         {
             "id": "122",
             "label": "122",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -983,7 +988,7 @@
         {
             "id": "123",
             "label": "123",
-            "group": 0,
+            "group": "0",
             "explicit_community": {
                 "ageGroup": "young",
                 "language": "IT"
@@ -992,7 +997,7 @@
         {
             "id": "124",
             "label": "124",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"
@@ -1001,7 +1006,7 @@
         {
             "id": "126",
             "label": "126",
-            "group": 1,
+            "group": "1",
             "explicit_community": {
                 "ageGroup": "adult",
                 "language": "IT"

@@ -1,130 +1,310 @@
-import DrawNetwork from "./drawNetwork";
+/**
+ * @fileoverview This class draw the network based on the inputJson, manages all network-related events and
+ * edit the network or the shown info based on the user inputs.
+ * @package It requires vis-Network package to be able to use the Network Class. 
+ * @author Marco Expósito Pérez
+ */
 
-export default class NetworkManager {
+//Namespaces
+import { edges } from "./constants/edges.js";
+import { nodes } from "./constants/nodes.js";
+import { networkHTML } from "./constants/networkHTML.js";
+//Packages
+import { Network } from "vis-network/peer";
+//Local classes
+import ImplicitCommsMan from "./networkManagerTools/implicitCommsData.js";
+import NodeVisuals from "./networkManagerTools/nodeVisuals.js";
+import NodeData from "./networkManagerTools/nodeData.js";
+import EdgeManager from "./networkManagerTools/edgeManager.js";
 
-    constructor() {
-        this.activesNetworksMap = new Map();
-        this.activesNetworksArray = new Array();
+export default class NetworkMan {
+
+    /**
+     * Constructor of the class
+     * @param {Object} jsonInput json input with all the network data
+     * @param {HTMLElement} container container of the network
+     * @param {HTMLElement} rightContainer container of the dataTables
+     * @param {NetworkGroupManager} networkManager manager of all active networks
+     * @param {Object} config config options for edges
+     */
+    constructor(jsonInput, container, rightContainer, networkManager, config) {
+        this.container = container;
+        this.groupManager = networkManager;
+        this.key = config.key;
+
+        this.implCommMan = new ImplicitCommsMan(jsonInput);
+        this.nodeVisuals = new NodeVisuals(this);
+
+        this.nodeData = new NodeData(this.nodeVisuals, rightContainer);
+        this.edgesMan = new EdgeManager(config);
+
+        this.data =
+        {
+            nodes: this.nodeData.parseNodes(jsonInput),
+            edges: this.edgesMan.parseEdges(jsonInput)
+        };
+
+        this.nodeData.createNodeDataTable(rightContainer);
+        this.implCommMan.createCommunityDataTable(rightContainer);
+
+        this.nodeVisuals.createNodeDimensionStrategy(this.data.nodes);
+
+        this.chooseOptions();
+        this.drawNetwork();
     }
 
-    /** Create and add a network to the web
-     * 
-     * @param {*} key Identifier of the new network
-     * @param {*} file File with the config of the network
-     * @param {*} leftContainer Container where the network will be placed
-     * @param {*} rightContainer Container where the network data will be placed
+    /**
+    * Initialize vis.network options
+    */
+    chooseOptions() {
+        this.options = {
+            autoResize: true,
+            edges: {
+                scaling: {
+                    min: edges.EdgeMinWidth,
+                    max: this.edgesMan.getMaxWidth(),
+                    label: {
+                        enabled: false
+                    }
+                },
+                color: {
+                    color: edges.EdgeDefaultColor,
+                    highlight: edges.EdgeSelectedColor
+                },
+                chosen: {
+                    label: this.edgesMan.labelEdgeChosen.bind(this),
+                },
+                font: {
+                    strokeWidth: edges.LabelStrokeWidth,
+                    size: edges.LabelSize,
+                    color: edges.LabelColor,
+                    strokeColor: edges.LabelStrokeColor,
+                    align: edges.LabelAlign,
+                    vadjust: edges.labelVerticalAdjust
+                },
+                smooth: {
+                    enabled: false,
+                }
+            },
+            nodes: {
+                shape: nodes.NodeShape,
+                borderWidth: nodes.NodeDefaultBorderWidth,
+                borderWidthSelected: nodes.NodeDefaultBorderWidthSelected,
+                shapeProperties: {
+                    interpolation: false
+                },
+                size: nodes.DefaultSize,
+                chosen: {
+                    node: this.nodeVisuals.nodeChosen.bind(this),
+                    label: this.nodeVisuals.labelChosen.bind(this),
+                },
+                color: {
+                    background: nodes.NodeColor,
+                    border: nodes.NodeColor,
+                },
+                font: {
+                    vadjust: nodes.NodevOffset,
+                    size: nodes.LabelSize,
+                }
+
+            },
+            groups: {
+                useDefaultGroups: false
+            },
+            physics: {
+                enabled: false,
+                //Avoid overlap between nodes, but enable physics. Leaving this here in case we need it in the future
+                /* barnesHut: {
+                    springConstant: 0,
+                    avoidOverlap: 0.1
+                }*/
+
+            },
+            interaction: {
+                zoomView: true,
+                dragView: true,
+                hover: false,
+                hoverConnectedEdges: false,
+            },
+            layout: {
+                improvedLayout: true,
+            }
+        };
+    }
+
+    /**
+     * Draw the network and initialize all Events
      */
-    addNetwork(file, leftContainer, rightContainer, config) {
-        try {
-            const jsonFile = JSON.parse(file);
-            const network = new DrawNetwork(jsonFile, leftContainer, rightContainer, this, config);
+    drawNetwork() {
+        this.network = new Network(this.container, this.data, this.options);
+        //this.network.stabilize();   //In case physics are active, we stop them just in case nodes start to "boing"
 
-            this.activesNetworksMap.set(config.key, network);
-            this.activesNetworksArray.push(network);
+        this.container.firstChild.id = networkHTML.topCanvasContainer + this.key;
 
-        } catch (e) {
-            console.log(e);
+        this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
+        this.network.on("click", (event) => this.clickEvent(event));
+        this.network.on("zoom", (event) => this.zoomEvent(event));
+    }
 
-            alert("The file is not a valid json file");
+    /** 
+     * Function executed when "beforeDrawing" event is launched. Happens before drawing the network
+     * @param {CanvasRenderingContext2D} ctx Context object necesary to draw in the network canvas
+     */
+    preDrawEvent(ctx) {
+        this.implCommMan.drawBoundingBoxes(ctx, this.data.nodes, this.network);
+    }
+
+    /** 
+     * Function executed when "click" event is launched. Happens when the user clicks in the canvas
+     * @param {Object} event Click event
+     */
+    clickEvent(event) {
+        this.groupManager.hideTooltip();
+
+        if (event.nodes.length > 0) {
+            this.nodeHasBeenClicked(event.nodes[0]);
+
+            this.groupManager.showTooltip(this, event, this.nodeData);
+            this.implCommMan.updateDataTableFromNodeId(event.nodes[0], this.data.nodes);
+
+        } else {
+            this.noNodeIsClicked();
+
+            this.groupManager.showTooltip(this, event, this.implCommMan);
+            this.implCommMan.updateDataTableFromClick(event);
         }
     }
 
-    /** Remove the network and the html div related
-     * 
-     * @param {*} key //Key of the network
+    /** 
+     * Function executed when "zoom" event is launched. Happens when the user zooms-in in the canvas
+     * @param {Object} event Zoom event
      */
-    removeNetwork(key) {
-        const network = this.activesNetworksMap.get(key);
-
-        this.activesNetworksArray = this.activesNetworksArray.filter(data => data.key != key);
-
-        network.clearNetwork();
-
-        const networkContainer = document.getElementById("networksContainer");
-        const divToDelete = document.getElementById("network_" + key);
-
-        networkContainer.removeChild(divToDelete);
+    zoomEvent(event) {
+        this.groupManager.updateTooltipPosition(this);
     }
 
-    /** Set the current active popup. There is only one across all networks
-     * 
-     * @param {*} newTooltip new bootstrap popover object
-     */
-    setTooltip(newTooltip) {
-        this.tooltip = newTooltip;
+    /** 
+    * Function executed only when this was the network that received the click event on top of a node
+    * @param {*} id id of the node 
+    */
+    nodeHasBeenClicked(id) {
+        this.groupManager.nodeSelected(id);
     }
 
-    /** Broadcast to all networks that node id has been selected
-     * 
-     * @param {*} id id of the selected node
+    /** 
+     * Select the node and turn darker nodes that are not connected to it, darkens all edges not conected to it
+     * and fit the camera to zoom into all not darkened nodes
+     * @param {Integer} id //Id of the node
      */
     nodeSelected(id) {
-        if (this.tooltip !== undefined) this.tooltip.hide();
+        this.network.selectNodes([id], true);
 
-        this.activesNetworksArray.forEach((network) => network.nodeSelected(id));
+        //Update node data table
+        this.nodeData.updateDataTable(id);
+
+        //Search for the nodes that are connected to the selected Node
+        const selectedNodes = new Array();
+        selectedNodes.push(id)
+
+        const connected_edges = this.network.getConnectedEdges(selectedNodes[0]);
+        const clickedEdges = this.data.edges.get(connected_edges);
+
+        clickedEdges.forEach((edge) => {
+            if (!edge.hidden) {
+                if (edge.from !== selectedNodes[0] && edge.to === selectedNodes[0]) {
+                    selectedNodes.push(edge.from);
+                } else if (edge.to !== selectedNodes[0] && edge.from === selectedNodes[0]) {
+                    selectedNodes.push(edge.to);
+                }
+            }
+        })
+
+        //Move the "camera" to focus on these nodes
+        const fitOptions = {
+            nodes: selectedNodes,
+            animation: {
+                duration: nodes.ZoomDuration,
+            },
+        }
+        this.network.fit(fitOptions);
+
+        //Update all nodes color acording to their selected status
+        const newNodes = new Array();
+        this.data.nodes.forEach((node) => {
+            if (selectedNodes.includes(node.id)) {
+                if (!node.defaultColor) {
+                    this.nodeVisuals.nodeDimensionStrategy.nodeColorToDefault(node);
+                    newNodes.push(node);
+                }
+
+            } else if (node.defaultColor) {
+                this.nodeVisuals.nodeDimensionStrategy.nodeVisualsToColorless(node);
+                newNodes.push(node);
+            }
+        });
+
+        this.data.nodes.update(newNodes);
     }
 
-    /** Broadcast to all networks that there is not a node selected
-     * 
+    /** 
+     * Function executed only when this was the network that received the click event but no nodes was clicked
+     */
+    noNodeIsClicked() {
+        this.groupManager.nodeDeselected();
+    }
+
+    /**
+     * Restore the network to the original deselected state
      */
     nodeDeselected() {
-        if (this.tooltip !== undefined) this.tooltip.hide();
+        //Return to fit all nodes into the "camera"
+        const fitOptions = {
+            animation: true,
+            animation: {
+                duration: nodes.ZoomDuration,
+            },
+        }
+        this.network.fit(fitOptions);
 
-        this.activesNetworksArray.forEach((network) => network.nodeDeselected());
+        this.nodeData.clearDataTable();
+
+        this.network.unselectAll();
+
+        const newNodes = new Array();
+        this.data.nodes.forEach((node) => {
+            if (!node.defaultColor) {
+                this.nodeVisuals.nodeDimensionStrategy.nodeColorToDefault(node);
+                newNodes.push(node);
+            }
+
+        });
+
+        this.data.nodes.update(newNodes);
     }
 
-    /** Change the network threshold value
-     * 
-     * @param {*} key Key of the network
-     * @param {*} newValue New value of the threshold
+    /**
+     * Destroy the network 
      */
-    thresholdChange(key, newValue) {
-        const network = this.activesNetworksMap.get(key);
-
-        network.hideEdgesbelowThreshold(newValue);
+    clearNetwork() {
+        this.network.destroy();
     }
 
-    /** Change the key network variableEdge value
-     * 
-     * @param {*} key Key of the network
-     * @param {*} newBool New variableEdge value
+    /**
+     * Update node visuals of all networks to match current filter
+     * @param {String[]} filter string array with all values to hide
      */
-    variableEdgeChange(key, newBool) {
-        const network = this.activesNetworksMap.get(key);
-
-        network.updateVariableEdge(newBool);
+    updateFilterActives(filter) {
+        this.nodeVisuals.updateFilterActives(filter, this.data.nodes);
     }
 
-    highlightCommunity(key, selectedCommunities){
-        const network = this.activesNetworksMap.get(key);
-
-        network.highlightCommunity(selectedCommunities);
-    }
-
-    thresholdChangeALL(newValue) {
-        this.activesNetworksArray.forEach((network) => {
-            this.thresholdChange(network.key, newValue);
-        });
-    }
-
-
-    variableEdgeChangeALL(newBool) {
-        this.activesNetworksArray.forEach((network) => {
-            this.variableEdgeChange(network.key, newBool);
-        });
-    }
-
-    highlightCommunityALL(selectedCommunities){
-        this.activesNetworksArray.forEach((network) => {
-            this.highlightCommunity(network.key, selectedCommunities);
-        });
-    }
-
-    getNnetworks(){
-        return this.activesNetworksArray.length;
-    }
-
-    getExplicitCommunities(){
-        return this.activesNetworksArray[0].getExplicitCommunities();
+    /**
+     * Returns the attributes that changes visualization
+     * @returns {Object} Object with the attributes that change visualization
+     * Format-> {attr: (string), vals: (string[], dimension: (string))}
+     */
+    getVisualizationAttributes() {
+        return this.nodeVisuals.getVisualizationAttributes();
     }
 }
+
+
