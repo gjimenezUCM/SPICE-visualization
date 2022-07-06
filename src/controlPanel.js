@@ -9,6 +9,7 @@ import { networkHTML } from "./constants/networkHTML.js";
 //Local classes
 import Legend from "./controlPanelComponents/legend.js";
 import ThresholdSlider from "./controlPanelComponents/thresholdSlider.js";
+import UnselectedEdgesCheckbox from "./controlPanelComponents/unselectedEdgesCheckbox.js";
 import VariableEdgeCheckbox from "./controlPanelComponents/variableEdgeCheckbox.js";
 
 export default class ControlPanel {
@@ -30,7 +31,7 @@ export default class ControlPanel {
             return;
         this.isActive = true;
 
-    
+
         this.container = document.createElement("div");
         this.container.className = "middle";
         document.getElementById(networkHTML.controlPanelParentContainer).appendChild(this.container);
@@ -39,9 +40,11 @@ export default class ControlPanel {
         inputTitle.innerHTML = "Control Panel";
         this.container.appendChild(inputTitle);
 
-        new ThresholdSlider(this.container, this.networkManager);
-        new VariableEdgeCheckbox(this.container, this.networkManager);
-        new Legend(this.container, this.networkManager);
+        this.thresholdSlider = new ThresholdSlider(this.container, this.networkManager);
+        this.variableEdge = new VariableEdgeCheckbox(this.container, this.networkManager);
+        this.unselectedEdges = new UnselectedEdgesCheckbox(this.container, this.networkManager);
+
+        this.legend = new Legend(this.container, this.networkManager);
 
         this.container.append(document.createElement("br"));
     }
@@ -56,5 +59,53 @@ export default class ControlPanel {
         this.isActive = false;
 
         document.getElementById(networkHTML.controlPanelParentContainer).removeChild(this.container);
+    }
+
+    /**
+     * Returns the current value of the threshold Slider
+     * @returns {Float} returns the value of the slider
+     */
+    getSliderThreshold() {
+        if (!this.isActive)
+            return networkHTML.sliderThresholdInitialValue;
+        else {
+            return this.thresholdSlider.getThreshold();
+        }
+    }
+
+    /**
+     * Returns the current state of the variable Edge checkbox
+     * @returns {Boolean} current state of the checkbox
+     */
+    getVariableEdgeValue() {
+        if (!this.isActive)
+            return networkHTML.variableEdgeInitialValue;
+        else {
+            return this.variableEdge.getChecked();
+        }
+    }
+
+    /**
+     * Returns the current state of the unselected Edges checkbox
+     * @returns {Boolean} current state of the checkbox
+     */
+    getUnselectedEdgesValue() {
+        if (!this.isActive)
+            return networkHTML.unselectedEdgesInitialValue;
+        else {
+            return this.unselectedEdges.getChecked();
+        }
+    }
+
+    /**
+     * Returns the values to hide in a network based on the legend input
+     * @returns {String[]} values to hide
+     */
+    getValuesToHide() {
+        if (!this.isActive)
+            return [];
+        else {
+            return this.legend.filterValuesToHide;
+        }
     }
 }   

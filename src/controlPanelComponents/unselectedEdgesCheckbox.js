@@ -1,29 +1,29 @@
 /**
- * @fileoverview This class creates a checkbox that changes the edges width to relate with the similarity value
+ * @fileoverview This class creates a checkbox that hides all edges except when they are selected
  * @author Marco Expósito Pérez
  */
 
 //Namespaces
 import { networkHTML } from "../constants/networkHTML";
 
-export default class VariableEdgeCheckbox {
+export default class UnselectedEdgesCheckbox {
 
     /**
      * Constructor of the class
-     * @param {HTMLElement} container html container where the checkbox will be appended
-     * @param {NetworksGroup} networksGroup  group of all networks that will see their edges altered by the checkbox
+     * @param {HTMLElement} container html container where the checbox will be appended
+     * @param {NetworksGroup} networksGroup  group of all networks that will see their edges altered by the checbox
      */
     constructor(container, networkGroup) {
         this.domParser = new DOMParser();
         this.networksGroups = networkGroup;
 
-        this.checkboxId = "variableEdgeCheckbox";
+        this.checkboxId = "unselectedEdgesCheckbox";
 
-        const htmlString = this.variableEdgeTemplate();
+        const htmlString = this.unselectedEdgesTemplate();
         const html = this.domParser.parseFromString(htmlString, "text/html").body.firstChild;
         container.append(html);
 
-        this.checked = networkHTML.variableEdgeInitialValue;
+        this.checked = networkHTML.unselectedEdgesInitialValue;
 
         this.addCheckboxOnchange();
     }
@@ -32,14 +32,14 @@ export default class VariableEdgeCheckbox {
      * Function that returns a html string with the checkbox
      * @returns {String} returns the html string
      */
-    variableEdgeTemplate() {
+    unselectedEdgesTemplate() {
         let checked = "";
-        if (networkHTML.variableEdgeInitialValue)
+        if (networkHTML.unselectedEdgesInitialValue)
             checked = `checked="true"`;
 
         let html = `
         <div> 
-            <label class="unselectable" for="${this.checkboxId}"> Variable edge width:  </label>
+            <label class="unselectable" for="${this.checkboxId}"> Hide edges not selected: </label>
             <input type="checkbox" ${checked} id="${this.checkboxId}"></input>
         </div>`;
         return html;
@@ -51,23 +51,24 @@ export default class VariableEdgeCheckbox {
     addCheckboxOnchange() {
         const checkbox = document.getElementById(this.checkboxId);
 
-        checkbox.onchange = () => this.variableEdgeChange(checkbox);
+        checkbox.onchange = () => this.unselectedEdgeChange(checkbox);
     }
 
     /** 
      *  Update all networks with the new variableEdgeWidth value
      */
-    variableEdgeChange(checkBox) {
+    unselectedEdgeChange(checkBox) {
         this.checked = checkBox.checked;
 
-        this.networksGroups.variableEdgeChangeALL(checkBox.checked);
+        this.networksGroups.hideUnselectedEdgesALL(checkBox.checked);
     }
+
 
     /**
      * Returns the current state of the checkbox
      * @returns {Boolean} current state of the checkbox
      */
-    getChecked(){
+     getChecked(){
         return this.checked;
     }
 }

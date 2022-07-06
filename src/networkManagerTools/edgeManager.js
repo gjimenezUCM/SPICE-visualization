@@ -6,6 +6,7 @@
  */
 
 //Namespaces
+import { networkHTML } from "../constants/networkHTML.js";
 import { edges } from "../constants/edges.js";
 //Packages
 import { DataSet } from "vis-data/peer";
@@ -21,6 +22,8 @@ export default class EdgeManager {
         this.edgeValueThreshold = config.edgeThreshold;
         //Dictates if the edge width should change with the similarity value "strength"
         this.variableEdge = config.variableEdge;
+        //Dictates if All edges that are not currently selected, should be hidden
+        this.hideUnselected = config.hideUnselected;
     }
 
     /**
@@ -55,6 +58,13 @@ export default class EdgeManager {
                         edge["hidden"] = true;
                     } else
                         edge["hidden"] = false;
+
+                    //Hide unselected
+                    const color = edges.EdgeDefaultColor;
+                    if (this.hideUnselected)
+                        edge.color = { color: `${color}00` };
+                    else
+                        edge.color = { color: `${color}` };
 
                     newEdges.push(edge);
                 }
@@ -132,5 +142,27 @@ export default class EdgeManager {
 
         //Update all edges with the new options
         this.edges.update(this.edges);
+    }
+
+    /**
+     * Change base edge color based on the value of hideUnselected
+     * @param {Bool} newBool new value of hideUnselected
+     */
+    hideUnselectedEdges(newBool) {
+        this.hideUnselected = newBool;
+
+        const newEdges = new Array();
+
+        this.edges.forEach((edge) => {
+
+            if (this.hideUnselected)
+                edge.color = { color: `${edges.EdgeDefaultColor}00` };
+            else
+                edge.color = { color: edges.EdgeDefaultColor };
+
+            newEdges.push(edge);
+        })
+
+        this.edges.update(newEdges);
     }
 }

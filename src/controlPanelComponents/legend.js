@@ -58,7 +58,7 @@ export default class Legend {
      * @returns {String} returns a string with the html of the buttons
      */
     filterButtonsTemplate(values, dimension) {
-        let html = "<div>";
+        let buttonHTML = "";
 
         for (let i = 0; i < values.length; i++) {
             let value = values[i];
@@ -66,7 +66,7 @@ export default class Legend {
 
             const rightCol = this.getCommunityValueIndicator(dimension, i);
 
-            html += `
+            buttonHTML += `
             <div class="row align-items-left">
                 <button type="button" class="legend btn btn-outline-primary active" id="legendButton${values[i]}">
                     <div class="row align-items-center">
@@ -81,7 +81,12 @@ export default class Legend {
             </div>`;
         }
 
-        return html;
+        const output =`
+        <div>
+            ${buttonHTML}
+        </div>`;
+
+        return output;
     }
 
     /**
@@ -170,7 +175,7 @@ export default class Legend {
 
             this.filterValuesToHide.push(value);
         } else {
-            button.className = networkHTML.legendButtonClass + "  active";
+            button.className = `${networkHTML.legendButtonClass} active`;
 
             const index = this.filterValuesToHide.indexOf(value);
             if (index === -1) {
@@ -184,11 +189,6 @@ export default class Legend {
 
         this.networksGroup.updateFilterActivesALL(this.filterValuesToHide);
     }
-
-
-
-
-
 }
 
 
