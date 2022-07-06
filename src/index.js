@@ -8,6 +8,7 @@ import css from "../css/base.css";
 //Local classes
 import InitialOptions from "./initialOptions.js";
 
+
 window.onload = function () {
 	new InitialOptions();
 }
