@@ -46,7 +46,7 @@ export const nodes = {
 
     //html
     //Title of the table with selected node data
-    NodesTableTitle: "User Attributes",
+    NodesTableTitle: "Citizen Attributes",
     //ClassName of a row without border
     borderlessHTMLrow: "row dataRow",
     //ClassName of a row with main attributes
