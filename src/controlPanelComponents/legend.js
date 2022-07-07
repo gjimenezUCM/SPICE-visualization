@@ -36,14 +36,24 @@ export default class Legend {
      * @returns {HTMLElement} returns the container with the legend
      */
     createLegendContainer(attributes) {
-        let topBody = "";
+        let legendTable = "";
+
         for (let i = 0; i < attributes.length; i++) {
             const buttonsDiv = this.filterButtonsTemplate(attributes[i].vals, attributes[i].dimension);
 
-            const htmlString = this.accordionTemplate(attributes[i].attr, attributes[i].attr, buttonsDiv);
+            const htmlString = `
+            <div class="col ${attributes[i].dimension}">
+                <h5 class="fixedHeight"> ${attributes[i].attr} </h5>
+                <hr>
+                ${buttonsDiv}
+            </div>`;
 
-            topBody += htmlString;
+            legendTable += htmlString;
         }
+
+        let topBody = `<div class="row">
+            ${legendTable}
+        </div>`;
 
         const topAcoordion = this.accordionTemplate("top", "Legend", topBody);
 
@@ -67,21 +77,20 @@ export default class Legend {
             const rightCol = this.getCommunityValueIndicator(dimension, i);
 
             buttonHTML += `
-            <div class="row align-items-left">
-                <button type="button" class="legend btn btn-outline-primary active" id="legendButton${values[i]}">
-                    <div class="row align-items-center">
-                        <div class="col value">    
-                            ${value}
-                        </div>
-                        <div class="col">    
-                            ${rightCol}
-                        </div>
+            <button type="button" class="legend btn btn-block btn-outline-primary active" id="legendButton${values[i]}">
+                <div class="row align-items-center">
+                    <div class="col value">    
+                        ${value}
                     </div>
-                </button>
-            </div>`;
+                    <div class="col">    
+                        ${rightCol}
+                    </div>
+                </div>
+            </button>
+            `;
         }
 
-        const output =`
+        const output = `
         <div>
             ${buttonHTML}
         </div>`;
@@ -135,7 +144,7 @@ export default class Legend {
                         ${buttonText}
                     </button>
                 </h2>
-                <div id="collapse${id}" class="accordion-collapse collapse" aria-labelledby="heading${id}" data-bs-parent="#accordion${id}">
+                <div id="collapse${id}" class="accordion-collapse collapse" aria-labelledby="heading${id}" data-bs-parent="#accordion${id}"> 
                     ${body}
                 </div>
             </div>

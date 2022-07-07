@@ -61,7 +61,7 @@ export const nodes = {
     //KEYS
     nodeColorKey: "color",
     nodeShapeKey: "shape",
-    nodeBorderKey: "border",
+    nodeBorderKey: "nodeBorder",
     
     //Node attributes that change based on its explicit Community
     NodeAttr: {

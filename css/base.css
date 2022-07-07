@@ -49,6 +49,10 @@ canvas {
   --bs-gutter-x: 0;
 }
 
+row.align-items-center{
+  margin:auto;
+}
+
 .dataRow {
   margin-left: 1px;
   margin-Right: 1px;
@@ -129,12 +133,21 @@ canvas {
 
 /*Acoordion*/
 .accordiontop {
-  max-width: 20%;
+  max-width: 30%;
   margin: auto;
 }
 
 .accordion-button {
-  height: 30px;
+  margin:auto;
+} 
+
+.row.align-items-left{
+  height: 100%;
+}
+
+.fixedHeight{
+  height: 1em;
+  padding-top: 6px;
 }
 
 .legend.btn {
@@ -142,7 +155,7 @@ canvas {
   margin-bottom: 1px;
   margin-left: auto;
   margin-right: auto;
-  width: 100%;
+  width: 95%;
   height: 35px;
 }
 
@@ -189,3 +202,27 @@ canvas {
   -ms-user-select: none;
   user-select: none;
 }
+
+/* .col.color{
+  background-color: #000000;
+}
+
+.col.shape{
+  background-color: #ff0000;
+}
+
+.col.nodeBorder{
+  background-color: #00ff0d;
+} */
+
+/* .row {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display:         flex;
+}
+
+.row > [class*='col'] {
+	 display: flex;
+	 flex-direction: column;
+} */
