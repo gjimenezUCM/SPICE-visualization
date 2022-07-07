@@ -15,8 +15,11 @@ export const nodes = {
     nodeBetweenNodesDistance: 8,
 
     nodeGroupsViewMode: "circle", //"circle" to see nodes in a circle, "square" to see them in a square
+   
     //--- Configuration Values ---
 
+    //Acitvate the third node dimension if the network has 3 or more explicit communities
+    nodeThirdDimension: false,
     //Sizes
     DefaultSize: 20,
     SelectedSize: 30,

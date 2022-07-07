@@ -139,10 +139,12 @@ row.align-items-center{
 
 .accordion-button {
   margin:auto;
+  height: 40px;
 } 
 
-.row.align-items-left{
+.row.align-items-center{
   height: 100%;
+  margin: auto;
 }
 
 .fixedHeight{
@@ -153,6 +155,7 @@ row.align-items-center{
 .legend.btn {
   display: flex;
   margin-bottom: 1px;
+  margin-top: 0px;
   margin-left: auto;
   margin-right: auto;
   width: 95%;
@@ -203,6 +206,11 @@ row.align-items-center{
   user-select: none;
 }
 
+/* .legendButtonContainer {
+  margin: auto;
+  padding: 0px;
+  background-color: #000000;
+} */
 /* .col.color{
   background-color: #000000;
 }

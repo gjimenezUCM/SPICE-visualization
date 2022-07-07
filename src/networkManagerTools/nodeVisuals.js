@@ -18,6 +18,8 @@ export default class NodeVisuals {
     constructor() {
         //Contains all explicit Communities with its values
         this.communitiesData = new Array();
+
+        this.activateThirdDimension = nodes.nodeThirdDimension;
     }
 
     /** 
@@ -60,6 +62,14 @@ export default class NodeVisuals {
             dimension: nodes.nodeShapeKey,
         },
         ];
+
+        if(this.communitiesData[2] !== undefined && this.activateThirdDimension){
+            attributes.push({
+                attr: this.communitiesData[2].key,
+                vals: this.communitiesData[2].values,
+                dimension: nodes.nodeBorderKey,
+            })
+        }
 
         this.nodeDimensionStrategy = new NodeDimensionStrategy(attributes);
 

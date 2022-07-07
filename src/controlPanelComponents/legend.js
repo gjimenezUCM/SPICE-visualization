@@ -24,18 +24,18 @@ export default class Legend {
 
         const attributes = networksGroup.getVisualizationAttributes();
 
-        container.append(this.createLegendContainer(attributes));
+        this.createLegendContainer(attributes, container);
 
-        this.addButtonLegendOnclick(attributes);
+        this.buttonAdditions(attributes);
     }
 
     /**
      * Create a container with the legend. 
      * @param {Object} attributes Object with the attributes that change visualization
      * Format-> {attr: (string), vals: (string[], dimension: (string))}
-     * @returns {HTMLElement} returns the container with the legend
+     * @param {HTMLElement} container Container where the legend will be placed
      */
-    createLegendContainer(attributes) {
+    createLegendContainer(attributes, container) {
         let legendTable = "";
 
         for (let i = 0; i < attributes.length; i++) {
@@ -58,7 +58,10 @@ export default class Legend {
         const topAcoordion = this.accordionTemplate("top", "Legend", topBody);
 
         const html = this.domParser.parseFromString(topAcoordion, "text/html").body.firstChild;
-        return html;
+        container.append(html);
+
+        const topHTML = document.getElementById(`accordiontop`);
+        topHTML.style.maxWidth = `${10 * attributes.length}%`;
     }
 
     /**
@@ -91,7 +94,7 @@ export default class Legend {
         }
 
         const output = `
-        <div>
+        <div class="legendButtonContainer" id="legendButtonContainer ${dimension}">
             ${buttonHTML}
         </div>`;
 
@@ -137,7 +140,7 @@ export default class Legend {
      */
     accordionTemplate(id, buttonText, body) {
         const html = `
-        <div class="accordion${id}">
+        <div class="accordion${id}" id="accordion${id}">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading${id}">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${id}" aria-expanded="true" aria-controls="collapse${id}">
@@ -171,33 +174,71 @@ export default class Legend {
     }
 
     /**
+     * Add the onclick function to the buttons and also changes the height of buttons to fill all the space
+     * @param {Object} attributes Object with the attributes that change visualization
+     * Format-> {attr: (string), vals: (string[], dimension: (string))}
+     */
+    buttonAdditions(attributes) {
+        const buttonHeight = 35 + 1;
+        let maxHeight = 0;
+
+        //Calculate max Height and add the on click function to the buttons
+        for (let i = 0; i < attributes.length; i++) {
+            const values = attributes[i].vals;
+            let newHeight = 0;
+
+            for (let j = 0; j < values.length; j++) {
+                const button = document.getElementById(`legendButton${values[j]}`);
+                newHeight += buttonHeight;
+
+                button.onclick = () => this.filterButtonClick(values[j], button);
+            }
+
+            if(maxHeight < newHeight){
+                maxHeight = newHeight
+            }
+        }
+
+        //Fix the button height
+        for (let i = 0; i < attributes.length; i++) {
+            const values = attributes[i].vals;
+            const buttonHeight = maxHeight / values.length;
+
+            for (let j = 0; j < values.length; j++) {
+                const button = document.getElementById(`legendButton${values[j]}`);
+                button.style.height = `${buttonHeight}px`;
+            }
+        }
+    }
+
+    /**
      * Function executed when a legend button is clicked Update the values to hide and update the all networks 
      * @param {String} value value linked to the button.
      * @param {HTMLElement} button button clicked
      */
-    filterButtonClick(value, button) {
-        const btnClass = button.className;
-        const isActive = btnClass.slice(btnClass.length - 6);
-
-        if (isActive === "active") {
-            button.className = networkHTML.legendButtonClass;
-
-            this.filterValuesToHide.push(value);
-        } else {
-            button.className = `${networkHTML.legendButtonClass} active`;
-
-            const index = this.filterValuesToHide.indexOf(value);
-            if (index === -1) {
-                this.filterButtonClick(value, button);
-                return;
-
+         filterButtonClick(value, button) {
+            const btnClass = button.className;
+            const isActive = btnClass.slice(btnClass.length - 6);
+    
+            if (isActive === "active") {
+                button.className = networkHTML.legendButtonClass;
+    
+                this.filterValuesToHide.push(value);
             } else {
-                this.filterValuesToHide.splice(index, 1);
+                button.className = `${networkHTML.legendButtonClass} active`;
+    
+                const index = this.filterValuesToHide.indexOf(value);
+                if (index === -1) {
+                    this.filterButtonClick(value, button);
+                    return;
+    
+                } else {
+                    this.filterValuesToHide.splice(index, 1);
+                }
             }
+    
+            this.networksGroup.updateFilterActivesALL(this.filterValuesToHide);
         }
-
-        this.networksGroup.updateFilterActivesALL(this.filterValuesToHide);
-    }
 }
 
 
