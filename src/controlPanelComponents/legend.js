@@ -19,14 +19,10 @@ export default class Legend {
      */
     constructor(container, networksGroup) {
         this.domParser = new DOMParser();
-        this.filterValuesToHide = new Array();
         this.networksGroup = networksGroup;
+        this.container = container;
 
-        const attributes = networksGroup.getVisualizationAttributes();
-
-        this.createLegendContainer(attributes, container);
-
-        this.buttonAdditions(attributes);
+        this.initLegend();
     }
 
     /**
@@ -84,10 +80,10 @@ export default class Legend {
             <button type="button" class="${networkHTML.legendButtonClass}" id="legendButton${key}_${values[i]}">
                 <div class="container legend">
                     <div class="row">
-                        <div class="col">    
+                        <div class="col-6">    
                             ${value}
                         </div>
-                        <div class="col dimension">    
+                        <div class="col-6 dimension">    
                             ${rightCol}
                         </div>
                     </div>
@@ -235,6 +231,23 @@ export default class Legend {
         }
 
         this.networksGroup.updateFilterActivesALL(this.filterValuesToHide);
+    }
+
+    initLegend(){
+        this.filterValuesToHide = new Array();
+
+        const attributes = this.networksGroup.getVisualizationAttributes();
+
+        this.createLegendContainer(attributes, this.container);
+
+        this.buttonAdditions(attributes);
+    }
+
+    restartLegend(){
+        const legendContainer = document.getElementById("accordiontop");
+        legendContainer.remove();
+
+        this.initLegend();
     }
 }
 

@@ -260,6 +260,7 @@ export default class InitialOptions {
             variableEdge: this.controlPanel.getVariableEdgeValue(),
             hideUnselected: this.controlPanel.getUnselectedEdgesValue(),
             valuesToHide: this.controlPanel.getValuesToHide(),
+            allowThirdDimension: this.controlPanel.getThirdDimensionValue(),
             key: key
         };
 

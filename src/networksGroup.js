@@ -143,7 +143,7 @@ export default class NetworksGroup {
 
     /**
      * Broadcast the new hideUnselectedEdges value to all networks
-     * @param {Float} newValue New hideUnselectedEdges value
+     * @param {Boolean} newValue New hideUnselectedEdges value
      */
     hideUnselectedEdgesALL(newBool) {
         this.activesNetworksArray.forEach((network) => {
@@ -168,6 +168,27 @@ export default class NetworksGroup {
     updateFilterActivesALL(filter) {
         this.activesNetworksArray.forEach((network) => {
             this.updateFilterActives(network.key, filter);
+        });
+    }
+
+    /** 
+     * Change the network allowThirdDimension value
+     * @param {String} key Key of the network
+     * @param {Boolean} newBool New allowThirdDimension value
+     */
+    changeThirdDimension(key, newBool) {
+        const network = this.activesNetworksMap.get(key);
+
+        network.changeThirdDimension(newBool);
+    }
+
+    /**
+     * Broadcast the new allowThirdDimension value to all networks
+     * @param {Boolean} newValue New allowThirdDimension value
+     */
+    changeThirdDimensionALL(newBool) {
+        this.activesNetworksArray.forEach((network) => {
+            this.changeThirdDimension(network.key, newBool);
         });
     }
 

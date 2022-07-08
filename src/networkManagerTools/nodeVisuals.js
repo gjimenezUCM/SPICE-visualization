@@ -14,12 +14,13 @@ export default class NodeVisuals {
 
     /**
      * Constructor of the class
+     * @param {Boolean} thirdDimension activate or not the third dimension of the nodes 
      */
-    constructor() {
+    constructor(thirdDimension) {
         //Contains all explicit Communities with its values
         this.communitiesData = new Array();
 
-        this.activateThirdDimension = nodes.nodeThirdDimension;
+        this.activateThirdDimension = thirdDimension;
     }
 
     /** 

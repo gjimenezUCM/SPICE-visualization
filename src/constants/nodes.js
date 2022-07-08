@@ -18,8 +18,6 @@ export const nodes = {
    
     //--- Configuration Values ---
 
-    //Acitvate the third node dimension if the network has 3 or more explicit communities
-    nodeThirdDimension: true,
     //Sizes
     DefaultSize: 20,
     SelectedSize: 30,
@@ -94,7 +92,7 @@ export const nodes = {
         "rgb(13, 84, 128, 1)", //Blue
         "rgb(128, 0, 0, 1)", //Red
         "rgb(62, 6, 116, 1)", //Purple
-        "rgb(13, 84, 128, 1)", //Blue
+        "rgb(116, 67, 6, 1)", //Orange
     ],
 
     AvailableShapes: [

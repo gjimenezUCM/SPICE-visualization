@@ -51,7 +51,7 @@
 }
 
 /*--- LEGEND VALUES ---*/
-.col.dimension {
+.col-6.dimension {
     display: flex;
 } 
 
@@ -73,12 +73,12 @@
 }
 
 /* Background color */
-.legend.btn.active>.container.legend>.row>.col>.LegendColor {
+.legend.btn.active>.container.legend>.row>.col-6>.LegendColor {
     opacity: 25%;
 }
 
 /* Border color */
-.legend.btn.active>.container.legend>.row>.col>.LegendBorder {
+.legend.btn.active>.container.legend>.row>.col-6>.LegendBorder {
     opacity: 25%;
 }
 
@@ -114,6 +114,6 @@
     clip-path: polygon(var(--path));
 }
 
-.legend.btn.active>.container.legend>.row>.col>.LegendShape {
+.legend.btn.active>.container.legend>.row>.col-6>.LegendShape {
     opacity: 35%;
 }

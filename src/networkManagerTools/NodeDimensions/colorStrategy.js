@@ -45,8 +45,11 @@ export default class ColorStrategy {
         const value = nodeComms[this.key];
 
         node["color"] = {
-            background: this.nodeColors.get(value)
+            background: this.nodeColors.get(value),
         }
+
+        node["borderWidth"] = 0;
+        node["borderWidthSelected"] = 0;
 
         node.defaultColor = true;
     }
