@@ -4,7 +4,8 @@
  */
 //Css
 import bt_css from "../node_modules/bootstrap/dist/css/bootstrap.css";
-import css from "../css/base.css";
+import base_css from "../css/genericStyle.css";
+import legend_css from "../css/legendStyle.css";
 //Local classes
 import InitialOptions from "./initialOptions.js";
 

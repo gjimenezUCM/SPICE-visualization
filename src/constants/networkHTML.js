@@ -29,7 +29,7 @@ export const networkHTML = {
     unselectedEdgesInitialValue: false,
     
     //--- Legend HTML
-    legendButtonClass: "legend btn btn-outline-primary",
+    legendButtonClass: "legend btn",
 }
 
 

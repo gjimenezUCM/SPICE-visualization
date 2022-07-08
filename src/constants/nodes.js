@@ -19,7 +19,7 @@ export const nodes = {
     //--- Configuration Values ---
 
     //Acitvate the third node dimension if the network has 3 or more explicit communities
-    nodeThirdDimension: false,
+    nodeThirdDimension: true,
     //Sizes
     DefaultSize: 20,
     SelectedSize: 30,
@@ -150,5 +150,5 @@ const getBorderOfN = function (n) {
 const getShapehtml = function (html, n) {
     let shape = getShapeOfN(n).Shape;
 
-    html.className = shape;
+    html.className = `LegendShape ${shape}`;
 }

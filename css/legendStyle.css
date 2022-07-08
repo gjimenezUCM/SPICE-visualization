@@ -1,0 +1,116 @@
+/*--- LEGEND ACCORDION ---*/
+.accordiontop {
+    margin: auto;
+}
+
+.accordion-button {
+    height: 40px;
+}
+
+.Legend-subTittle {
+    margin: 5px auto 0px auto;
+    padding-bottom: 5px;
+}
+
+/*--- LEGEND BUTTONS ---*/
+
+/*Base button size*/
+.legend.btn {
+    display: flex;
+    margin: 0px auto 1px auto;
+    width: 95%;
+    height: 35px;
+    background: transparent;
+}
+
+.legend.btn:focus {
+    box-shadow: none;
+}
+
+.legend.btn:hover {
+    background: rgb(240, 240, 240);
+    box-shadow: none;
+}
+
+/*Default style*/
+.legend.btn {
+    color: #0d6efd;
+}
+
+.legend.btn:hover {
+    color: #002966;
+}
+
+/*When button is clicked*/
+.legend.btn.active {
+    color: #979797;
+}
+
+.legend.btn.active:hover {
+    color: #353535;
+}
+
+/*--- LEGEND VALUES ---*/
+.col.value {
+     min-width: 100px; 
+} 
+
+
+/*--- LEGEND DIMENSIONS HTML ---*/
+/* box shape with border color*/
+.box {
+    float: left;
+    height: 20px;
+    width: 20px;
+    margin: auto;
+    border: 1px solid black;
+    clear: both;
+}
+
+/* Background color */
+.legend.btn.active>.row.align-center>.col>.LegendColor {
+    opacity: 25%;
+}
+
+/* Border color */
+.legend.btn.active>.row.align-center>.col>.LegendBorder {
+    opacity: 25%;
+}
+
+/*Parent shape*/
+.LegendShape {
+    width: 20px;
+    height: 20px;
+    background: rgb(0, 0, 0);
+}
+
+/*All available shapes*/
+.square {
+    float: left;
+    margin: auto;
+    clear: both;
+}
+
+.triangle {
+    --path: 50% 0, 100% 100%, 0 100%;
+    /*Second number is the height, starting with 0 at the top of the div*/
+    clip-path: polygon(var(--path));
+}
+
+.diamond {
+    --path: 50% 0, 0% 50%, 50% 100%, 100% 50%;
+    clip-path: polygon(var(--path));
+}
+
+.dot {
+    border-radius: 50%;
+}
+
+.star {
+    --path: 50% 5%, 61% 40%, 98% 40%, 68% 62%, 79% 96%, 50% 75%, 21% 96%, 32% 62%, 2% 40%, 39% 40%;
+    clip-path: polygon(var(--path));
+}
+
+.legend.btn.active>.row.align-center>.col>.LegendShape {
+    opacity: 35%;
+}

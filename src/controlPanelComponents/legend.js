@@ -42,12 +42,11 @@ export default class Legend {
             const buttonsDiv = this.filterButtonsTemplate(attributes[i].attr, attributes[i].vals, attributes[i].dimension);
 
             const htmlString = `
-            <div class="col ${attributes[i].dimension}">
-                <h5 class="fixedHeight"> ${attributes[i].attr} </h5>
-                <hr>
+            <div class="col ${attributes[i].dimension} ${i !== attributes.length - 1 ? "border-end border-dark" : ""}">
+                <h5 class="Legend-subTittle border-bottom border-dark"> ${attributes[i].attr} </h5>
                 ${buttonsDiv}
             </div>`;
-
+            
             legendTable += htmlString;
         }
 
@@ -81,8 +80,8 @@ export default class Legend {
             const rightCol = this.getCommunityValueIndicator(dimension, i);
 
             buttonHTML += `
-            <button type="button" class="legend btn btn-outline-primary active" id="legendButton${key}_${values[i]}">
-                <div class="row align-items-center">
+            <button type="button" class="${networkHTML.legendButtonClass}" id="legendButton${key}_${values[i]}">
+                <div class="row align-center">
                     <div class="col value">    
                         ${value}
                     </div>
@@ -90,8 +89,7 @@ export default class Legend {
                         ${rightCol}
                     </div>
                 </div>
-            </button>
-            `;
+            </button>`;
         }
 
         const output = `
@@ -114,7 +112,7 @@ export default class Legend {
 
         switch (dimension) {
             case nodes.nodeColorKey:
-                output.className = "box";
+                output.className = "LegendColor box";
                 output.style.backgroundColor = nodes.NodeAttr.getColor(valueIndex);
                 break;
 
@@ -123,7 +121,7 @@ export default class Legend {
                 break;
 
             case nodes.nodeBorderKey:
-                output.className = "box";
+                output.className = "LegendBorder box";
                 output.style.borderColor = nodes.NodeAttr.getBorder(valueIndex);
                 output.style.borderWidth = "4px";
                 break;
@@ -216,12 +214,12 @@ export default class Legend {
         const btnClass = button.className;
         const isActive = btnClass.slice(btnClass.length - 6);
 
-        if (isActive === "active") {
-            button.className = networkHTML.legendButtonClass;
+        if (isActive !== "active") {
+            button.className = `${networkHTML.legendButtonClass} active`; 
 
             this.filterValuesToHide.push(`${key}_${value}`);
         } else {
-            button.className = `${networkHTML.legendButtonClass} active`;
+            button.className = networkHTML.legendButtonClass;
 
             const index = this.filterValuesToHide.indexOf(`${key}_${value}`);
             if (index === -1) {
