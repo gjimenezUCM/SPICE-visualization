@@ -275,7 +275,6 @@ export default class NetworkMan {
 
         
         if (boundingBoxId !== undefined) {
-
             const nodesInsideBoundingBox = new Array();
             this.data.nodes.forEach((node) => {
                 if (node[comms.ImplUserNewKey] === boundingBoxId) {
