@@ -39,7 +39,7 @@ export default class Legend {
         let legendTable = "";
 
         for (let i = 0; i < attributes.length; i++) {
-            const buttonsDiv = this.filterButtonsTemplate(attributes[i].vals, attributes[i].dimension);
+            const buttonsDiv = this.filterButtonsTemplate(attributes[i].attr, attributes[i].vals, attributes[i].dimension);
 
             const htmlString = `
             <div class="col ${attributes[i].dimension}">
@@ -61,16 +61,17 @@ export default class Legend {
         container.append(html);
 
         const topHTML = document.getElementById(`accordiontop`);
-        topHTML.style.maxWidth = `${10 * attributes.length}%`;
+        topHTML.style.maxWidth = `${15 * attributes.length}%`;
     }
 
     /**
      * Function that returns a html string based on a template and the parameters of the function
+     * @param {String} key key linked to the button.
      * @param {String[]} values String Array with the values of the buttons 
      * @param {String} dimension Name of the dimension that all these buttons will change
      * @returns {String} returns a string with the html of the buttons
      */
-    filterButtonsTemplate(values, dimension) {
+    filterButtonsTemplate(key, values, dimension) {
         let buttonHTML = "";
 
         for (let i = 0; i < values.length; i++) {
@@ -80,7 +81,7 @@ export default class Legend {
             const rightCol = this.getCommunityValueIndicator(dimension, i);
 
             buttonHTML += `
-            <button type="button" class="legend btn btn-block btn-outline-primary active" id="legendButton${values[i]}">
+            <button type="button" class="legend btn btn-outline-primary active" id="legendButton${key}_${values[i]}">
                 <div class="row align-items-center">
                     <div class="col value">    
                         ${value}
@@ -157,23 +158,6 @@ export default class Legend {
     }
 
     /**
-     * Look for the legendButtons and add them the corresponding onclick function
-     * @param {Object} attributes Object with the attributes that change visualization
-     * Format-> {attr: (string), vals: (string[], dimension: (string))}
-     */
-    addButtonLegendOnclick(attributes) {
-        for (let i = 0; i < attributes.length; i++) {
-            const values = attributes[i].vals;
-
-            for (let j = 0; j < values.length; j++) {
-                const button = document.getElementById(`legendButton${values[j]}`);
-
-                button.onclick = () => this.filterButtonClick(values[j], button);
-            }
-        }
-    }
-
-    /**
      * Add the onclick function to the buttons and also changes the height of buttons to fill all the space
      * @param {Object} attributes Object with the attributes that change visualization
      * Format-> {attr: (string), vals: (string[], dimension: (string))}
@@ -185,13 +169,14 @@ export default class Legend {
         //Calculate max Height and add the on click function to the buttons
         for (let i = 0; i < attributes.length; i++) {
             const values = attributes[i].vals;
+            const key = attributes[i].attr;
             let newHeight = 0;
 
             for (let j = 0; j < values.length; j++) {
-                const button = document.getElementById(`legendButton${values[j]}`);
+                const button = document.getElementById(`legendButton${key}_${values[j]}`);
                 newHeight += buttonHeight;
 
-                button.onclick = () => this.filterButtonClick(values[j], button);
+                button.onclick = () => this.filterButtonClick(key, values[j], button);
             }
 
             if(maxHeight < newHeight){
@@ -199,7 +184,17 @@ export default class Legend {
             }
         }
 
-        //Fix the button height
+        //Auto adjust button height 
+        //this.autoAdjustButtonHeight(attributes, maxHeight);
+    }
+
+    /**
+     * AutoAdjust Legend's buttons height
+     * @param {Object} attributes Object with the attributes that change visualization
+     * Format-> {attr: (string), vals: (string[], dimension: (string))}
+     * @param {Integer} maxHeight Max height
+     */
+    autoAdjustButtonHeight(attributes, maxHeight) {
         for (let i = 0; i < attributes.length; i++) {
             const values = attributes[i].vals;
             const buttonHeight = maxHeight / values.length;
@@ -213,32 +208,33 @@ export default class Legend {
 
     /**
      * Function executed when a legend button is clicked Update the values to hide and update the all networks 
+     * @param {String} key key linked to the button.
      * @param {String} value value linked to the button.
      * @param {HTMLElement} button button clicked
      */
-         filterButtonClick(value, button) {
-            const btnClass = button.className;
-            const isActive = btnClass.slice(btnClass.length - 6);
-    
-            if (isActive === "active") {
-                button.className = networkHTML.legendButtonClass;
-    
-                this.filterValuesToHide.push(value);
+    filterButtonClick(key, value, button) {
+        const btnClass = button.className;
+        const isActive = btnClass.slice(btnClass.length - 6);
+
+        if (isActive === "active") {
+            button.className = networkHTML.legendButtonClass;
+
+            this.filterValuesToHide.push(`${key}_${value}`);
+        } else {
+            button.className = `${networkHTML.legendButtonClass} active`;
+
+            const index = this.filterValuesToHide.indexOf(`${key}_${value}`);
+            if (index === -1) {
+                this.filterButtonClick(key, value, button);
+                return;
+
             } else {
-                button.className = `${networkHTML.legendButtonClass} active`;
-    
-                const index = this.filterValuesToHide.indexOf(value);
-                if (index === -1) {
-                    this.filterButtonClick(value, button);
-                    return;
-    
-                } else {
-                    this.filterValuesToHide.splice(index, 1);
-                }
+                this.filterValuesToHide.splice(index, 1);
             }
-    
-            this.networksGroup.updateFilterActivesALL(this.filterValuesToHide);
         }
+
+        this.networksGroup.updateFilterActivesALL(this.filterValuesToHide);
+    }
 }
 
 

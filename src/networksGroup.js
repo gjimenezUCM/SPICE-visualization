@@ -49,6 +49,8 @@ export default class NetworksGroup {
      * @param {String} key //Key of the network
      */
     removeNetwork(key) {
+        this.hideTooltip();
+
         const network = this.activesNetworksMap.get(key);
 
         this.activesNetworksArray = this.activesNetworksArray.filter(data => data.key != key);

@@ -115,8 +115,9 @@ export default class NodeVisuals {
             let isHidden = false;
             for (let i = 0; i < keys.length; i++) {
                 const value = explComms[keys[i]]
-
-                if (filter.includes(value)) {
+                const key = keys[i];
+                
+                if (filter.includes(`${key}_${value}`)) {
                     isHidden = true;
                     this.nodeDimensionStrategy.nodeVisualsToColorless(node);
                     break;
