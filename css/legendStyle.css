@@ -51,9 +51,14 @@
 }
 
 /*--- LEGEND VALUES ---*/
-.col.value {
-     min-width: 100px; 
+.col.dimension {
+    display: flex;
 } 
+
+.container.legend{
+    margin:auto;
+    padding: 0px;
+}
 
 
 /*--- LEGEND DIMENSIONS HTML ---*/
@@ -68,12 +73,12 @@
 }
 
 /* Background color */
-.legend.btn.active>.row.align-center>.col>.LegendColor {
+.legend.btn.active>.container.legend>.row>.col>.LegendColor {
     opacity: 25%;
 }
 
 /* Border color */
-.legend.btn.active>.row.align-center>.col>.LegendBorder {
+.legend.btn.active>.container.legend>.row>.col>.LegendBorder {
     opacity: 25%;
 }
 
@@ -86,9 +91,7 @@
 
 /*All available shapes*/
 .square {
-    float: left;
-    margin: auto;
-    clear: both;
+
 }
 
 .triangle {
@@ -111,6 +114,6 @@
     clip-path: polygon(var(--path));
 }
 
-.legend.btn.active>.row.align-center>.col>.LegendShape {
+.legend.btn.active>.container.legend>.row>.col>.LegendShape {
     opacity: 35%;
 }

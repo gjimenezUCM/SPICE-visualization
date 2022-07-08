@@ -50,7 +50,8 @@ export default class Legend {
             legendTable += htmlString;
         }
 
-        let topBody = `<div class="row">
+        let topBody = `
+        <div class="row">
             ${legendTable}
         </div>`;
 
@@ -81,12 +82,14 @@ export default class Legend {
 
             buttonHTML += `
             <button type="button" class="${networkHTML.legendButtonClass}" id="legendButton${key}_${values[i]}">
-                <div class="row align-center">
-                    <div class="col value">    
-                        ${value}
-                    </div>
-                    <div class="col">    
-                        ${rightCol}
+                <div class="container legend">
+                    <div class="row">
+                        <div class="col">    
+                            ${value}
+                        </div>
+                        <div class="col dimension">    
+                            ${rightCol}
+                        </div>
                     </div>
                 </div>
             </button>`;

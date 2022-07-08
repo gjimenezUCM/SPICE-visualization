@@ -1,8 +1,20 @@
 /*--- GENERIC OPTIONS ---*/
-.align-center{
-  margin: auto;
+body {
+  background-color: rgb(204, 204, 204);
+  color: rgb(53, 53, 53);
+  overflow-y: scroll;
 }
 
+h1 {
+  font-weight: 200%;
+  text-align: center;
+} 
+
+canvas {
+  border-style: dotted;
+}
+
+/*Make text inside an element unselectable (to evade unwanted text highlight)*/
 .unselectable {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -12,53 +24,22 @@
   user-select: none;
 }
 
-h1 {
-  font-weight: 200%;
+.align-center {
   text-align: center;
-}
-
-body {
-  background-color: rgb(204, 204, 204);
-  color: rgb(53, 53, 53);
-  overflow-y: scroll;
-}
-
-canvas {
   margin: auto;
-  display: block;
 }
 
-.title {
-  margin-bottom: 5px;
-}
-
-.middle {
-  float: middle;
-  text-align: center;
-  margin-top: auto;
-  margin-bottom: 10px;
-  margin-right: auto;
-  margin-left: auto;
-}
-
-.col-sm-8.network {
+.networkContainer {
   height: 40em;
-  border-style: dotted;
   margin-bottom: 1%;
 }
 
+/*Need this so the app width has a minimum width*/
 .container {
-  min-width: 90%;
+  min-width: 95%;
 }
 
-.dataContainer {
-  border-style: dotted;
-}
-
-.col-6 {
-  word-wrap: break-word;
-}
-
+/*--- DATA TABLES ---*/
 .dataRow {
   margin-left: 1px;
   margin-Right: 1px;
@@ -69,11 +50,7 @@ canvas {
   margin-left: 10px;
 }
 
-.middle.attributes {
-  margin-bottom: auto;
-}
-
+/*--- TOOLTIP ---*/
 .popover.node {
   opacity: 0.8;
 }
-

@@ -70,8 +70,8 @@ export default class InitialOptions {
                 <div class="col" id="${networkHTML.algorithmDropdownContainer}"> 
                 </div>
             </div>
-            <div class="middle" id="${networkHTML.controlPanelParentContainer}"> </div>
-            <div class="middle" id="${networkHTML.networksParentContainer}"> </div>
+            <div class="align-center" id="${networkHTML.controlPanelParentContainer}"> </div>
+            <div class="align-center" id="${networkHTML.networksParentContainer}"> </div>
         </div>`;
 
         const html = this.domParser.parseFromString(htmlString, "text/html").body.firstChild;
@@ -235,14 +235,14 @@ export default class InitialOptions {
     createNetwork(key, file) {
         const htmlString = `
         <div class="container" id="${networkHTML.topNetworkContainer + key}">
-            <div class="title">
+            <div>
                 <hr>
                 <h2 class="col-sm-1">
                     ${key}
                 </h2>
             </div>
             <div class="row">
-                <div class="col-sm-8 network" id="leftCol_${key}"> </div>
+                <div class="col-sm-8 networkContainer" id="leftCol_${key}"> </div>
                 <div class="col-sm-4"id="rightCol_${key}"> </div>
             </div>
         </div>`;
