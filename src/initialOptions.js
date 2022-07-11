@@ -31,7 +31,7 @@ export default class InitialOptions {
         this.networkManager = new NetworksGroup();
         this.controlPanel = new ControlPanel(this.networkManager);
 
-        const radioButtons = this.createRadioOptions(currentURL);
+        const radioButtons = this.createRadioOptions(isLocalhost);
         this.createHTMLSkeleton(radioButtons);
         this.addRadioOnclick();
 
@@ -46,11 +46,11 @@ export default class InitialOptions {
     createRadioOptions(isLocalhost) {
         const html = `
         <div>
-            <input type="radio" name="source" value="local" ${isLocalhost ? `checked="true"` : ""} id="radioLocal">
+            <input type="radio" name="source" value="local" ${isLocalhost ? 'checked="true"' : ""} id="radioLocal">
             <label class="unselectable" for="radioLocal">Local files </label>
         </div>
         <div>
-            <input type="radio" name="source" value="githubMain" ${!isLocalhost ? `checked="true"` : ""} id="radioGithubMain">
+            <input type="radio" name="source" value="githubMain" ${!isLocalhost ? 'checked="true"' : ""} id="radioGithubMain">
             <label class="unselectable" for="radioGithubMain"> Github Main </label>
         </div>`;
         return html;
