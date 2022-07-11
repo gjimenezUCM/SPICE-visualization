@@ -1,10 +1,13 @@
 {
 	"files": [
 		{
-			"name": "perspective0"
+			"name": "GAM-I"
 		},
 		{
-			"name": "perspective1"
+			"name": "HECHT-I"
+		},
+		{
+			"name": "TEST-I"
 		}
 	]
 }

@@ -19,45 +19,55 @@ export default class Legend {
      */
     constructor(container, networksGroup) {
         this.domParser = new DOMParser();
-        this.filterValuesToHide = new Array();
         this.networksGroup = networksGroup;
+        this.container = container;
 
-        const attributes = networksGroup.getVisualizationAttributes();
-
-        container.append(this.createLegendContainer(attributes));
-
-        this.addButtonLegendOnclick(attributes);
+        this.initLegend();
     }
 
     /**
      * Create a container with the legend. 
      * @param {Object} attributes Object with the attributes that change visualization
      * Format-> {attr: (string), vals: (string[], dimension: (string))}
-     * @returns {HTMLElement} returns the container with the legend
+     * @param {HTMLElement} container Container where the legend will be placed
      */
-    createLegendContainer(attributes) {
-        let topBody = "";
+    createLegendContainer(attributes, container) {
+        let legendTable = "";
+
         for (let i = 0; i < attributes.length; i++) {
-            const buttonsDiv = this.filterButtonsTemplate(attributes[i].vals, attributes[i].dimension);
+            const buttonsDiv = this.filterButtonsTemplate(attributes[i].attr, attributes[i].vals, attributes[i].dimension);
 
-            const htmlString = this.accordionTemplate(attributes[i].attr, attributes[i].attr, buttonsDiv);
-
-            topBody += htmlString;
+            const htmlString = `
+            <div class="col ${attributes[i].dimension} ${i !== attributes.length - 1 ? "border-end border-dark" : ""}">
+                <h5 class="Legend-subTittle border-bottom border-dark"> ${attributes[i].attr} </h5>
+                ${buttonsDiv}
+            </div>`;
+            
+            legendTable += htmlString;
         }
+
+        let topBody = `
+        <div class="row">
+            ${legendTable}
+        </div>`;
 
         const topAcoordion = this.accordionTemplate("top", "Legend", topBody);
 
         const html = this.domParser.parseFromString(topAcoordion, "text/html").body.firstChild;
-        return html;
+        container.append(html);
+
+        const topHTML = document.getElementById(`accordiontop`);
+        topHTML.style.maxWidth = `${15 * attributes.length}%`;
     }
 
     /**
      * Function that returns a html string based on a template and the parameters of the function
+     * @param {String} key key linked to the button.
      * @param {String[]} values String Array with the values of the buttons 
      * @param {String} dimension Name of the dimension that all these buttons will change
      * @returns {String} returns a string with the html of the buttons
      */
-    filterButtonsTemplate(values, dimension) {
+    filterButtonsTemplate(key, values, dimension) {
         let buttonHTML = "";
 
         for (let i = 0; i < values.length; i++) {
@@ -67,22 +77,22 @@ export default class Legend {
             const rightCol = this.getCommunityValueIndicator(dimension, i);
 
             buttonHTML += `
-            <div class="row align-items-left">
-                <button type="button" class="legend btn btn-outline-primary active" id="legendButton${values[i]}">
-                    <div class="row align-items-center">
-                        <div class="col value">    
+            <button type="button" class="${networkHTML.legendButtonClass}" id="legendButton${key}_${values[i]}">
+                <div class="container legend">
+                    <div class="row">
+                        <div class="col-6">    
                             ${value}
                         </div>
-                        <div class="col">    
+                        <div class="col-6 dimension">    
                             ${rightCol}
                         </div>
                     </div>
-                </button>
-            </div>`;
+                </div>
+            </button>`;
         }
 
-        const output =`
-        <div>
+        const output = `
+        <div class="legendButtonContainer" id="legendButtonContainer ${dimension}">
             ${buttonHTML}
         </div>`;
 
@@ -101,7 +111,7 @@ export default class Legend {
 
         switch (dimension) {
             case nodes.nodeColorKey:
-                output.className = "box";
+                output.className = "LegendColor box";
                 output.style.backgroundColor = nodes.NodeAttr.getColor(valueIndex);
                 break;
 
@@ -110,7 +120,7 @@ export default class Legend {
                 break;
 
             case nodes.nodeBorderKey:
-                output.className = "box";
+                output.className = "LegendBorder box";
                 output.style.borderColor = nodes.NodeAttr.getBorder(valueIndex);
                 output.style.borderWidth = "4px";
                 break;
@@ -128,14 +138,14 @@ export default class Legend {
      */
     accordionTemplate(id, buttonText, body) {
         const html = `
-        <div class="accordion${id}">
+        <div class="accordion${id}" id="accordion${id}">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading${id}">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${id}" aria-expanded="true" aria-controls="collapse${id}">
                         ${buttonText}
                     </button>
                 </h2>
-                <div id="collapse${id}" class="accordion-collapse collapse" aria-labelledby="heading${id}" data-bs-parent="#accordion${id}">
+                <div id="collapse${id}" class="accordion-collapse collapse" aria-labelledby="heading${id}" data-bs-parent="#accordion${id}"> 
                     ${body}
                 </div>
             </div>
@@ -145,41 +155,74 @@ export default class Legend {
     }
 
     /**
-     * Look for the legendButtons and add them the corresponding onclick function
+     * Add the onclick function to the buttons and also changes the height of buttons to fill all the space
      * @param {Object} attributes Object with the attributes that change visualization
      * Format-> {attr: (string), vals: (string[], dimension: (string))}
      */
-    addButtonLegendOnclick(attributes) {
+    buttonAdditions(attributes) {
+        const buttonHeight = 35 + 1;
+        let maxHeight = 0;
+
+        //Calculate max Height and add the on click function to the buttons
         for (let i = 0; i < attributes.length; i++) {
             const values = attributes[i].vals;
+            const key = attributes[i].attr;
+            let newHeight = 0;
+
+            for (let j = 0; j < values.length; j++) {
+                const button = document.getElementById(`legendButton${key}_${values[j]}`);
+                newHeight += buttonHeight;
+
+                button.onclick = () => this.filterButtonClick(key, values[j], button);
+            }
+
+            if(maxHeight < newHeight){
+                maxHeight = newHeight
+            }
+        }
+
+        //Auto adjust button height 
+        //this.autoAdjustButtonHeight(attributes, maxHeight);
+    }
+
+    /**
+     * AutoAdjust Legend's buttons height
+     * @param {Object} attributes Object with the attributes that change visualization
+     * Format-> {attr: (string), vals: (string[], dimension: (string))}
+     * @param {Integer} maxHeight Max height
+     */
+    autoAdjustButtonHeight(attributes, maxHeight) {
+        for (let i = 0; i < attributes.length; i++) {
+            const values = attributes[i].vals;
+            const buttonHeight = maxHeight / values.length;
 
             for (let j = 0; j < values.length; j++) {
                 const button = document.getElementById(`legendButton${values[j]}`);
-
-                button.onclick = () => this.filterButtonClick(values[j], button);
+                button.style.height = `${buttonHeight}px`;
             }
         }
     }
 
     /**
      * Function executed when a legend button is clicked Update the values to hide and update the all networks 
+     * @param {String} key key linked to the button.
      * @param {String} value value linked to the button.
      * @param {HTMLElement} button button clicked
      */
-    filterButtonClick(value, button) {
+    filterButtonClick(key, value, button) {
         const btnClass = button.className;
         const isActive = btnClass.slice(btnClass.length - 6);
 
-        if (isActive === "active") {
+        if (isActive !== "active") {
+            button.className = `${networkHTML.legendButtonClass} active`; 
+
+            this.filterValuesToHide.push(`${key}_${value}`);
+        } else {
             button.className = networkHTML.legendButtonClass;
 
-            this.filterValuesToHide.push(value);
-        } else {
-            button.className = `${networkHTML.legendButtonClass} active`;
-
-            const index = this.filterValuesToHide.indexOf(value);
+            const index = this.filterValuesToHide.indexOf(`${key}_${value}`);
             if (index === -1) {
-                this.filterButtonClick(value, button);
+                this.filterButtonClick(key, value, button);
                 return;
 
             } else {
@@ -188,6 +231,23 @@ export default class Legend {
         }
 
         this.networksGroup.updateFilterActivesALL(this.filterValuesToHide);
+    }
+
+    initLegend(){
+        this.filterValuesToHide = new Array();
+
+        const attributes = this.networksGroup.getVisualizationAttributes();
+
+        this.createLegendContainer(attributes, this.container);
+
+        this.buttonAdditions(attributes);
+    }
+
+    restartLegend(){
+        const legendContainer = document.getElementById("accordiontop");
+        legendContainer.remove();
+
+        this.initLegend();
     }
 }
 

@@ -30,9 +30,6 @@ export default class ImplicitCommsData {
      * @param {Network} network Network where the bounding boxes are being drawn on
      */
     drawBoundingBoxes(ctx, data, network) {
-        //Tracks the draw order of the bounding boxes
-        this.bbOrder = new Array();
-
         //Initialize all bounding boxes
         const boundingBoxes = new Array();
         for (let i = 0; i < Object.keys(this.implComms).length; i++) {
@@ -49,12 +46,8 @@ export default class ImplicitCommsData {
 
             if (boundingBoxes[group] === null) {
                 boundingBoxes[group] = node_bb;
-                this.bbOrder.push(group);
 
-                //DEBUG TO SEE THE BB COLOR IN THE TABLE
-                this.implComms[group].color = this.getCommunityBBcolor(bb_count);
                 bb_count++;
-
             } else {
                 if (node_bb.left < boundingBoxes[group].left)
                     boundingBoxes[group].left = node_bb.left;
@@ -73,6 +66,8 @@ export default class ImplicitCommsData {
         //Draw the bounding box of all groups
         for (let i = 0; i < boundingBoxes.length; i++) {
             if (boundingBoxes[i] !== null) {
+                //DEBUG TO SEE THE BB COLOR IN THE TABLE
+                this.implComms[i].color = this.getCommunityBBcolor(i);
 
                 //Draw Border
                 ctx.lineWidth = comms.Bb.BoderWidth;
@@ -183,7 +178,7 @@ export default class ImplicitCommsData {
      * @param {Integer} i index of the bounding box
      */
     updateDataTable(i) {
-        const community = this.implComms[this.bbOrder[i]];
+        const community = this.implComms[i];
         const newRowData = new Map();
 
         for (let i = 0; i < comms.ImplWantedAttr.length; i++) {
@@ -242,7 +237,7 @@ export default class ImplicitCommsData {
      * @returns {String} String with the tootip tittle
      */
     getTooltipTitle(networkManager, event, titleTemplate) {
-        const communityClicked = this.implComms[this.bbOrder[this.activeBBindex]];
+        const communityClicked = this.implComms[this.activeBBindex];
         const title = communityClicked.id;
 
         return titleTemplate(title);
@@ -256,7 +251,7 @@ export default class ImplicitCommsData {
      * @returns {String} String with the tootip content
      */
     getTooltipContent(networkManager, event, contentTemplate) {
-        const communityClicked = this.implComms[this.bbOrder[this.activeBBindex]];
+        const communityClicked = this.implComms[this.activeBBindex];
         const rowData = new Array();
 
         for (let i = 0; i < comms.ImplWantedAttr.length; i++) {

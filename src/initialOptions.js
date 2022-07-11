@@ -18,17 +18,20 @@ export default class InitialOptions {
 
     /**
      * Constructor of the class
+     * @param {Boolean} isLocalhost check if the App is running in localhost
      */
-    constructor() {
+    constructor(isLocalhost) {
         this.localURL = "../data/";
         this.githubURL = "https://raw.githubusercontent.com/gjimenezUCM/SPICE-visualization/main/data/";
 
+        let currentURL = isLocalhost ? this.localURL : this.githubURL;
+
         this.domParser = new DOMParser();
-        this.requestManager = new RequestManager(this.localURL);
+        this.requestManager = new RequestManager(currentURL);
         this.networkManager = new NetworksGroup();
         this.controlPanel = new ControlPanel(this.networkManager);
 
-        const radioButtons = this.createRadioOptions();
+        const radioButtons = this.createRadioOptions(currentURL);
         this.createHTMLSkeleton(radioButtons);
         this.addRadioOnclick();
 
@@ -37,20 +40,19 @@ export default class InitialOptions {
 
     /**
      * Create a html string with radio buttons to choose the baseURL of the request manager
+     * @param {Boolean} isLocalhost check if the App is running in localhost
      * @returns {String} returns the html string
      */
-    createRadioOptions() {
+    createRadioOptions(isLocalhost) {
         const html = `
-            <div>
-                <input type="radio" name="source" value="local" checked="true" id="radioLocal">
-                <label class="unselectable" for="radioLocal">Local files </label>
-            </div>
-            <div>
-                <input type="radio" name="source" value="githubMain" id="radioGithubMain">
-                <label class="unselectable" for="radioGithubMain"> Github Main </label>
-            </div>
-        `;
-
+        <div>
+            <input type="radio" name="source" value="local" ${isLocalhost ? `checked="true"` : ""} id="radioLocal">
+            <label class="unselectable" for="radioLocal">Local files </label>
+        </div>
+        <div>
+            <input type="radio" name="source" value="githubMain" ${!isLocalhost ? `checked="true"` : ""} id="radioGithubMain">
+            <label class="unselectable" for="radioGithubMain"> Github Main </label>
+        </div>`;
         return html;
     }
 
@@ -61,15 +63,15 @@ export default class InitialOptions {
         const htmlString = `
         <div>
             <div class="row"> 
-                <div class="col-sm-4"> </div>
-                <div class="col-sm-2"> 
+                <div class="col-sm-5"> </div>
+                <div class="col-sm-1"> 
                     ${radioButtons}
                 </div>
                 <div class="col" id="${networkHTML.algorithmDropdownContainer}"> 
                 </div>
             </div>
-            <div class="middle" id="${networkHTML.controlPanelParentContainer}"> </div>
-            <div class="middle" id="${networkHTML.networksParentContainer}"> </div>
+            <div class="align-center" id="${networkHTML.controlPanelParentContainer}"> </div>
+            <div class="align-center" id="${networkHTML.networksParentContainer}"> </div>
         </div>`;
 
         const html = this.domParser.parseFromString(htmlString, "text/html").body.firstChild;
@@ -233,14 +235,14 @@ export default class InitialOptions {
     createNetwork(key, file) {
         const htmlString = `
         <div class="container" id="${networkHTML.topNetworkContainer + key}">
-            <div class="title">
+            <div>
                 <hr>
                 <h2 class="col-sm-1">
                     ${key}
                 </h2>
             </div>
             <div class="row">
-                <div class="col-sm-8 network" id="leftCol_${key}"> </div>
+                <div class="col-sm-8 networkContainer" id="leftCol_${key}"> </div>
                 <div class="col-sm-4"id="rightCol_${key}"> </div>
             </div>
         </div>`;
@@ -258,6 +260,7 @@ export default class InitialOptions {
             variableEdge: this.controlPanel.getVariableEdgeValue(),
             hideUnselected: this.controlPanel.getUnselectedEdgesValue(),
             valuesToHide: this.controlPanel.getValuesToHide(),
+            allowThirdDimension: this.controlPanel.getThirdDimensionValue(),
             key: key
         };
 

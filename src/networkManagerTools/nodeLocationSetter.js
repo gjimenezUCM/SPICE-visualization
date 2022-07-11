@@ -17,7 +17,6 @@ export default class nodeLocationSetter {
      */
     constructor(nodeData, n) {
         this.mode = nodes.nodeGroupsViewMode;
-        console.log(this.mode);
 
         this.setNodeLocation(nodeData, n);
     }

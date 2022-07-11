@@ -6,6 +6,7 @@
  */
 //Namespaces
 import { networkHTML } from "./constants/networkHTML.js";
+import AllowThirdDimensionCheckbox from "./controlPanelComponents/allowThirdDimensionCheckbox.js";
 //Local classes
 import Legend from "./controlPanelComponents/legend.js";
 import ThresholdSlider from "./controlPanelComponents/thresholdSlider.js";
@@ -43,10 +44,13 @@ export default class ControlPanel {
         this.thresholdSlider = new ThresholdSlider(this.container, this.networkManager);
         this.variableEdge = new VariableEdgeCheckbox(this.container, this.networkManager);
         this.unselectedEdges = new UnselectedEdgesCheckbox(this.container, this.networkManager);
+        this.allowThirdDimension = new AllowThirdDimensionCheckbox(this.container, this.networkManager);
 
         this.legend = new Legend(this.container, this.networkManager);
+        this.allowThirdDimension.setLegend(this.legend)
+        
 
-        this.container.append(document.createElement("br"));
+        //this.container.append(document.createElement("br"));
     }
 
     /**
@@ -106,6 +110,18 @@ export default class ControlPanel {
             return [];
         else {
             return this.legend.filterValuesToHide;
+        }
+    }
+
+    /**
+     * Returns the current state of the allowThirdDimension checkbox
+     * @returns {Boolean} current state of the checkbox
+     */
+    getThirdDimensionValue(){
+        if (!this.isActive)
+            return networkHTML.thirdDimensionInitialValue;
+        else {
+            return this.allowThirdDimension.getChecked();
         }
     }
 }   

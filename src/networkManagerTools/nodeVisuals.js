@@ -14,10 +14,13 @@ export default class NodeVisuals {
 
     /**
      * Constructor of the class
+     * @param {Boolean} thirdDimension activate or not the third dimension of the nodes 
      */
-    constructor() {
+    constructor(thirdDimension) {
         //Contains all explicit Communities with its values
         this.communitiesData = new Array();
+
+        this.activateThirdDimension = thirdDimension;
     }
 
     /** 
@@ -60,6 +63,14 @@ export default class NodeVisuals {
             dimension: nodes.nodeShapeKey,
         },
         ];
+
+        if(this.communitiesData[2] !== undefined && this.activateThirdDimension){
+            attributes.push({
+                attr: this.communitiesData[2].key,
+                vals: this.communitiesData[2].values,
+                dimension: nodes.nodeBorderKey,
+            })
+        }
 
         this.nodeDimensionStrategy = new NodeDimensionStrategy(attributes);
 
@@ -105,8 +116,9 @@ export default class NodeVisuals {
             let isHidden = false;
             for (let i = 0; i < keys.length; i++) {
                 const value = explComms[keys[i]]
-
-                if (filter.includes(value)) {
+                const key = keys[i];
+                
+                if (filter.includes(`${key}_${value}`)) {
                     isHidden = true;
                     this.nodeDimensionStrategy.nodeVisualsToColorless(node);
                     break;

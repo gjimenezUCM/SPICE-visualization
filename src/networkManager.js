@@ -36,7 +36,7 @@ export default class NetworkMan {
         this.valuesToHide = config.valuesToHide;
 
         this.implCommMan = new ImplicitCommsMan(jsonInput);
-        this.nodeVisuals = new NodeVisuals(this);
+        this.nodeVisuals = new NodeVisuals(config.allowThirdDimension);
 
         this.nodeData = new NodeData(this.nodeVisuals, rightContainer);
         this.edgesMan = new EdgeManager(config);
@@ -275,7 +275,6 @@ export default class NetworkMan {
 
         
         if (boundingBoxId !== undefined) {
-
             const nodesInsideBoundingBox = new Array();
             this.data.nodes.forEach((node) => {
                 if (node[comms.ImplUserNewKey] === boundingBoxId) {
@@ -311,6 +310,14 @@ export default class NetworkMan {
         this.valuesToHide = filter;
     }
 
+    /** 
+     * Change the network allowThirdDimension value
+     * @param {Boolean} newBool New allowThirdDimension value
+     */
+    changeThirdDimension(newBool){
+        this.nodeVisuals.activateThirdDimension = newBool;
+        this.nodeVisuals.createNodeDimensionStrategy(this.data.nodes);
+    }
     /**
      * Returns the attributes that changes visualization
      * @returns {Object} Object with the attributes that change visualization

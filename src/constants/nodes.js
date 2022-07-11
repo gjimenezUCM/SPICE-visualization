@@ -15,6 +15,7 @@ export const nodes = {
     nodeBetweenNodesDistance: 8,
 
     nodeGroupsViewMode: "circle", //"circle" to see nodes in a circle, "square" to see them in a square
+   
     //--- Configuration Values ---
 
     //Sizes
@@ -46,7 +47,7 @@ export const nodes = {
 
     //html
     //Title of the table with selected node data
-    NodesTableTitle: "User Attributes",
+    NodesTableTitle: "Citizen Attributes",
     //ClassName of a row without border
     borderlessHTMLrow: "row dataRow",
     //ClassName of a row with main attributes
@@ -61,7 +62,7 @@ export const nodes = {
     //KEYS
     nodeColorKey: "color",
     nodeShapeKey: "shape",
-    nodeBorderKey: "border",
+    nodeBorderKey: "nodeBorder",
     
     //Node attributes that change based on its explicit Community
     NodeAttr: {
@@ -91,7 +92,7 @@ export const nodes = {
         "rgb(13, 84, 128, 1)", //Blue
         "rgb(128, 0, 0, 1)", //Red
         "rgb(62, 6, 116, 1)", //Purple
-        "rgb(13, 84, 128, 1)", //Blue
+        "rgb(116, 67, 6, 1)", //Orange
     ],
 
     AvailableShapes: [
@@ -147,5 +148,5 @@ const getBorderOfN = function (n) {
 const getShapehtml = function (html, n) {
     let shape = getShapeOfN(n).Shape;
 
-    html.className = shape;
+    html.className = `LegendShape ${shape}`;
 }
