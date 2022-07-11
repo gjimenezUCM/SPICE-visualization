@@ -64,6 +64,13 @@ export default class NetworkMan {
     * Initialize vis.network options
     */
     chooseOptions() {
+        this.fitOptions = {
+            animation: true,
+            animation: {
+                duration: nodes.ZoomDuration,
+            },
+        }
+
         this.options = {
             autoResize: true,
             edges: {
@@ -169,16 +176,12 @@ export default class NetworkMan {
         this.groupManager.hideTooltip();
 
         if (event.nodes.length > 0) {
-            this.nodeHasBeenClicked(event.nodes[0]);
+            this.nodeHasBeenClicked(event);
 
-            this.groupManager.createTooltip(this, event, this.nodeData);
-            this.implCommMan.updateDataTableFromNodeId(event.nodes[0], this.data.nodes);
+            
 
         } else {
             this.noNodeIsClicked(event);
-
-            this.groupManager.createTooltip(this, event, this.implCommMan);
-            this.implCommMan.updateDataTableFromClick(event);
         }
     }
 
@@ -192,10 +195,12 @@ export default class NetworkMan {
 
     /** 
     * Function executed only when this was the network that received the click event on top of a node
-    * @param {*} id id of the node 
+    * @param {Object} event click event 
     */
-    nodeHasBeenClicked(id) {
-        this.groupManager.nodeSelected(id);
+    nodeHasBeenClicked(event) {
+        this.groupManager.nodeSelected(event.nodes[0]);
+
+        this.groupManager.createTooltip(this, event, this.nodeData);
     }
 
     /** 
@@ -205,6 +210,9 @@ export default class NetworkMan {
      */
     nodeSelected(id) {
         this.network.selectNodes([id], true);
+
+        //Update node community data table
+        this.implCommMan.updateDataTableFromNodeId(id, this.data.nodes);
 
         //Update node data table
         this.nodeData.updateDataTable(id);
@@ -258,36 +266,38 @@ export default class NetworkMan {
      */
     noNodeIsClicked(event) {
         const index = this.implCommMan.checkBoundingBoxClick(event);
+        if (index !== undefined) {
+            const nodesInsideBoundingBox = new Array();
+            this.data.nodes.forEach((node) => {
+                if (node[comms.ImplUserNewKey] === index) {
+                    nodesInsideBoundingBox.push(node.id);
+                }
+            });
 
-        this.groupManager.nodeDeselected(index);
+            this.fitOptions["nodes"] = nodesInsideBoundingBox;
+        }
+
+        this.groupManager.nodeDeselected();
+
+        this.groupManager.createTooltip(this, event, this.implCommMan);
+        this.implCommMan.updateDataTableFromClick(event);
     }
 
     /**
      * Restore the network to the original deselected state
      */
-    nodeDeselected(boundingBoxId) {
-        const fitOptions = {
+    nodeDeselected() {
+        this.network.fit(this.fitOptions);
+
+        this.fitOptions = {
             animation: true,
             animation: {
                 duration: nodes.ZoomDuration,
             },
         }
 
-        
-        if (boundingBoxId !== undefined) {
-            const nodesInsideBoundingBox = new Array();
-            this.data.nodes.forEach((node) => {
-                if (node[comms.ImplUserNewKey] === boundingBoxId) {
-                    nodesInsideBoundingBox.push(node.id);
-                }
-            });
-
-            fitOptions["nodes"] = nodesInsideBoundingBox;
-        }
-
-        this.network.fit(fitOptions);
-        
         this.nodeData.clearDataTable();
+        this.implCommMan.clearDataTable();
 
         this.network.unselectAll();
 
