@@ -150,6 +150,8 @@ export default class NetworkMan {
         this.network.on("beforeDrawing", (ctx) => this.preDrawEvent(ctx));
         this.network.on("click", (event) => this.clickEvent(event));
         this.network.on("zoom", (event) => this.zoomEvent(event));
+        this.network.on("dragging", (event) => this.draggingEvent(event));
+        
         this.network.on("animationFinished", () => this.animationFinishEvent());
     }
 
@@ -189,10 +191,18 @@ export default class NetworkMan {
      * Function executed when "zoom" event is launched. Happens when the user zooms-in in the canvas
      * @param {Object} event Zoom event
      */
-    zoomEvent() {
+    zoomEvent(event) {
         this.groupManager.updateTooltipPosition();
     }
 
+    /** 
+     * Function executed when "dragging" event is launched. Happens when the user drag a node or the canvas
+     * @param {Object} event Drag event
+     */
+    draggingEvent(event){
+        this.groupManager.updateTooltipPosition();
+    }
+    
     /** 
     * Function executed only when this was the network that received the click event on top of a node
     * @param {Object} event click event 

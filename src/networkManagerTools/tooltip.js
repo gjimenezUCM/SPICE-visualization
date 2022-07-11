@@ -32,8 +32,8 @@ export default class Tooltip {
         this.event = event;
         this.networkManager = networkManager;
 
-        const spawnPoint = tooltipManager.calculateTooltipSpawn(networkManager, event, this.getElementPosition.bind(this));
-
+        const spawnPoint = tooltipManager.calculateTooltipSpawn(networkManager, event, this.getElementPosition.bind(this), this.isClickOnCanvas.bind(this));
+        
         if (spawnPoint !== null && spawnPoint !== undefined) {
             if (!update) {
                 const html = this.tooltipTemplate();
@@ -59,9 +59,13 @@ export default class Tooltip {
             this.container.style.left = `${spawnPoint.x}px`;
             this.container.style.position = "absolute";
 
-            if (update)
+            if (update){
                 this.tooltip.update();
+                this.tooltip.show();
+            }
 
+        }else if(this.tooltip !== null) {
+            this.tooltip.hide();
         }
     }
 
@@ -78,8 +82,21 @@ export default class Tooltip {
 
         const top = element.offsetTop - parseFloat(marginTop);
         const left = element.offsetLeft - parseFloat(marginLeft);
+        
+        return { top: top, left: left, right: left + element.offsetWidth, bottom: top + element.offsetHeight };
+    }
 
-        return { top: top, left: left };
+    /**
+     * Check if the click is inside the canvas
+     * @param {Object} click click position.
+     * Format-> { x: (integer), y: (integer) } 
+     * @param {Object} canvas canvas position.
+     * Format-> { top: (integer), left: (integer), bottom: (integer), top: (integer) }
+     * @returns {Boolean} returns true if the click is inside the canvas, false otherwise
+     */
+    isClickOnCanvas(click, canvas){
+        return click.y > canvas.top && click.y < canvas.bottom &&
+            click.x > canvas.left && click.x < canvas.right;
     }
 
     /**

@@ -128,10 +128,11 @@ export default class NodeData {
      * @param {NetworkManager} networkManager Manager of the network where the tooltip is going to be draw
      * @param {Object} event Event with the location of the user click
      * @param {Function} getElementPosition Function that returns the DOM position of a HTML element
+     * @param {Function} isClickOnCanvas Function that returns if the click object is in the canvas
      * @returns {Object} returns an object with the spawn Point.
      * Format-> { x: (integer), y: (integer) } 
      */
-    calculateTooltipSpawn(networkManager, event, getElementPosition) {
+    calculateTooltipSpawn(networkManager, event, getElementPosition, isClickOnCanvas) {
         //Calculate the relative position of the click in the canvas
         const nodeInCanvasPosition = networkManager.network.getPosition(event.nodes[0]);
         const nodeInCanvasDOMposition = networkManager.network.canvasToDOM(nodeInCanvasPosition);
@@ -144,7 +145,11 @@ export default class NodeData {
         const clickX = nodeInCanvasDOMposition.x + networkCanvasPosition.left + xOffset;
         const clickY = nodeInCanvasDOMposition.y + networkCanvasPosition.top;
 
-        return { x: clickX, y: clickY };
+        const output = { x: clickX, y: clickY };
+
+        if (isClickOnCanvas(output, networkCanvasPosition)) 
+            return output;
+        return null;
     }
 
     /**

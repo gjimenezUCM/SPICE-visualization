@@ -200,10 +200,11 @@ export default class ImplicitCommsData {
      * @param {NetworkManager} networkManager Manager of the network where the tooltip is going to be draw
      * @param {Object} event Event with the location of the user click
      * @param {Function} getElementPosition Function that returns the DOM position of a HTML element
+     * @param {Function} isClickOnCanvas Function that returns if the click object is in the canvas
      * @returns {Object} returns an object with the spawn Point.
      * Format-> { x: (integer), y: (integer) } 
      */
-    calculateTooltipSpawn(networkManager, event, getElementPosition) {
+    calculateTooltipSpawn(networkManager, event, getElementPosition, isClickOnCanvas) {
         //CHeck if the click hit a bounding box
         this.activeBBindex = this.checkBoundingBoxClick(event);
 
@@ -222,12 +223,18 @@ export default class ImplicitCommsData {
 
         //Calculate the real absolute click coordinates
         const networkCanvasPosition = getElementPosition(networkHTML.topCanvasContainer + networkManager.key);
-
+        networkCanvasPosition.wid
         const clickX = bbLeft.x + (bbRight.x - bbLeft.x) / 2 + networkCanvasPosition.left;
         const clickY = bbLeft.y + (bbRight.y - bbLeft.y) / 2 + networkCanvasPosition.top;
 
-        return { x: clickX, y: clickY };
+        const output = { x: clickX, y: clickY };
+
+        if (isClickOnCanvas(output, networkCanvasPosition)) 
+            return output;
+        return null;
     }
+
+
 
     /**
      * Returns the Title of the tooltip
