@@ -36,7 +36,7 @@ export default class NetworkMan {
         this.valuesToHide = config.valuesToHide;
 
         this.implCommMan = new ImplicitCommsMan(jsonInput);
-        this.nodeVisuals = new NodeVisuals(config.allowThirdDimension);
+        this.nodeVisuals = new NodeVisuals(config);
 
         this.nodeData = new NodeData(this.nodeVisuals, rightContainer);
         this.edgesMan = new EdgeManager(config);
@@ -336,6 +336,16 @@ export default class NetworkMan {
         this.nodeVisuals.activateThirdDimension = newBool;
         this.nodeVisuals.createNodeDimensionStrategy(this.data.nodes);
     }
+
+    /** 
+     * Change the network nodeLabelVisibility value
+     * @param {Boolean} newBool New nodeLabelVisibility value
+     */
+    nodeLabelVisibilityChange(newBool){
+        this.nodeVisuals.nodeLabelVisibility = newBool;
+        this.nodeVisuals.updateNodeLabelsVisibility(this.data.nodes);
+    }
+
     /**
      * Returns the attributes that changes visualization
      * @returns {Object} Object with the attributes that change visualization

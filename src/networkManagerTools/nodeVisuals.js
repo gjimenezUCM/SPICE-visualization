@@ -14,13 +14,15 @@ export default class NodeVisuals {
 
     /**
      * Constructor of the class
-     * @param {Boolean} thirdDimension activate or not the third dimension of the nodes 
+     * @param {Object} config Object with the initial configuration of this class
      */
-    constructor(thirdDimension) {
+    constructor(config) {
         //Contains all explicit Communities with its values
         this.communitiesData = new Array();
 
-        this.activateThirdDimension = thirdDimension;
+        this.activateThirdDimension = config.allowThirdDimension;
+
+        this.nodeLabelVisibility = config.showNodeLabels;
     }
 
     /** 
@@ -133,6 +135,24 @@ export default class NodeVisuals {
         nodes.update(newNodes);
     }
 
+    /**
+     * Hide/Show the label of the nodes based on nodeLabelVisibility value
+     * @param {DataSet} nodes Dataset with the network's data of all nodes
+     */
+    updateNodeLabelsVisibility(nodes){
+        const newNodes = new Array();
+
+        nodes.forEach((node) => {
+            if(!this.nodeLabelVisibility)
+                node["font"].color = "#00000000"; 
+            else 
+                node["font"].color = "#000000FF";
+
+            newNodes.push(node);
+        });
+        nodes.update(newNodes);
+    }
+    
     /** 
      * Function executed when a node is selected that update the node visual attributes
      * @param {Object} values value of the parameters that will change

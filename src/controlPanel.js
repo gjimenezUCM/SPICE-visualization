@@ -7,6 +7,7 @@
 //Namespaces
 import { networkHTML } from "./constants/networkHTML.js";
 import AllowThirdDimensionCheckbox from "./controlPanelComponents/allowThirdDimensionCheckbox.js";
+import ChangeNodeLabelVisibilityCheckbox from "./controlPanelComponents/changeNodeLabelVisibilityCheckbox.js";
 //Local classes
 import Legend from "./controlPanelComponents/legend.js";
 import ThresholdSlider from "./controlPanelComponents/thresholdSlider.js";
@@ -45,6 +46,7 @@ export default class ControlPanel {
         this.variableEdge = new VariableEdgeCheckbox(this.container, this.networkManager);
         this.unselectedEdges = new UnselectedEdgesCheckbox(this.container, this.networkManager);
         this.allowThirdDimension = new AllowThirdDimensionCheckbox(this.container, this.networkManager);
+        this.changeNodeVisbility = new ChangeNodeLabelVisibilityCheckbox(this.container, this.networkManager);
 
         this.legend = new Legend(this.container, this.networkManager);
         this.allowThirdDimension.setLegend(this.legend)
@@ -122,6 +124,17 @@ export default class ControlPanel {
             return networkHTML.thirdDimensionInitialValue;
         else {
             return this.allowThirdDimension.getChecked();
+        }
+    }
+
+    /**
+     * 
+     */
+    getShowNodeLabelValue(){
+        if (!this.isActive)
+            return networkHTML.showNodeLabelInitialValue;
+        else {
+            return this.changeNodeVisbility.getChecked();
         }
     }
 }   

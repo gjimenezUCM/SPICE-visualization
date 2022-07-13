@@ -261,6 +261,7 @@ export default class InitialOptions {
             hideUnselected: this.controlPanel.getUnselectedEdgesValue(),
             valuesToHide: this.controlPanel.getValuesToHide(),
             allowThirdDimension: this.controlPanel.getThirdDimensionValue(),
+            showNodeLabels: this.controlPanel.getShowNodeLabelValue(),
             key: key
         };
 

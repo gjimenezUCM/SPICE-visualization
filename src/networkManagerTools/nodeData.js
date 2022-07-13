@@ -41,6 +41,18 @@ export default class NodeData {
                 delete node["group"];
 
             node["defaultColor"] = true;
+
+            if(!networkHTML.showNodeLabelInitialValue){
+                node["font"] = {
+                    color: "#00000000"
+                }
+            }else{
+                node["font"] = {
+                    color: "#000000FF"
+                }
+            }
+            
+            console.log(node);
         }
         this.nodes = new DataSet(json.users);
 

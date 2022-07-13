@@ -28,6 +28,7 @@ export const networkHTML = {
     variableEdgeInitialValue: false,
     unselectedEdgesInitialValue: false,
     thirdDimensionInitialValue: false,
+    showNodeLabelInitialValue: false,
     
     //--- Legend HTML
     legendButtonClass: "legend btn",

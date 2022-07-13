@@ -192,6 +192,25 @@ export default class NetworksGroup {
         });
     }
 
+    /** 
+     * Change the network nodeLabelVisibility value
+     * @param {String} key Key of the network
+     * @param {Boolean} newBool New nodeLabelVisibility value
+     */
+     nodeLabelVisibilityChange(key, newBool) {
+        const network = this.activesNetworksMap.get(key);
+
+        network.nodeLabelVisibilityChange(newBool);
+    }
+    /**
+     * Broadcast the new nodeLabelVisibility value to all networks
+     * @param {Boolean} newValue New nodeLabelVisibility value
+     */
+    nodeLabelVisibilityChangeALL(newValue){
+        this.activesNetworksArray.forEach((network) => {
+            this.nodeLabelVisibilityChange(network.key, newValue);
+        });
+    }
     /**
      * Hide the current active popover
      */

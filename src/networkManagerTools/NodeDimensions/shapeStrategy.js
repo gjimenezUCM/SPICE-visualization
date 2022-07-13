@@ -46,8 +46,7 @@ export default class ShapeStrategy {
         const shapeVals = this.nodeShapes.get(value);
 
         node["shape"] = shapeVals.Shape;
-        node.font = {
-            vadjust: shapeVals.vOffset,
-        };
+        node.font["vadjust"] = shapeVals.vOffset;
+
     }
 }
