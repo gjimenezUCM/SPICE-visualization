@@ -205,6 +205,9 @@ export default class ImplicitCommsData {
      * Format-> { x: (integer), y: (integer) } 
      */
     calculateTooltipSpawn(networkManager, event, getElementPosition, isClickOnCanvas) {
+        //Horizontal offset to make the tooltip not overlap the bounding box
+        const xOffset = 10;
+
         //CHeck if the click hit a bounding box
         this.activeBBindex = this.checkBoundingBoxClick(event);
 
@@ -223,8 +226,8 @@ export default class ImplicitCommsData {
 
         //Calculate the real absolute click coordinates
         const networkCanvasPosition = getElementPosition(networkHTML.topCanvasContainer + networkManager.key);
-        networkCanvasPosition.wid
-        const clickX = bbLeft.x + (bbRight.x - bbLeft.x) / 2 + networkCanvasPosition.left;
+
+        const clickX = bbRight.x + xOffset + networkCanvasPosition.left;
         const clickY = bbLeft.y + (bbRight.y - bbLeft.y) / 2 + networkCanvasPosition.top;
 
         const output = { x: clickX, y: clickY };

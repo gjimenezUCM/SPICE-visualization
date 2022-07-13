@@ -180,8 +180,6 @@ export default class NetworkMan {
         if (event.nodes.length > 0) {
             this.nodeHasBeenClicked(event);
 
-            
-
         } else {
             this.noNodeIsClicked(event);
         }
