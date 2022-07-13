@@ -271,7 +271,12 @@ export default class ImplicitCommsData {
         return contentTemplate(rowData);
     }
 
-
+    /**
+     * Completely remove the dataTable
+     */
+    removeTable(){
+        this.dataTable.removeDataTable();
+    }
 
     //This is intended for debug purpouses
     getCommunityBBcolor(index) {

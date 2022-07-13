@@ -16,7 +16,10 @@ export default class NetworksGroup {
     /**
      * Constructor of the class
      */
-    constructor() {
+    constructor(initialOptions) {
+        this.initialOptions = initialOptions;
+        this.secondNetworkTag = this.initialOptions.secondNetworkTag;
+
         this.activesNetworksMap = new Map();
         this.activesNetworksArray = new Array();
 
@@ -53,14 +56,49 @@ export default class NetworksGroup {
 
         const network = this.activesNetworksMap.get(key);
 
-        this.activesNetworksArray = this.activesNetworksArray.filter(data => data.key != key);
+        if (network !== undefined) {
+            this.activesNetworksArray = this.activesNetworksArray.filter(data => data.key != key);
 
-        network.clearNetwork();
+            network.clearNetwork();
 
-        const networkContainer = document.getElementById(networkHTML.networksParentContainer);
-        const divToDelete = document.getElementById(`${networkHTML.topNetworkContainer}${key}`);
+            if (key.length <= this.secondNetworkTag.length || key.slice(key.length -this.secondNetworkTag.length) !== this.secondNetworkTag) {
+                //Its a main network
+                const networkContainer = document.getElementById(networkHTML.networksParentContainer);
+                const pairContainer = document.getElementById(`${key}PairNetworkContainer`);
 
-        networkContainer.removeChild(divToDelete);
+                //Remove the secondary network if it exist
+                const secondaryKey = `${key}${this.secondNetworkTag}`;
+                if(this.activesNetworksMap.get(secondaryKey) !== undefined){
+
+                    this.removeNetwork(secondaryKey);
+                    this.initialOptions.disactivateDropdownOption(`${key}${this.secondNetworkTag}`);
+
+                }
+                //Remove this network/key from the needPairKeys array
+                for(let i = 0; i < this.initialOptions.needPairKeys.length; i++){
+                    if(this.initialOptions.needPairKeys[i] === key){
+                        this.initialOptions.needPairKeys.splice(i, 1); 
+                    }
+                }
+                
+                networkContainer.removeChild(pairContainer);
+            } else {
+                //Its a secondary network
+                //Add the main network to the needPairKeys array
+                const mainKey = key.slice(0, -this.secondNetworkTag.length);
+
+                this.initialOptions.needPairKeys.push(mainKey);
+
+                const otherNetworkContainer = document.getElementById(`leftCol_${mainKey}`);
+                otherNetworkContainer.className = "col-sm-8 networkContainer";
+
+                const network = this.activesNetworksMap.get(mainKey);
+
+                setTimeout(() => network.network.fit(), 1);
+            }
+
+            this.activesNetworksMap.delete(key);
+        }
     }
 
     /**
@@ -197,7 +235,7 @@ export default class NetworksGroup {
      * @param {String} key Key of the network
      * @param {Boolean} newBool New nodeLabelVisibility value
      */
-     nodeLabelVisibilityChange(key, newBool) {
+    nodeLabelVisibilityChange(key, newBool) {
         const network = this.activesNetworksMap.get(key);
 
         network.nodeLabelVisibilityChange(newBool);
@@ -206,7 +244,7 @@ export default class NetworksGroup {
      * Broadcast the new nodeLabelVisibility value to all networks
      * @param {Boolean} newValue New nodeLabelVisibility value
      */
-    nodeLabelVisibilityChangeALL(newValue){
+    nodeLabelVisibilityChangeALL(newValue) {
         this.activesNetworksArray.forEach((network) => {
             this.nodeLabelVisibilityChange(network.key, newValue);
         });

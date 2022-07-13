@@ -51,8 +51,6 @@ export default class NodeData {
                     color: "#000000FF"
                 }
             }
-            
-            console.log(node);
         }
         this.nodes = new DataSet(json.users);
 
@@ -201,6 +199,11 @@ export default class NodeData {
         return contentTemplate(rowData);
     }
 
-
+    /**
+     * Completely remove the dataTable
+     */
+     removeTable(){
+        this.dataTable.removeDataTable();
+    }
 
 }

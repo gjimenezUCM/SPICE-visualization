@@ -316,6 +316,9 @@ export default class NetworkMan {
      * Destroy the network 
      */
     clearNetwork() {
+        this.implCommMan.removeTable();
+        this.nodeData.removeTable();
+        
         this.network.destroy();
     }
 

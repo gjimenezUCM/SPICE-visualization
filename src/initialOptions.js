@@ -21,6 +21,13 @@ export default class InitialOptions {
      * @param {Boolean} isLocalhost check if the App is running in localhost
      */
     constructor(isLocalhost) {
+        this.layout = 0;
+        this.secondNetworkTag = "secondary";
+        this.needPairKeys = new Array();
+
+        this.realToOnUseKeyMap = new Map();
+        this.OnUseToRealKeymap = new Map();
+
         this.localURL = "../data/";
         this.githubURL = "https://raw.githubusercontent.com/gjimenezUCM/SPICE-visualization/main/data/";
 
@@ -28,7 +35,7 @@ export default class InitialOptions {
 
         this.domParser = new DOMParser();
         this.requestManager = new RequestManager(currentURL);
-        this.networkManager = new NetworksGroup();
+        this.networkManager = new NetworksGroup(this);
         this.controlPanel = new ControlPanel(this.networkManager);
 
         const radioButtons = this.createRadioOptions(isLocalhost);
@@ -206,7 +213,10 @@ export default class InitialOptions {
         if (isActive === "active") {
             //Turn the className into the Inactive class name
             dropdownOption.className = "dropdown-item unselectable";
-            this.networkManager.removeNetwork(key);
+
+            const onuseKey = this.realToOnUseKeyMap.get(key);
+            
+            this.networkManager.removeNetwork(onuseKey);
 
             if (this.networkManager.getNnetworks() === 0) {
                 this.controlPanel.removeControlpanel();
@@ -227,30 +237,122 @@ export default class InitialOptions {
         }
     }
 
+    createNetworkPairTemplate(key) {
+        let htmlString="";
+
+        switch (this.layout) {
+            case 0: //Vertical Layout
+                htmlString = `
+                <div id="${key}PairNetworkContainer">
+                    <div class="row container">
+                        ${this.createNetworkTemplate(this.createNetworkTitleTemplate(key), key, this.layout, "networkContainer")}
+                    </div>                
+                    <div class="row container">
+                        ${this.createNetworkTemplate("", `${key}${this.secondNetworkTag}`, this.layout, "networkContainerVertical")}
+                    </div>
+                </div>`
+                break;
+            case 1: //Horizontal Layour
+                htmlString = `
+                <div id="${key}PairNetworkContainer" class="row">
+                    <div class="row ps-5">
+                        <hr>
+                        <h2 class="text-start">
+                            ${key}
+                        </h2>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            ${this.createNetworkTemplate("", key, this.layout, "networkContainer")}  
+                        </div>
+                        <div class="col-sm-6">
+                            ${this.createNetworkTemplate("", `${key}${this.secondNetworkTag}`, this.layout, "networkContainerHorizontal")}
+                        </div>   
+                    </div>
+                </div>`
+                break;
+        }
+        return htmlString;
+    }
+
+    createNetworkTemplate(tittle, key, layout, networkClass){
+        const htmlString = `
+        <div class="container" id="${networkHTML.topNetworkContainer + key}">
+            ${tittle}
+            <div class="row" id="${layout}">
+                <div class="col-sm-8 ${networkClass}" id="leftCol_${key}"> </div>
+                <div class="col-sm-4" id="rightCol_${key}"> </div>
+            </div>
+        </div>`;
+        return htmlString;
+    }
+
+    createNetworkTitleTemplate(tittle){
+        const htmlString = `
+        <div class="row">
+            <hr>
+            <h2 class="text-start">
+                ${tittle}
+            </h2>
+        </div>`;
+        return htmlString;
+    }
+
     /** 
      * Create the network and the control panel if it doesnt exist 
      * @param {String} key Key of the netwprk
      * @param {JSON} file File with the network config data
      */
     createNetwork(key, file) {
-        const htmlString = `
-        <div class="container" id="${networkHTML.topNetworkContainer + key}">
-            <div>
-                <hr>
-                <h2 class="col-sm-1">
-                    ${key}
-                </h2>
-            </div>
-            <div class="row">
-                <div class="col-sm-8 networkContainer" id="leftCol_${key}"> </div>
-                <div class="col-sm-4"id="rightCol_${key}"> </div>
-            </div>
-        </div>`;
+        let htmlString;
+        let oldKey = key;
 
-        const html = this.domParser.parseFromString(htmlString, "text/html").body.firstChild;
+        if (this.needPairKeys.length > 0) {
+            //Add network to the pair template
+            key = this.needPairKeys.pop();
 
-        const topContainer = document.getElementById(networkHTML.networksParentContainer);
-        topContainer.append(html);
+            if (key === null || key === undefined) {
+                alert("Error while adding a network to a pair");
+                return;
+            } 
+
+            const otherNetworkContainer = document.getElementById(`leftCol_${key}`);
+
+            switch(otherNetworkContainer.parentElement.id){
+                case "0":
+                    otherNetworkContainer.className = "col-sm-8 networkContainerVertical";
+                    break;
+                case "1":
+                    otherNetworkContainer.className = "col-sm-8 networkContainerHorizontal";
+                    otherNetworkContainer.parentElement.parentElement.parentElement.className = "col-sm-6";
+                    break;
+                default:
+                    console.log("default")
+                    break;
+            }
+            
+
+            const mainKey = key;
+            setTimeout( () => {
+                this.networkManager.activesNetworksMap.get(mainKey).network.fit();
+            }, 1);
+
+            key =  `${key}${this.secondNetworkTag}`;
+        } else {
+            //Create a new pair template
+            //Add the key to the need a pair key array
+            this.needPairKeys.push(key);
+
+            htmlString = this.createNetworkPairTemplate(key);
+
+            const html = this.domParser.parseFromString(htmlString, "text/html").body.firstChild;
+
+            const topContainer = document.getElementById(networkHTML.networksParentContainer);
+            topContainer.append(html);
+        
+        }
+        this.realToOnUseKeyMap.set(oldKey, key);
+        this.OnUseToRealKeymap.set(key, oldKey);
 
         const leftContainer = document.getElementById(`leftCol_${key}`);
         const rightContainer = document.getElementById(`rightCol_${key}`);
@@ -268,5 +370,14 @@ export default class InitialOptions {
         this.networkManager.addNetwork(file, leftContainer, rightContainer, config)
 
         this.controlPanel.createControlPanel()
+    }
+
+
+    disactivateDropdownOption(key){
+        const realkey = this.OnUseToRealKeymap.get(key);
+
+        const dropdownOption = document.getElementById(`dropdownOption${realkey}`);
+        dropdownOption.className = "dropdown-item unselectable";
+
     }
 }
