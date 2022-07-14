@@ -54,7 +54,7 @@ export default class VerticalLayout {
     }
 
     addNetwork(key, file){
-
+        
         const unpairedRow = this.unpairedRows.pop();
 
         const config = {
@@ -158,11 +158,18 @@ export default class VerticalLayout {
         document.getElementById(`leftCol_${nRow}_${location}`).innerHTML = "";
         document.getElementById(`rightCol_${nRow}_${location}`).innerHTML = "";
 
-        if(this.unpairedRows.includes(nRow)){
+        let isUnpaired = false;
 
-            const index = this.unpairedRows.indexOf(nRow);
-            this.unpairedRows = this.unpairedRows.splice(0, index);
-            
+        for(let i = 0; i < this.unpairedRows.length; i++){
+            const unpairedRow = this.unpairedRows[i];
+
+            if(unpairedRow.nRow === nRow){
+                isUnpaired = true;
+                this.unpairedRows = this.unpairedRows.splice(0, i);
+            }
+        }
+        if(isUnpaired){
+
             const rowContainer = document.getElementById(`networkContainer_${nRow}`); 
             document.getElementById(networkHTML.networksParentContainer).removeChild(rowContainer);
 
