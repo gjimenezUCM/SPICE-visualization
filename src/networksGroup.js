@@ -26,6 +26,9 @@ export default class NetworksGroup {
         this.tooltip = new Tooltip();
     }
 
+    setLayout(layout){
+        this.layout = layout;
+    }
     /** 
      * Create and add a network to the web
      * @param {String} key Identifier of the new network
@@ -54,8 +57,6 @@ export default class NetworksGroup {
         }
         this.activesNetworksMap.set(config.key, network);
         this.activesNetworksArray.push(network);
-
-
     }
 
     /** 
@@ -71,42 +72,8 @@ export default class NetworksGroup {
             this.activesNetworksArray = this.activesNetworksArray.filter(data => data.key != key);
 
             network.clearNetwork();
-
-            if (key.length <= this.secondNetworkTag.length || key.slice(key.length -this.secondNetworkTag.length) !== this.secondNetworkTag) {
-                //Its a main network
-                const networkContainer = document.getElementById(networkHTML.networksParentContainer);
-                const pairContainer = document.getElementById(`${key}PairNetworkContainer`);
-
-                //Remove the secondary network if it exist
-                const secondaryKey = `${key}${this.secondNetworkTag}`;
-                if(this.activesNetworksMap.get(secondaryKey) !== undefined){
-
-                    this.removeNetwork(secondaryKey);
-                    this.initialOptions.disactivateDropdownOption(`${key}${this.secondNetworkTag}`);
-
-                }
-                //Remove this network/key from the needPairKeys array
-                for(let i = 0; i < this.initialOptions.needPairKeys.length; i++){
-                    if(this.initialOptions.needPairKeys[i] === key){
-                        this.initialOptions.needPairKeys.splice(i, 1); 
-                    }
-                }
-                
-                networkContainer.removeChild(pairContainer);
-            } else {
-                //Its a secondary network
-                //Add the main network to the needPairKeys array
-                const mainKey = key.slice(0, -this.secondNetworkTag.length);
-
-                this.initialOptions.needPairKeys.push(mainKey);
-
-                const otherNetworkContainer = document.getElementById(`leftCol_${mainKey}`);
-                otherNetworkContainer.className = "col-sm-8 networkContainer";
-
-                const network = this.activesNetworksMap.get(mainKey);
-
-                setTimeout(() => network.network.fit(), 1);
-            }
+            this.layout.deleteNetwork(key);
+  
 
             this.activesNetworksMap.delete(key);
         }

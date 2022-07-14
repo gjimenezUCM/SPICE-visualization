@@ -13,6 +13,7 @@ import { Dropdown } from 'bootstrap';
 import NetworksGroup from "./networksGroup.js";
 import RequestManager from "./requestManager.js";
 import ControlPanel from "./controlPanel.js";
+import VerticalLayout from "./layouts/verticalLayout.js";
 
 export default class InitialOptions {
 
@@ -42,6 +43,8 @@ export default class InitialOptions {
         this.createHTMLSkeleton(radioButtons);
         this.addRadioOnclick();
 
+        this.layoutManager = new VerticalLayout(this.networkManager, this.controlPanel);
+
         this.requestAllFiles();
     }
 
@@ -68,7 +71,7 @@ export default class InitialOptions {
      */
     createHTMLSkeleton(radioButtons) {
         const htmlString = `
-        <div>
+        <div class="container">
             <div class="row"> 
                 <div class="col-sm-5"> </div>
                 <div class="col-sm-1"> 
@@ -213,10 +216,8 @@ export default class InitialOptions {
         if (isActive === "active") {
             //Turn the className into the Inactive class name
             dropdownOption.className = "dropdown-item unselectable";
-
-            const onuseKey = this.realToOnUseKeyMap.get(key);
             
-            this.networkManager.removeNetwork(onuseKey);
+            this.networkManager.removeNetwork(key);
 
             if (this.networkManager.getNnetworks() === 0) {
                 this.controlPanel.removeControlpanel();
@@ -304,72 +305,7 @@ export default class InitialOptions {
      * @param {JSON} file File with the network config data
      */
     createNetwork(key, file) {
-        let htmlString;
-        let oldKey = key;
-
-        if (this.needPairKeys.length > 0) {
-            //Add network to the pair template
-            key = this.needPairKeys.pop();
-
-            if (key === null || key === undefined) {
-                alert("Error while adding a network to a pair");
-                return;
-            } 
-
-            const otherNetworkContainer = document.getElementById(`leftCol_${key}`);
-
-            switch(otherNetworkContainer.parentElement.id){
-                case "0":
-                    otherNetworkContainer.className = "col-sm-8 networkContainerVertical";
-                    break;
-                case "1":
-                    otherNetworkContainer.className = "col-sm-8 networkContainerHorizontal";
-                    otherNetworkContainer.parentElement.parentElement.parentElement.className = "col-sm-6";
-                    break;
-                default:
-                    console.log("default")
-                    break;
-            }
-            
-
-            const mainKey = key;
-            setTimeout( () => {
-                this.networkManager.activesNetworksMap.get(mainKey).network.fit();
-            }, 1);
-
-            key =  `${key}${this.secondNetworkTag}`;
-        } else {
-            //Create a new pair template
-            //Add the key to the need a pair key array
-            this.needPairKeys.push(key);
-
-            htmlString = this.createNetworkPairTemplate(key);
-
-            const html = this.domParser.parseFromString(htmlString, "text/html").body.firstChild;
-
-            const topContainer = document.getElementById(networkHTML.networksParentContainer);
-            topContainer.append(html);
-        
-        }
-        this.realToOnUseKeyMap.set(oldKey, key);
-        this.OnUseToRealKeymap.set(key, oldKey);
-
-        const leftContainer = document.getElementById(`leftCol_${key}`);
-        const rightContainer = document.getElementById(`rightCol_${key}`);
-
-        const config = {
-            edgeThreshold: this.controlPanel.getSliderThreshold(),
-            variableEdge: this.controlPanel.getVariableEdgeValue(),
-            hideUnselected: this.controlPanel.getUnselectedEdgesValue(),
-            valuesToHide: this.controlPanel.getValuesToHide(),
-            allowThirdDimension: this.controlPanel.getThirdDimensionValue(),
-            showNodeLabels: this.controlPanel.getShowNodeLabelValue(),
-            key: key
-        };
-
-        this.networkManager.addNetwork(file, leftContainer, rightContainer, config)
-
-        this.controlPanel.createControlPanel()
+        this.layoutManager.addNetwork(key, file);
     }
 
 
