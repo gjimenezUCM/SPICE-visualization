@@ -55,16 +55,23 @@ export default class NodeVisuals {
      * @param {Dataset} nods Dataset with the data of all nodes of the network
      */
     createNodeDimensionStrategy(nods) {
-        const attributes = [{
-            attr: this.communitiesData[0].key,
-            vals: this.communitiesData[0].values,
-            dimension: nodes.nodeColorKey,
-        }, {
-            attr: this.communitiesData[1].key,
-            vals: this.communitiesData[1].values,
-            dimension: nodes.nodeShapeKey,
-        },
-        ];
+        const attributes = new Array();
+        
+        if(this.communitiesData[1] !== undefined){
+            attributes.push({
+                attr: this.communitiesData[0].key,
+                vals: this.communitiesData[0].values,
+                dimension: nodes.nodeColorKey,
+            })
+        }
+
+        if(this.communitiesData[1] !== undefined){
+            attributes.push({
+                attr: this.communitiesData[1].key,
+                vals: this.communitiesData[1].values,
+                dimension: nodes.nodeShapeKey,
+            })
+        }
 
         if(this.communitiesData[2] !== undefined && this.activateThirdDimension){
             attributes.push({

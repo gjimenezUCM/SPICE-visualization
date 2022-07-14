@@ -49,8 +49,16 @@ export const comms = {
                 Color: "rgba(254, 212, 213, 0.6)", Border: "rgba(252, 153, 156, 1)" //Red
             }, {
                 Color: "rgba(220, 235, 254, 0.6)", Border: "rgba(168, 201, 248, 1)" //Blue
+            },{
+                Color: "rgba(250, 220, 185, 0.6)", Border: "rgba(250, 169, 73, 1)" //orange
+            },{
+                Color: "rgba(240, 240, 240, 0.6)", Border: "rgba(230, 230, 230, 1)" //white
+            },{
+                Color: "rgba(10, 10, 10, 0.6)", Border: "rgba(0, 0, 0, 1)" //black
             },],
     },
-
 }
 
+
+
+/// El nombre de las prespectivas en el drop down que dependa de una variable del json si esta variable existe

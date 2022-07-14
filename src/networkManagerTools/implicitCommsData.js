@@ -291,6 +291,12 @@ export default class ImplicitCommsData {
                 return "red";
             case 4:
                 return "blue";
+            case 5:
+                return "orange";
+            case 6:
+                return "white";
+            case 7:
+                return "black";
         }
     }
 }
