@@ -36,18 +36,24 @@ export default class ImplicitCommsData {
             boundingBoxes.push(null);
         }
 
-        //DEBUG TO SEE THE BB COLOR IN THE TABLE
-        let bb_count = 0;
-
         //Obtain the bounding box of every Implicit Community of nodes
         data.forEach((node) => {
             const group = node[comms.ImplUserNewKey];
-            const node_bb = network.getBoundingBox(node.id)
+            const node_bb = {};
 
+            //Remove label size from the bounding box
+            const position = network.getPosition(node.id);
+
+            node_bb.top = position.y - node.size / 2 - comms.Bb.nodePadding;
+            node_bb.bottom = position.y + node.size / 2 + comms.Bb.nodePadding;
+            node_bb.left = position.x - node.size / 2 - comms.Bb.nodePadding;
+            node_bb.right = position.x + node.size / 2 + comms.Bb.nodePadding;
+
+            
             if (boundingBoxes[group] === null) {
+
                 boundingBoxes[group] = node_bb;
 
-                bb_count++;
             } else {
                 if (node_bb.left < boundingBoxes[group].left)
                     boundingBoxes[group].left = node_bb.left;
@@ -232,7 +238,7 @@ export default class ImplicitCommsData {
 
         const output = { x: clickX, y: clickY };
 
-        if (isClickOnCanvas(output, networkCanvasPosition)) 
+        if (isClickOnCanvas(output, networkCanvasPosition))
             return output;
         return null;
     }
@@ -274,7 +280,7 @@ export default class ImplicitCommsData {
     /**
      * Completely remove the dataTable
      */
-    removeTable(){
+    removeTable() {
         this.dataTable.removeDataTable();
     }
 

@@ -90,10 +90,6 @@
 }
 
 /*All available shapes*/
-.square {
-
-}
-
 .triangle {
     --path: 50% 0, 100% 100%, 0 100%;
     /*Second number is the height, starting with 0 at the top of the div*/

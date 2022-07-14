@@ -35,6 +35,8 @@ export const comms = {
     //--- Bounding boxes ---
 
     Bb: {
+        //Padding to make bounding boxes a bit bigger than the nodes they bound
+        nodePadding: 15,
         //width of the border of the bounding boxes
         BoderWidth: 4,
         //backgroundColor and border color of the bounding boxes

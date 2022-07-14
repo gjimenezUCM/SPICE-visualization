@@ -41,7 +41,8 @@ export default class NodeData {
                 delete node["group"];
 
             node["defaultColor"] = true;
-
+            node["size"] = nodes.DefaultSize;
+            
             if(!networkHTML.showNodeLabelInitialValue){
                 node["font"] = {
                     color: "#00000000"

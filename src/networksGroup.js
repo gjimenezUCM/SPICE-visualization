@@ -74,7 +74,6 @@ export default class NetworksGroup {
             network.clearNetwork();
             this.layout.deleteNetwork(key);
   
-
             this.activesNetworksMap.delete(key);
         }
     }
