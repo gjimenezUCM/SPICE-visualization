@@ -19,7 +19,6 @@ export default class NodeDimensionStrategy {
      * Format-> {attr: (string), vals: (string[], dimension: (string))}
      */
     constructor(attributes) {
-
         const colorStrat = new ColorStrategy(attributes);
         const shapeStrat = new ShapeStrategy(attributes);
         const borderStrat = new BorderStrategy(attributes);

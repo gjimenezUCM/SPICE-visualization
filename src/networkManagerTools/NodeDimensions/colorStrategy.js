@@ -18,8 +18,11 @@ export default class ColorStrategy {
         //Look for the attribute related to color Strat
         const AttributeToColor = Attributes.filter(attr => attr.dimension === nodes.nodeColorKey)[0];
 
-        this.key = AttributeToColor.attr;
-        this.initColorMap(AttributeToColor.vals);
+        if (AttributeToColor !== undefined) {
+
+            this.key = AttributeToColor.attr;
+            this.initColorMap(AttributeToColor.vals);
+        }
     }
 
     /**
@@ -41,24 +44,26 @@ export default class ColorStrategy {
      * @param {Object} node node to be edited
      */
     change(node) {
-        const nodeComms = node[comms.ExpUserKsonKey];
-        const value = nodeComms[this.key];
+        if (this.key !== undefined) {
+            const nodeComms = node[comms.ExpUserKsonKey];
+            const value = nodeComms[this.key];
 
-        node["color"] = {
-            background: this.nodeColors.get(value),
+            node["color"] = {
+                background: this.nodeColors.get(value),
+            }
+
+            node["borderWidth"] = 0;
+            node["borderWidthSelected"] = 0;
+
+            node.defaultColor = true;
         }
-
-        node["borderWidth"] = 0;
-        node["borderWidthSelected"] = 0;
-
-        node.defaultColor = true;
     }
 
     /**
      * Change node background color to its colorless color
      * @param {Object} node node to be edited
      */
-    toColorless(node){
+    toColorless(node) {
         node.defaultColor = false;
 
         node["color"]["background"] = nodes.NoFocusColor.Background;

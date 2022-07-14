@@ -34,17 +34,28 @@ export default class NetworksGroup {
      * @param {HTMLElement} rightContainer Container where the network data will be placed
      */
     addNetwork(file, leftContainer, rightContainer, config) {
+        let jsonFile;
+        let network;
+
         try {
-            const jsonFile = JSON.parse(file);
-            const network = new NetworkMan(jsonFile, leftContainer, rightContainer, this, config);
-
-            this.activesNetworksMap.set(config.key, network);
-            this.activesNetworksArray.push(network);
-
+            jsonFile = JSON.parse(file);
         } catch (e) {
             console.log(e);
-            alert("The file is not a valid json file");
+            alert("Json parsing has failed");
+            return;
         }
+
+        try {
+            network = new NetworkMan(jsonFile, leftContainer, rightContainer, this, config);
+        } catch(e){
+            console.log(e);
+            alert("Network creation has failed");
+            return;
+        }
+        this.activesNetworksMap.set(config.key, network);
+        this.activesNetworksArray.push(network);
+
+
     }
 
     /** 

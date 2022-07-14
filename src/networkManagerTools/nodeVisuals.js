@@ -56,8 +56,9 @@ export default class NodeVisuals {
      */
     createNodeDimensionStrategy(nods) {
         const attributes = new Array();
+        console.log(this.communitiesData );
         
-        if(this.communitiesData[1] !== undefined){
+        if(this.communitiesData[0] !== undefined){
             attributes.push({
                 attr: this.communitiesData[0].key,
                 vals: this.communitiesData[0].values,
