@@ -16,10 +16,7 @@ export default class NetworksGroup {
     /**
      * Constructor of the class
      */
-    constructor(initialOptions) {
-        this.initialOptions = initialOptions;
-        this.secondNetworkTag = this.initialOptions.secondNetworkTag;
-
+    constructor() {
         this.activesNetworksMap = new Map();
         this.activesNetworksArray = new Array();
 

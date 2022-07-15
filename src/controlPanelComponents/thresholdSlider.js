@@ -55,26 +55,7 @@ export default class ThresholdSlider {
         slider.oninput = () => this.updateSliderText(slider, text);
     }
 
-    /** 
-     *  Update all networks with the new threshold value.
-     */
-    thresholdChange(slider) {
-        this.value = slider.value;
 
-        this.networksGroups.thresholdChangeALL(this.value);
-    }
-
-    /**
-     * Update the slider text to show the new values
-     */
-    updateSliderText(slider, text) {
-        let newValue = slider.value;
-
-        if (newValue === "0") newValue = "0.0";
-        if (newValue === "1") newValue = "1.0";
-
-        text.innerHTML = newValue;
-    }
 
     /**
      * Returns the current value of the threshold Slider

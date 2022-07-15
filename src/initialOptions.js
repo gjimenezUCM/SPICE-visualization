@@ -37,8 +37,8 @@ export default class InitialOptions {
         let currentURL = isLocalhost ? this.localURL : this.githubURL;
 
         this.domParser = new DOMParser();
-        this.toolBar = new ToolBar(this);
-        this.requestManager = new RequestManager(currentURL);
+        this.toolBar = new ToolBar(this, isLocalhost);
+        //this.requestManager = new RequestManager(currentURL);
         this.networkManager = new NetworksGroup(this);
         this.controlPanel = new ControlPanel(this.networkManager, this);
 
@@ -48,7 +48,7 @@ export default class InitialOptions {
         
         this.layoutManager = new VerticalLayout(this.networkManager);
 
-        this.requestAllFiles();
+        //this.requestAllFiles();
     }
 
     /**

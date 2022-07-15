@@ -14,6 +14,9 @@ import Legend from "./controlPanelComponents/legend.js";
 import ThresholdSlider from "./controlPanelComponents/thresholdSlider.js";
 import UnselectedEdgesCheckbox from "./controlPanelComponents/unselectedEdgesCheckbox.js";
 import VariableEdgeCheckbox from "./controlPanelComponents/variableEdgeCheckbox.js";
+import NetworksGroup from "./networksGroup.js";
+import RequestManager from "./requestManager.js";
+import LeftAlignedToolbarItems from "./toolbarComponents/leftAlignedToolbarItems.js";
 
 export default class ToolBar {
 
@@ -25,55 +28,21 @@ export default class ToolBar {
         this.initialOptions = initialOptions;
         this.domParser = new DOMParser();
 
+        this.requestManager = new RequestManager();
+        this.networksGroup = new NetworksGroup();
+
+        this.toolbarParts = new Array();
+
+        this.leftAlignedItems = new LeftAlignedToolbarItems(this);
+        this.toolbarParts.push(this.leftAlignedItems);
+
+        this.value=0.5;
+
         const htmlString = `
         <nav class="navbar fixed-top navbar-expand-md navbar-light bg-light">
             <div class="container-fluid">
-                        <! -- Left aligned items -->
-                        <div class="d-flex col leftNavbarGroup">
-                            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNavbar">
-                                <span class="navbar-toggler-icon"></span>
-                            </button>
-                            <a class="navbar-brand abs" href="#"> Visualization module</a>
-
-                            <div class="navbar-collapse collapse" id="collapseNavbar">
-                                <ul class="navbar-nav">
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            File Source
-                                        </a>
-                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                            <li><a class="dropdown-item unselectable" name="fileSource" id="githubMainOption">Github Main</a></li>
-                                            <li><a class="dropdown-item unselectable" name="fileSource" id="LocalOption" >Local</a></li>
-                                            <li><a class="dropdown-item unselectable" name="fileSource" id="githubDevOption" >Github Develop</a></li>
-                                        </ul>
-                                    </li>
-
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Options
-                                        </a>
-                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                            <li><a class="dropdown-item" href="#">Hide node labels</a></li>
-                                            <li><a class="dropdown-item" href="#">Hide unselected Edges</a></li>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item" href="#">Variable edge width</a></li>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item" href="#">Allow third dimension</a></li>
-                                        </ul>
-                                    </li>
-
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Layout
-                                        </a>
-                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                            <li><a class="dropdown-item" href="#">Horizontal</a></li>
-                                            <li><a class="dropdown-item" href="#">Vertical</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
+                    <! -- Left aligned items -->
+                    ${this.leftAlignedItems.htmlString}  
 
                     <! -- Mid aligned items -->
                     <div class="d-flex col">
@@ -83,8 +52,8 @@ export default class ToolBar {
                                     Select Perspective
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <li><a class="dropdown-item" href="#">Perspective 1</a></li>
-                                    <li><a class="dropdown-item" href="#">Perspective 2 action</a></li>
+                                    <li><a class="dropdown-item unselectable" href="#">Perspective 1</a></li>
+                                    <li><a class="dropdown-item unselectable" href="#">Perspective 2 action</a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -98,8 +67,8 @@ export default class ToolBar {
                                     Legend WIP
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <li><a class="dropdown-item" href="#">WIP</a></li>
-                                    <li><a class="dropdown-item" href="#">WIP</a></li>
+                                    <li><a class="dropdown-item unselectable" href="#">WIP</a></li>
+                                    <li><a class="dropdown-item unselectable" href="#">WIP</a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -111,126 +80,42 @@ export default class ToolBar {
         const html = this.domParser.parseFromString(htmlString, "text/html").body.firstChild;
         document.body.append(html);
 
-        this.createOnclickEvents();
-    }
-
-    createOnclickEvents(){
-        this.fileSourceEvents();
-
-
-    }
-
-
-    fileSourceEvents(){
-        this.fileSourceArray = new Array();
-
-        const fileSourceOptions = document.querySelectorAll("a[name='fileSource']");
-
-        for(const option of fileSourceOptions){
-            option.onclick = () => this.fileSourceOnClick(option.id);
-        }
-    }
-
-    fileSourceOnClick(id){
-        let url;
-        switch(id){
-            case "githubMainOption":
-                url = "https://raw.githubusercontent.com/gjimenezUCM/SPICE-visualization/main/data/"
-                break;
-            case "LocalOption":
-                url = "../data/";
-                break;
-            case "githubDevOption":
-                url = "https://raw.githubusercontent.com/gjimenezUCM/SPICE-visualization/develop/data/"
-                break;
-        }
-
-        this.initialOptions.changeFileSourceURL(url);
-    }
-
-    /** 
-    * Create an option in a dropdown menu for each file to interact with every network
-    * @param {JSON} headersFile JSON file with all available files
-    */
-     createDropdown(headersFile) {
-        const n = headersFile.files.length;
-        let content = "";
-        for (let i = 0; i < n; i++) {
-            const key = headersFile.files[i].name;
-            content += `
-                <li>
-                    <a class="dropdown-item unselectable" id="dropdownOption${key}">
-                        ${key}
-                    </a>
-                </li>`;
-        }
-
-        const htmlString = this.dropdownTemplate(content);
-        const html = this.domParser.parseFromString(htmlString, "text/html").body.firstChild;
-
-        const container = document.getElementById(networkHTML.algorithmDropdownContainer);
-        container.append(html);
-
-        for (let i = 0; i < n; i++) {
-            const key = headersFile.files[i].name;
-
-            const dropdownOption = document.getElementById(`dropdownOption${key}`);
-            dropdownOption.onclick = () => this.optionClicked(dropdownOption, key);
-        }
+        this.createEvents();
     }
 
     /**
-     * Returns a html string of a dropdown based on a template
-     * @param {String} dropdownContent html string of the content of the dropdown
-     * @returns {String} returns the html string
+     * Create all events for every item of the toolbar
      */
-    dropdownTemplate(dropdownContent) {
-        const html = `
-            <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="perspectiveDropdownButton" 
-                data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                    Select Perspective
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="perspectiveDropdownButton">
-                    ${dropdownContent}
-                </ul>
-            </div>`;
-
-        return html;
-    }
-
-
-    /**
-     * show/Hides the network based on the state of the option
-     * @param {HTMLElement} dropdownOption dropdown option/button clicked
-     * @param {String} key key of the network
-     */
-    optionClicked(dropdownOption, key) {
-        const isActive = dropdownOption.className.split(" ").pop();
-
-        if (isActive === "active") {
-            //Turn the className into the Inactive class name
-            dropdownOption.className = "dropdown-item unselectable";
-            
-            this.networkManager.removeNetwork(key);
-
-            if (this.networkManager.getNnetworks() === 0) {
-                this.controlPanel.removeControlpanel();
-            }
-        } else {
-            const name = key + ".json";
-
-            this.requestManager.getFile(name)
-                .then((file) => {
-                    this.createNetwork(key, file);
-                    //Turn the className into the active class name
-                    dropdownOption.className = "dropdown-item unselectable active";
-                })
-                .catch((error) => {
-                    console.log(error);
-                    alert("Error while getting the selected file");
-                });
+    createEvents(){
+        for(const part of this.toolbarParts){
+            part.createEvents();
         }
     }
 
+    changeFileSourceURL(url){
+        this.requestManager.changeBaseURL(url);
+
+        //TODO: RESTART PROGRAM
+    }
+
+    /**
+     * Toggle the state of a dropdown item
+     * @param {HTMLElement} item element that is going to be toggled
+     * @returns {Boolean} returns the new state of the item
+     */
+    toggleDropdownItemState(item){
+        let active = false;
+        if(item.className === "dropdown-item unselectable"){
+            item.className = "dropdown-item unselectable active";
+            active = true;
+        }else{
+            item.className = "dropdown-item unselectable";
+        }
+
+        return active;
+    }
+    /**
+     * Create the events related with the Options dropdown
+     */
+   
 }   

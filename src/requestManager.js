@@ -10,14 +10,20 @@ import { Axios } from 'axios'
 export default class RequestManager {
     /**
      * Constructor of the class
+     */
+    constructor() {
+        this.isActive = false;
+    }
+
+    /**
+     * Initialize axios API
      * @param {String} baseURL base url of all axios petitions
      */
-    constructor(baseURL) {
+    init(baseURL) {
         this.axios = new Axios({
             baseURL: baseURL,
         });
     }
-
     /**
      * Send a GET petition to obtain a singleFile in a directory
      * @param {String} name Name of the file we want to get. It needs to include the extension
@@ -41,6 +47,12 @@ export default class RequestManager {
      * @param {String} newURL the new url
      */
     changeBaseURL(newURL) {
-        this.axios.defaults.baseURL = newURL;
+        if (this.isActive) {
+            this.axios.defaults.baseURL = newURL;
+        }else{
+            this.init(newURL);
+        }
+
+        console.log(`Source url changed to ${newURL}`)
     }
 }
