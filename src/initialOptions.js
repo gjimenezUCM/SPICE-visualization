@@ -15,6 +15,7 @@ import RequestManager from "./requestManager.js";
 import ControlPanel from "./controlPanel.js";
 import VerticalLayout from "./layouts/verticalLayout.js";
 import HorizontalLayout from "./layouts/horizontalLayout.js";
+import ToolBar from "./toolBar.js";
 
 export default class InitialOptions {
 
@@ -36,6 +37,7 @@ export default class InitialOptions {
         let currentURL = isLocalhost ? this.localURL : this.githubURL;
 
         this.domParser = new DOMParser();
+        this.toolBar = new ToolBar(this);
         this.requestManager = new RequestManager(currentURL);
         this.networkManager = new NetworksGroup(this);
         this.controlPanel = new ControlPanel(this.networkManager, this);
@@ -116,6 +118,12 @@ export default class InitialOptions {
 
             this.restartInitialOptions();
         }
+    }
+
+    changeFileSourceURL(url){
+        this.requestManager.changeBaseURL(url);
+
+        this.restartInitialOptions();
     }
 
     /**

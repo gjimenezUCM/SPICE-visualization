@@ -1,0 +1,15 @@
+/*Remove the bullet point*/
+.nav-item.dropdown{
+    list-style-type: none;
+}
+
+
+.leftNavbarGroup{
+    margin-right: -3em;
+}
+
+
+.nav-link.btn-secondary{
+    color: white !important;
+    border-radius: 5px;
+}
