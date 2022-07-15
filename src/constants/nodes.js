@@ -17,7 +17,7 @@ export const nodes = {
     nodeGroupsViewMode: "circle", //"circle" to see nodes in a circle, "square" to see them in a square
    
     //--- Configuration Values ---
-
+    ZoomDuration: 300,
     //Sizes
     DefaultSize: 20,
     SelectedSize: 30,

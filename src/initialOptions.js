@@ -13,6 +13,7 @@ import { Dropdown } from 'bootstrap';
 import NetworksGroup from "./networksGroup.js";
 import RequestManager from "./requestManager.js";
 import ControlPanel from "./controlPanel.js";
+import VerticalLayout from "./layouts/verticalLayout.js";
 
 export default class InitialOptions {
 
@@ -21,6 +22,13 @@ export default class InitialOptions {
      * @param {Boolean} isLocalhost check if the App is running in localhost
      */
     constructor(isLocalhost) {
+        this.layout = 0;
+        this.secondNetworkTag = "secondary";
+        this.needPairKeys = new Array();
+
+        this.realToOnUseKeyMap = new Map();
+        this.OnUseToRealKeymap = new Map();
+
         this.localURL = "../data/";
         this.githubURL = "https://raw.githubusercontent.com/gjimenezUCM/SPICE-visualization/main/data/";
 
@@ -28,12 +36,14 @@ export default class InitialOptions {
 
         this.domParser = new DOMParser();
         this.requestManager = new RequestManager(currentURL);
-        this.networkManager = new NetworksGroup();
+        this.networkManager = new NetworksGroup(this);
         this.controlPanel = new ControlPanel(this.networkManager);
 
-        const radioButtons = this.createRadioOptions(currentURL);
+        const radioButtons = this.createRadioOptions(isLocalhost);
         this.createHTMLSkeleton(radioButtons);
         this.addRadioOnclick();
+
+        this.layoutManager = new VerticalLayout(this.networkManager, this.controlPanel);
 
         this.requestAllFiles();
     }
@@ -46,11 +56,11 @@ export default class InitialOptions {
     createRadioOptions(isLocalhost) {
         const html = `
         <div>
-            <input type="radio" name="source" value="local" ${isLocalhost ? `checked="true"` : ""} id="radioLocal">
+            <input type="radio" name="source" value="local" ${isLocalhost ? 'checked="true"' : ""} id="radioLocal">
             <label class="unselectable" for="radioLocal">Local files </label>
         </div>
         <div>
-            <input type="radio" name="source" value="githubMain" ${!isLocalhost ? `checked="true"` : ""} id="radioGithubMain">
+            <input type="radio" name="source" value="githubMain" ${!isLocalhost ? 'checked="true"' : ""} id="radioGithubMain">
             <label class="unselectable" for="radioGithubMain"> Github Main </label>
         </div>`;
         return html;
@@ -61,7 +71,7 @@ export default class InitialOptions {
      */
     createHTMLSkeleton(radioButtons) {
         const htmlString = `
-        <div>
+        <div class="container">
             <div class="row"> 
                 <div class="col-sm-5"> </div>
                 <div class="col-sm-1"> 
@@ -206,6 +216,7 @@ export default class InitialOptions {
         if (isActive === "active") {
             //Turn the className into the Inactive class name
             dropdownOption.className = "dropdown-item unselectable";
+            
             this.networkManager.removeNetwork(key);
 
             if (this.networkManager.getNnetworks() === 0) {
@@ -227,45 +238,82 @@ export default class InitialOptions {
         }
     }
 
+    createNetworkPairTemplate(key) {
+        let htmlString="";
+
+        switch (this.layout) {
+            case 0: //Vertical Layout
+                htmlString = `
+                <div id="${key}PairNetworkContainer">
+                    <div class="row container">
+                        ${this.createNetworkTemplate(this.createNetworkTitleTemplate(key), key, this.layout, "networkContainer")}
+                    </div>                
+                    <div class="row container">
+                        ${this.createNetworkTemplate("", `${key}${this.secondNetworkTag}`, this.layout, "networkContainerVertical")}
+                    </div>
+                </div>`
+                break;
+            case 1: //Horizontal Layour
+                htmlString = `
+                <div id="${key}PairNetworkContainer" class="row">
+                    <div class="row ps-5">
+                        <hr>
+                        <h2 class="text-start">
+                            ${key}
+                        </h2>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            ${this.createNetworkTemplate("", key, this.layout, "networkContainer")}  
+                        </div>
+                        <div class="col-sm-6">
+                            ${this.createNetworkTemplate("", `${key}${this.secondNetworkTag}`, this.layout, "networkContainerHorizontal")}
+                        </div>   
+                    </div>
+                </div>`
+                break;
+        }
+        return htmlString;
+    }
+
+    createNetworkTemplate(tittle, key, layout, networkClass){
+        const htmlString = `
+        <div class="container" id="${networkHTML.topNetworkContainer + key}">
+            ${tittle}
+            <div class="row" id="${layout}">
+                <div class="col-sm-8 ${networkClass}" id="leftCol_${key}"> </div>
+                <div class="col-sm-4" id="rightCol_${key}"> </div>
+            </div>
+        </div>`;
+        return htmlString;
+    }
+
+    createNetworkTitleTemplate(tittle){
+        const htmlString = `
+        <div class="row">
+            <hr>
+            <h2 class="text-start">
+                ${tittle}
+            </h2>
+        </div>`;
+        return htmlString;
+    }
+
     /** 
      * Create the network and the control panel if it doesnt exist 
      * @param {String} key Key of the netwprk
      * @param {JSON} file File with the network config data
      */
     createNetwork(key, file) {
-        const htmlString = `
-        <div class="container" id="${networkHTML.topNetworkContainer + key}">
-            <div>
-                <hr>
-                <h2 class="col-sm-1">
-                    ${key}
-                </h2>
-            </div>
-            <div class="row">
-                <div class="col-sm-8 networkContainer" id="leftCol_${key}"> </div>
-                <div class="col-sm-4"id="rightCol_${key}"> </div>
-            </div>
-        </div>`;
+        this.layoutManager.addNetwork(key, file);
+    }
 
-        const html = this.domParser.parseFromString(htmlString, "text/html").body.firstChild;
 
-        const topContainer = document.getElementById(networkHTML.networksParentContainer);
-        topContainer.append(html);
+    disactivateDropdownOption(key){
+        const realkey = this.OnUseToRealKeymap.get(key);
 
-        const leftContainer = document.getElementById(`leftCol_${key}`);
-        const rightContainer = document.getElementById(`rightCol_${key}`);
+        const dropdownOption = document.getElementById(`dropdownOption${realkey}`);
+        dropdownOption.className = "dropdown-item unselectable";
 
-        const config = {
-            edgeThreshold: this.controlPanel.getSliderThreshold(),
-            variableEdge: this.controlPanel.getVariableEdgeValue(),
-            hideUnselected: this.controlPanel.getUnselectedEdgesValue(),
-            valuesToHide: this.controlPanel.getValuesToHide(),
-            allowThirdDimension: this.controlPanel.getThirdDimensionValue(),
-            key: key
-        };
-
-        this.networkManager.addNetwork(file, leftContainer, rightContainer, config)
-
-        this.controlPanel.createControlPanel()
     }
 }

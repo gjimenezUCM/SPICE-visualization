@@ -1,0 +1,27 @@
+
+.singleNetworkContainer {
+    margin-bottom: 1%;
+}
+
+/* Need this to make the vertical network canvas stop growing verticaly*/
+.singleNetworkContainer > div > div >  div {
+    height: 60em; /*var(--singleNetworkSize)+"em";*/
+}
+
+.pairNetworkVertical{
+    margin-bottom: 1%;
+}
+/* Need this to make the vertical network canvas stop growing verticaly*/
+.pairNetworkVertical > div > div >  div {
+    height: 30em;
+}
+
+.networkContainerVertical{
+    height: 30em;
+    margin-bottom: 1%;
+}
+
+.networkContainerHorizontal{
+    height: 40em;
+    margin-bottom: 1%;
+}

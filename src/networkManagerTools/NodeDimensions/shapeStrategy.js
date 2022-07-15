@@ -18,8 +18,11 @@ export default class ShapeStrategy {
         //Look for the attribute related to shape Strat
         const AttributeToShape = Attributes.filter(attr => attr.dimension === nodes.nodeShapeKey)[0];
 
-        this.key = AttributeToShape.attr;
-        this.initShapeMap(AttributeToShape.vals);
+        if (AttributeToShape !== undefined) {
+
+            this.key = AttributeToShape.attr;
+            this.initShapeMap(AttributeToShape.vals);
+        }
     }
 
     /**
@@ -40,14 +43,14 @@ export default class ShapeStrategy {
      * @param {Object} node node to be edited
      */
     change(node) {
-        const nodeComms = node[comms.ExpUserKsonKey];
-        const value = nodeComms[this.key];
+        if (this.key !== undefined) {
+            const nodeComms = node[comms.ExpUserKsonKey];
+            const value = nodeComms[this.key];
 
-        const shapeVals = this.nodeShapes.get(value);
+            const shapeVals = this.nodeShapes.get(value);
 
-        node["shape"] = shapeVals.Shape;
-        node.font = {
-            vadjust: shapeVals.vOffset,
-        };
+            node["shape"] = shapeVals.Shape;
+            node.font["vadjust"] = shapeVals.vOffset;
+        }
     }
 }

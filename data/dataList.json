@@ -11,6 +11,33 @@
 		},
 		{
 			"name": "TEST-I"
+		},		
+		{
+			"name": "HECHT_beliefJ (kmedoids)"
+		},
+		{
+			"name": "HECHT_beliefJ"
+		},
+		{
+			"name": "HECHT_beliefR (agglomerative)"
+		},
+		{
+			"name": "HECHT_beliefR (kmedoids)"
+		},		
+		{
+			"name": "IMMA_complex_taxonomy"
+		},
+		{
+			"name": "IMMA_country_taxonomy (kmedoids)"
+		},
+		{
+			"name": "IMMA_country_taxonomy"
+		},
+		{
+			"name": "IMMA_number_interactions (kmedoids)"
+		},
+		{
+			"name": "IMMA_number_interactions"
 		}
 	]
 }

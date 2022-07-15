@@ -16,13 +16,19 @@ export default class NetworksGroup {
     /**
      * Constructor of the class
      */
-    constructor() {
+    constructor(initialOptions) {
+        this.initialOptions = initialOptions;
+        this.secondNetworkTag = this.initialOptions.secondNetworkTag;
+
         this.activesNetworksMap = new Map();
         this.activesNetworksArray = new Array();
 
         this.tooltip = new Tooltip();
     }
 
+    setLayout(layout){
+        this.layout = layout;
+    }
     /** 
      * Create and add a network to the web
      * @param {String} key Identifier of the new network
@@ -31,17 +37,26 @@ export default class NetworksGroup {
      * @param {HTMLElement} rightContainer Container where the network data will be placed
      */
     addNetwork(file, leftContainer, rightContainer, config) {
+        let jsonFile;
+        let network;
+
         try {
-            const jsonFile = JSON.parse(file);
-            const network = new NetworkMan(jsonFile, leftContainer, rightContainer, this, config);
-
-            this.activesNetworksMap.set(config.key, network);
-            this.activesNetworksArray.push(network);
-
+            jsonFile = JSON.parse(file);
         } catch (e) {
             console.log(e);
-            alert("The file is not a valid json file");
+            alert("Json parsing has failed");
+            return;
         }
+
+        try {
+            network = new NetworkMan(jsonFile, leftContainer, rightContainer, this, config);
+        } catch(e){
+            console.log(e);
+            alert("Network creation has failed");
+            return;
+        }
+        this.activesNetworksMap.set(config.key, network);
+        this.activesNetworksArray.push(network);
     }
 
     /** 
@@ -53,14 +68,14 @@ export default class NetworksGroup {
 
         const network = this.activesNetworksMap.get(key);
 
-        this.activesNetworksArray = this.activesNetworksArray.filter(data => data.key != key);
+        if (network !== undefined) {
+            this.activesNetworksArray = this.activesNetworksArray.filter(data => data.key != key);
 
-        network.clearNetwork();
-
-        const networkContainer = document.getElementById(networkHTML.networksParentContainer);
-        const divToDelete = document.getElementById(`${networkHTML.topNetworkContainer}${key}`);
-
-        networkContainer.removeChild(divToDelete);
+            network.clearNetwork();
+            this.layout.deleteNetwork(key);
+  
+            this.activesNetworksMap.delete(key);
+        }
     }
 
     /**
@@ -83,8 +98,8 @@ export default class NetworksGroup {
     /** 
      * Broadcast to all networks that no node was selected
      */
-    nodeDeselected(event) {
-        this.activesNetworksArray.forEach((network) => network.nodeDeselected(event));
+    nodeDeselected() {
+        this.activesNetworksArray.forEach((network) => network.nodeDeselected());
     }
 
 
@@ -192,6 +207,25 @@ export default class NetworksGroup {
         });
     }
 
+    /** 
+     * Change the network nodeLabelVisibility value
+     * @param {String} key Key of the network
+     * @param {Boolean} newBool New nodeLabelVisibility value
+     */
+    nodeLabelVisibilityChange(key, newBool) {
+        const network = this.activesNetworksMap.get(key);
+
+        network.nodeLabelVisibilityChange(newBool);
+    }
+    /**
+     * Broadcast the new nodeLabelVisibility value to all networks
+     * @param {Boolean} newValue New nodeLabelVisibility value
+     */
+    nodeLabelVisibilityChangeALL(newValue) {
+        this.activesNetworksArray.forEach((network) => {
+            this.nodeLabelVisibilityChange(network.key, newValue);
+        });
+    }
     /**
      * Hide the current active popover
      */

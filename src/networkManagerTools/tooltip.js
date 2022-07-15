@@ -6,7 +6,7 @@
 //Namespaces
 import { nodes } from "../constants/nodes.js";
 //Packages
-import { Popover } from 'bootstrap';
+import { Button, Popover } from 'bootstrap';
 
 export default class Tooltip {
 
@@ -32,7 +32,7 @@ export default class Tooltip {
         this.event = event;
         this.networkManager = networkManager;
 
-        const spawnPoint = tooltipManager.calculateTooltipSpawn(networkManager, event, this.getElementPosition.bind(this));
+        const spawnPoint = tooltipManager.calculateTooltipSpawn(networkManager, event, this.getElementPosition.bind(this), this.isClickOnCanvas.bind(this));
 
         if (spawnPoint !== null && spawnPoint !== undefined) {
             if (!update) {
@@ -41,6 +41,8 @@ export default class Tooltip {
                 const title = tooltipManager.getTooltipTitle(networkManager, event, this.titleTemplate.bind(this));
                 const content = tooltipManager.getTooltipContent(networkManager, event, this.contentTemplate.bind(this));
 
+                const allowList = this.tooltipAllowTagsList();
+
                 const options = {
                     trigger: "manual",
                     placement: "right",
@@ -48,6 +50,7 @@ export default class Tooltip {
                     content: content,
                     title: title,
                     fallbackPlacements: ["right"],
+                    allowList: allowList,
                     offset: [0, 0],
                     html: true,
                 };
@@ -59,9 +62,14 @@ export default class Tooltip {
             this.container.style.left = `${spawnPoint.x}px`;
             this.container.style.position = "absolute";
 
-            if (update)
+            if (update) {
                 this.tooltip.update();
+                this.tooltip.show();
+                this.addCloseButtonOnclick();
+            }
 
+        } else if (this.tooltip !== null) {
+            this.tooltip.hide();
         }
     }
 
@@ -79,7 +87,20 @@ export default class Tooltip {
         const top = element.offsetTop - parseFloat(marginTop);
         const left = element.offsetLeft - parseFloat(marginLeft);
 
-        return { top: top, left: left };
+        return { top: top, left: left, right: left + element.offsetWidth, bottom: top + element.offsetHeight };
+    }
+
+    /**
+     * Check if the click is inside the canvas
+     * @param {Object} click click position.
+     * Format-> { x: (integer), y: (integer) } 
+     * @param {Object} canvas canvas position.
+     * Format-> { top: (integer), left: (integer), bottom: (integer), top: (integer) }
+     * @returns {Boolean} returns true if the click is inside the canvas, false otherwise
+     */
+    isClickOnCanvas(click, canvas) {
+        return click.y > canvas.top && click.y < canvas.bottom &&
+            click.x > canvas.left && click.x < canvas.right;
     }
 
     /**
@@ -97,7 +118,7 @@ export default class Tooltip {
      */
     tooltipTemplate() {
         const html = `
-        <div class="popover node" role="tooltip">
+        <div class="popover node" role="tooltip">  
             <div class="popover-arrow"></div>
             <h3 class="popover-header"></h3>
             <div class="popover-body"></div>
@@ -112,7 +133,15 @@ export default class Tooltip {
      * @returns {String} returns a string with the template
      */
     titleTemplate(tittle) {
-        return `<strong> ${tittle} </strong>`;
+        return `
+        <div class="row">
+            <div class="col">
+                <strong class="align-middle"> ${tittle} </strong>
+            </div>
+            <div class="col">
+                <button type="button" class="btn-close align-middle float-end" aria-label="Close" id="CloseButtonPopover"></button>
+            </div>
+        </div>`;
     }
 
     /**
@@ -144,6 +173,28 @@ export default class Tooltip {
     }
 
     /**
+     * Create a list of allowed html tags for the bootstrap popover using bootstrap default allowlist as base
+     * @returns {Object} returns an objet with the allowlist
+     */
+    tooltipAllowTagsList() {
+        const allowList = Popover.Default.allowList;
+        //Allow buttons
+        allowList.button = [];
+
+        return allowList;
+    }
+
+    /**
+     * Add the onclick behaviour to the "X" button of the popover. It will close/hide the popover
+     */
+    addCloseButtonOnclick(){
+        const button = document.getElementById("CloseButtonPopover");
+
+        if(button !== undefined && button !== null)
+            button.onclick = () => this.hide();
+    }
+
+    /**
      * Hide the current active tooltip if it exist
      */
     hide() {
@@ -161,7 +212,6 @@ export default class Tooltip {
      */
     show() {
         if (this.tooltip !== null) {
-            this.tooltip.show();
             this.createTooltip(this.networkManager, this.event, this.tooltipManager, true)
         }
     }

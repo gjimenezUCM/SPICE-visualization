@@ -12,6 +12,7 @@ h1 {
 
 canvas {
   border-style: dotted;
+  height: 100%;
 }
 
 /*Make text inside an element unselectable (to evade unwanted text highlight)*/
@@ -27,11 +28,6 @@ canvas {
 .align-center {
   text-align: center;
   margin: auto;
-}
-
-.networkContainer {
-  height: 40em;
-  margin-bottom: 1%;
 }
 
 /*Need this so the app width has a minimum width*/

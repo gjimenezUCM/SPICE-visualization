@@ -119,4 +119,8 @@ export default class dataTable {
 
         return html;
     }
+
+    removeDataTable(){
+        this.container.innerHTML = "";
+    }
 }

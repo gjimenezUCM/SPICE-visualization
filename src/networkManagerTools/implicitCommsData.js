@@ -36,18 +36,24 @@ export default class ImplicitCommsData {
             boundingBoxes.push(null);
         }
 
-        //DEBUG TO SEE THE BB COLOR IN THE TABLE
-        let bb_count = 0;
-
         //Obtain the bounding box of every Implicit Community of nodes
         data.forEach((node) => {
             const group = node[comms.ImplUserNewKey];
-            const node_bb = network.getBoundingBox(node.id)
+            const node_bb = {};
 
+            //Remove label size from the bounding box
+            const position = network.getPosition(node.id);
+
+            node_bb.top = position.y - node.size / 2 - comms.Bb.nodePadding;
+            node_bb.bottom = position.y + node.size / 2 + comms.Bb.nodePadding;
+            node_bb.left = position.x - node.size / 2 - comms.Bb.nodePadding;
+            node_bb.right = position.x + node.size / 2 + comms.Bb.nodePadding;
+
+            
             if (boundingBoxes[group] === null) {
+
                 boundingBoxes[group] = node_bb;
 
-                bb_count++;
             } else {
                 if (node_bb.left < boundingBoxes[group].left)
                     boundingBoxes[group].left = node_bb.left;
@@ -200,10 +206,14 @@ export default class ImplicitCommsData {
      * @param {NetworkManager} networkManager Manager of the network where the tooltip is going to be draw
      * @param {Object} event Event with the location of the user click
      * @param {Function} getElementPosition Function that returns the DOM position of a HTML element
+     * @param {Function} isClickOnCanvas Function that returns if the click object is in the canvas
      * @returns {Object} returns an object with the spawn Point.
      * Format-> { x: (integer), y: (integer) } 
      */
-    calculateTooltipSpawn(networkManager, event, getElementPosition) {
+    calculateTooltipSpawn(networkManager, event, getElementPosition, isClickOnCanvas) {
+        //Horizontal offset to make the tooltip not overlap the bounding box
+        const xOffset = 10;
+
         //CHeck if the click hit a bounding box
         this.activeBBindex = this.checkBoundingBoxClick(event);
 
@@ -223,11 +233,17 @@ export default class ImplicitCommsData {
         //Calculate the real absolute click coordinates
         const networkCanvasPosition = getElementPosition(networkHTML.topCanvasContainer + networkManager.key);
 
-        const clickX = bbLeft.x + (bbRight.x - bbLeft.x) / 2 + networkCanvasPosition.left;
+        const clickX = bbRight.x + xOffset + networkCanvasPosition.left;
         const clickY = bbLeft.y + (bbRight.y - bbLeft.y) / 2 + networkCanvasPosition.top;
 
-        return { x: clickX, y: clickY };
+        const output = { x: clickX, y: clickY };
+
+        if (isClickOnCanvas(output, networkCanvasPosition))
+            return output;
+        return null;
     }
+
+
 
     /**
      * Returns the Title of the tooltip
@@ -261,7 +277,12 @@ export default class ImplicitCommsData {
         return contentTemplate(rowData);
     }
 
-
+    /**
+     * Completely remove the dataTable
+     */
+    removeTable() {
+        this.dataTable.removeDataTable();
+    }
 
     //This is intended for debug purpouses
     getCommunityBBcolor(index) {
@@ -276,6 +297,12 @@ export default class ImplicitCommsData {
                 return "red";
             case 4:
                 return "blue";
+            case 5:
+                return "orange";
+            case 6:
+                return "white";
+            case 7:
+                return "black";
         }
     }
 }
