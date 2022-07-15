@@ -8,6 +8,7 @@
 import { networkHTML } from "./constants/networkHTML.js";
 import AllowThirdDimensionCheckbox from "./controlPanelComponents/allowThirdDimensionCheckbox.js";
 import ChangeNodeLabelVisibilityCheckbox from "./controlPanelComponents/changeNodeLabelVisibilityCheckbox.js";
+import layoutChange from "./controlPanelComponents/layoutChangeCheckbox.js";
 //Local classes
 import Legend from "./controlPanelComponents/legend.js";
 import ThresholdSlider from "./controlPanelComponents/thresholdSlider.js";
@@ -20,9 +21,10 @@ export default class ControlPanel {
      * Constructor of the class
      * @param {NetworksGroup} networksGroup group of networks that will be controled by this panel
      */
-    constructor(networksGroup) {
+    constructor(networksGroup, initialOptions) {
         this.isActive = false;
         this.networkManager = networksGroup;
+        this.initialOptions = initialOptions;
     }
 
     /**
@@ -47,6 +49,7 @@ export default class ControlPanel {
         this.unselectedEdges = new UnselectedEdgesCheckbox(this.container, this.networkManager);
         this.allowThirdDimension = new AllowThirdDimensionCheckbox(this.container, this.networkManager);
         this.changeNodeVisbility = new ChangeNodeLabelVisibilityCheckbox(this.container, this.networkManager);
+        this.layoutChange = new layoutChange(this.container, this.initialOptions, this.networkManager);
 
         this.legend = new Legend(this.container, this.networkManager);
         this.allowThirdDimension.setLegend(this.legend)

@@ -38,14 +38,13 @@ export default class InitialOptions {
         this.domParser = new DOMParser();
         this.requestManager = new RequestManager(currentURL);
         this.networkManager = new NetworksGroup(this);
-        this.controlPanel = new ControlPanel(this.networkManager);
+        this.controlPanel = new ControlPanel(this.networkManager, this);
 
         const radioButtons = this.createRadioOptions(isLocalhost);
         this.createHTMLSkeleton(radioButtons);
         this.addRadioOnclick();
-
+        
         this.layoutManager = new VerticalLayout(this.networkManager);
-        this.layoutManager = new HorizontalLayout(this.networkManager);
 
         this.requestAllFiles();
     }
@@ -134,6 +133,9 @@ export default class InitialOptions {
             child.remove();
             child = parent.firstChild;
         }
+
+        document.getElementById(networkHTML.networksParentContainer).innerHTML = "";
+        
 
         this.requestAllFiles();
     }
@@ -238,67 +240,6 @@ export default class InitialOptions {
                     alert("Error while getting the selected file");
                 });
         }
-    }
-
-    createNetworkPairTemplate(key) {
-        let htmlString="";
-
-        switch (this.layout) {
-            case 0: //Vertical Layout
-                htmlString = `
-                <div id="${key}PairNetworkContainer">
-                    <div class="row container">
-                        ${this.createNetworkTemplate(this.createNetworkTitleTemplate(key), key, this.layout, "networkContainer")}
-                    </div>                
-                    <div class="row container">
-                        ${this.createNetworkTemplate("", `${key}${this.secondNetworkTag}`, this.layout, "networkContainerVertical")}
-                    </div>
-                </div>`
-                break;
-            case 1: //Horizontal Layour
-                htmlString = `
-                <div id="${key}PairNetworkContainer" class="row">
-                    <div class="row ps-5">
-                        <hr>
-                        <h2 class="text-start">
-                            ${key}
-                        </h2>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            ${this.createNetworkTemplate("", key, this.layout, "networkContainer")}  
-                        </div>
-                        <div class="col-sm-6">
-                            ${this.createNetworkTemplate("", `${key}${this.secondNetworkTag}`, this.layout, "networkContainerHorizontal")}
-                        </div>   
-                    </div>
-                </div>`
-                break;
-        }
-        return htmlString;
-    }
-
-    createNetworkTemplate(tittle, key, layout, networkClass){
-        const htmlString = `
-        <div class="container" id="${networkHTML.topNetworkContainer + key}">
-            ${tittle}
-            <div class="row" id="${layout}">
-                <div class="col-sm-8 ${networkClass}" id="leftCol_${key}"> </div>
-                <div class="col-sm-4" id="rightCol_${key}"> </div>
-            </div>
-        </div>`;
-        return htmlString;
-    }
-
-    createNetworkTitleTemplate(tittle){
-        const htmlString = `
-        <div class="row">
-            <hr>
-            <h2 class="text-start">
-                ${tittle}
-            </h2>
-        </div>`;
-        return htmlString;
     }
 
     /** 
