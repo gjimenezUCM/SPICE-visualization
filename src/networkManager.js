@@ -24,13 +24,13 @@ export default class NetworkMan {
     /**
      * Constructor of the class
      * @param {Object} jsonInput json input with all the network data
-     * @param {HTMLElement} container container of the network
-     * @param {HTMLElement} rightContainer container of the dataTables
+     * @param {HTMLElement} networkContainer container of the network
+     * @param {HTMLElement} datatableContainer container of the dataTables
      * @param {NetworkGroupManager} networkManager manager of all active networks
      * @param {Object} config config options for edges
      */
-    constructor(jsonInput, container, rightContainer, networkManager, config) {
-        this.container = container;
+    constructor(jsonInput, networkContainer, datatableContainer, networkManager, config) {
+        this.container = networkContainer;
         this.groupManager = networkManager;
         this.key = config.key;
         this.valuesToHide = config.valuesToHide;
@@ -38,7 +38,7 @@ export default class NetworkMan {
         this.implCommMan = new ImplicitCommsMan(jsonInput);
         this.nodeVisuals = new NodeVisuals(config);
 
-        this.nodeData = new NodeData(this.nodeVisuals, rightContainer);
+        this.nodeData = new NodeData(this.nodeVisuals, datatableContainer);
         this.edgesMan = new EdgeManager(config);
 
         this.data =
@@ -49,8 +49,8 @@ export default class NetworkMan {
 
         new nodeLocationSetter(this.data.nodes, this.implCommMan.implComms.length);
 
-        this.nodeData.createNodeDataTable(rightContainer);
-        this.implCommMan.createCommunityDataTable(rightContainer);
+        this.nodeData.createNodeDataTable(datatableContainer);
+        this.implCommMan.createCommunityDataTable(datatableContainer);
 
         this.nodeVisuals.createNodeDimensionStrategy(this.data.nodes);
 

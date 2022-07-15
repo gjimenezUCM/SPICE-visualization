@@ -33,10 +33,10 @@ export default class NetworksGroup {
      * Create and add a network to the web
      * @param {String} key Identifier of the new network
      * @param {File} file File with the config of the network
-     * @param {HTMLElement} leftContainer Container where the network will be placed
-     * @param {HTMLElement} rightContainer Container where the network data will be placed
+     * @param {HTMLElement} networkContainer Container where the network will be placed
+     * @param {HTMLElement} dataTableContainer Container where the dataTable will be placed
      */
-    addNetwork(file, leftContainer, rightContainer, config) {
+    addNetwork(file, networkContainer, dataTableContainer, config) {
         let jsonFile;
         let network;
 
@@ -49,7 +49,7 @@ export default class NetworksGroup {
         }
 
         try {
-            network = new NetworkMan(jsonFile, leftContainer, rightContainer, this, config);
+            network = new NetworkMan(jsonFile, networkContainer, dataTableContainer, this, config);
         } catch(e){
             console.log(e);
             alert("Network creation has failed");

@@ -14,6 +14,7 @@ import NetworksGroup from "./networksGroup.js";
 import RequestManager from "./requestManager.js";
 import ControlPanel from "./controlPanel.js";
 import VerticalLayout from "./layouts/verticalLayout.js";
+import HorizontalLayout from "./layouts/horizontalLayout.js";
 
 export default class InitialOptions {
 
@@ -43,7 +44,8 @@ export default class InitialOptions {
         this.createHTMLSkeleton(radioButtons);
         this.addRadioOnclick();
 
-        this.layoutManager = new VerticalLayout(this.networkManager, this.controlPanel);
+        this.layoutManager = new VerticalLayout(this.networkManager);
+        this.layoutManager = new HorizontalLayout(this.networkManager);
 
         this.requestAllFiles();
     }
@@ -305,7 +307,20 @@ export default class InitialOptions {
      * @param {JSON} file File with the network config data
      */
     createNetwork(key, file) {
-        this.layoutManager.addNetwork(key, file);
+
+        const config = {
+            edgeThreshold: this.controlPanel.getSliderThreshold(),
+            variableEdge: this.controlPanel.getVariableEdgeValue(),
+            hideUnselected: this.controlPanel.getUnselectedEdgesValue(),
+            valuesToHide: this.controlPanel.getValuesToHide(),
+            allowThirdDimension: this.controlPanel.getThirdDimensionValue(),
+            showNodeLabels: this.controlPanel.getShowNodeLabelValue(),
+            key: key
+        };
+
+        this.layoutManager.addNetwork(key, file, config);
+
+        this.controlPanel.createControlPanel()
     }
 
 

@@ -14,7 +14,10 @@ export const networkHTML = {
     //Id of the container with all the networks active in the html
     networksParentContainer: "networksContainer",
 
-
+    //Id of the first network in a pair Layout
+    networkFirst: "first",
+    //Id of the second network in a pair Layout
+    networkSecond: "second",
     //--- Next to all these Id, the network's key will be added in the code ---
 
     //Id of the top container with the canvas of a network. 
@@ -30,6 +33,7 @@ export const networkHTML = {
     thirdDimensionInitialValue: false,
     showNodeLabelInitialValue: false,
     
+
     //--- Legend HTML
     legendButtonClass: "legend btn",
 }
