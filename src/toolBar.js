@@ -27,8 +27,7 @@ export default class ToolBar {
      * Constructor of the class
 
      */
-    constructor(initialOptions) {
-        this.initialOptions = initialOptions;
+    constructor() {
         this.domParser = new DOMParser();
 
         this.requestManager = new RequestManager();
@@ -36,7 +35,7 @@ export default class ToolBar {
         this.layout = new VerticalLayout(this.networksGroup);
 
         this.initToolbarParts();
-
+        this.initHTML();
         const htmlString = `
         <nav class="navbar fixed-top navbar-expand-md navbar-light bg-light">
             <div class="container-fluid">
@@ -68,7 +67,7 @@ export default class ToolBar {
         </nav>`;
 
         const html = this.domParser.parseFromString(htmlString, "text/html").body.firstChild;
-        document.body.append(html);
+        document.getElementById(networkHTML.toolBarParentContainer).append(html);
 
         this.requestAllFiles();
     }
@@ -85,6 +84,22 @@ export default class ToolBar {
         this.midAlignedItems = new MidAlignedToolbarItems(this);
         this.toolbarParts.push(this.midAlignedItems);
      }
+
+    /**
+     * Create the basic HTML divs to support all aplication's parts
+     */
+    initHTML() {
+        const htmlString = `
+        <div class="container">
+            <div class="align-center" id="${networkHTML.toolBarParentContainer}"> </div>
+            <h1 style="margin-top: 60px;"> Visualization testing </h1>
+            <div class="align-center" id="${networkHTML.networksParentContainer}"> </div>
+        </div>`;
+
+        const html = this.domParser.parseFromString(htmlString, "text/html").body.firstChild;
+
+        document.body.appendChild(html);
+    }
 
      /**
       * Request the name of all available perspective files

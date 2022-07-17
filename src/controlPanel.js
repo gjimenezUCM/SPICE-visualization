@@ -38,7 +38,7 @@ export default class ControlPanel {
 
         this.container = document.createElement("div");
         this.container.className = "middle";
-        document.getElementById(networkHTML.controlPanelParentContainer).appendChild(this.container);
+        document.getElementById(networkHTML.toolBarParentContainer).appendChild(this.container);
 
         const inputTitle = document.createElement("h5");
         inputTitle.innerHTML = "Control Panel";
@@ -67,7 +67,7 @@ export default class ControlPanel {
 
         this.isActive = false;
 
-        document.getElementById(networkHTML.controlPanelParentContainer).removeChild(this.container);
+        document.getElementById(networkHTML.toolBarParentContainer).removeChild(this.container);
     }
 
     /**

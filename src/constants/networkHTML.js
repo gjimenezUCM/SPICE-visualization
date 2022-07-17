@@ -10,7 +10,7 @@ export const networkHTML = {
     //Id of the container with the Select filter attributes dropdown
     filterDropdownContainer: "filter_Dropdown",
     //Id of the container with the control Panel.
-    controlPanelParentContainer: "controlPanelContainer",
+    toolBarParentContainer: "controlPanelContainer",
     //Id of the container with all the networks active in the html
     networksParentContainer: "networksContainer",
 

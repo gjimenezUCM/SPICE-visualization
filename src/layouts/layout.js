@@ -113,7 +113,7 @@ export default class Layout {
         for(let i = 0; i < this.unpairedRows.length; i++){
             const unpairedRow = this.unpairedRows[i];
 
-            if(unpairedRow.nRow === nRow){
+            if(unpairedRow.nRow === parseInt(nRow)){
                 isUnpaired = true;
                 this.unpairedRows = this.unpairedRows.splice(0, i);
             }

@@ -6,23 +6,17 @@
  */
 //Namespaces
 import { networkHTML } from "../constants/networkHTML";
+import Layout from "./layout";
 //Local classes
 
-export default class VerticalLayout {
+export default class VerticalLayout extends Layout{
 
     /**
      * Constructor of the class
      * @param {NetworksGroup} networksGroup group of networks that will be controled by this panel
      */
     constructor(networksGroup) {
-        this.networksGroup = networksGroup;
-        this.domParser = new DOMParser();
-
-        this.unpairedRows = new Array();
-        this.networkKeyToRow = new Map();
-        this.nRows = 0;
-        
-        this.networksGroup.setLayout(this);
+        super(networksGroup, {main: "col singleNetworkContainer", second: "", pair: "col pairNetworkVertical"});
     }
 
     /**
@@ -38,23 +32,6 @@ export default class VerticalLayout {
             </div>
             <div class="row" id="bottomRow_${nRow}">
                 ${this.networkTemplate(`${this.nRows}_${networkHTML.networkSecond}`)}
-            </div>
-        </div>`;
-
-        return htmlString;
-    }
-
-    /**
-     * Returns an htmlString with the basic layout of a network.
-     * @param {Integer} nRow numer of the row used as a key
-     * @returns {String} returns the html string
-     */
-    networkTemplate(key) {
-        const htmlString = `
-        <div id="${networkHTML.topNetworkContainer}${key}">
-            <div class="row" id="">
-                <div class="col-sm-8" id="leftCol_${key}"> </div>
-                <div class="col-sm-4" id="rightCol_${key}"> </div>
             </div>
         </div>`;
 
@@ -163,44 +140,4 @@ export default class VerticalLayout {
         </div>`;
         return htmlString;
     }
-
-    /**
-     * Delete a network from this layout
-     * @param {String} key unique key of the network to be deleted 
-     */
-    deleteNetwork(key){
-        const networkRowid = this.networkKeyToRow.get(key).split("_");
-
-        const nRow = networkRowid[0];
-        const location = networkRowid[1];
-        
-        document.getElementById(`leftCol_${nRow}_${location}`).innerHTML = "";
-        document.getElementById(`rightCol_${nRow}_${location}`).innerHTML = "";
-
-        let isUnpaired = false;
-
-        for(let i = 0; i < this.unpairedRows.length; i++){
-            const unpairedRow = this.unpairedRows[i];
-
-            if(unpairedRow.nRow === nRow){
-                isUnpaired = true;
-                this.unpairedRows = this.unpairedRows.splice(0, i);
-            }
-        }
-        if(isUnpaired){
-
-            const rowContainer = document.getElementById(`networkContainer_${nRow}`); 
-            document.getElementById(networkHTML.networksParentContainer).removeChild(rowContainer);
-
-        }else{
-            if(location === networkHTML.networkFirst){
-                this.makeSingleNetworkRow(nRow, networkHTML.networkSecond);
-            }else{
-                this.makeSingleNetworkRow(nRow, networkHTML.networkFirst);
-            }
-
-            this.unpairedRows.push({nRow: nRow, location: location});
-        }
-    }
-
 }   

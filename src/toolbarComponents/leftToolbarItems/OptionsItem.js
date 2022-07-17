@@ -118,7 +118,7 @@ export default class OptionsItem {
         this.thirdDimensionValue = active;
         console.log(`toggle thirdDimension ${active}`);
 
-        this.toolbar.networksGroup.variableEdgeChangeALL(active);
+        this.toolbar.networksGroup.changeThirdDimensionALL(active);
     }
 
     /**

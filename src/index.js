@@ -11,13 +11,11 @@ import toolBar_css from "../css/toolBar.css";
 
 //Local classes
 import InitialOptions from "./initialOptions.js";
+import ToolBar from "./toolBar";
 
 
 window.onload = function () {
-
-	
-
-	new InitialOptions(true);
+	new ToolBar();
 }
 
 

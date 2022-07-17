@@ -4,9 +4,6 @@
  * @author Marco Expósito Pérez
  */
 
-//Namespace
-import { networkHTML } from "./constants/networkHTML.js";
-
 //Local classes
 import NetworkMan from "./networkManager.js";
 import Tooltip from "./networkManagerTools/tooltip.js";
@@ -69,6 +66,7 @@ export default class NetworksGroup {
             this.activesNetworksArray = this.activesNetworksArray.filter(data => data.key != key);
 
             network.clearNetwork();
+
             this.layout.deleteNetwork(key);
   
             this.activesNetworksMap.delete(key);
