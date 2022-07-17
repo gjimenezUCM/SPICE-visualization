@@ -1,6 +1,6 @@
-import FileSourceItem from "./leftToolbarItems/FileSource"
-import LayoutItem from "./leftToolbarItems/LayoutItem";
-import OptionsItem from "./leftToolbarItems/OptionsItem";
+import FileSourceItem from "./leftAlignedItems/FileSource"
+import LayoutItem from "./leftAlignedItems/LayoutItem";
+import OptionsItem from "./leftAlignedItems/OptionsItem";
 
 
 

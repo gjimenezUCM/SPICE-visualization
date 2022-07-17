@@ -50,3 +50,11 @@ canvas {
 .popover.node {
   opacity: 0.8;
 }
+
+.popover.legend{
+  direction: rtl;
+}
+
+.popover.legend > *{
+  direction: ltr;
+}

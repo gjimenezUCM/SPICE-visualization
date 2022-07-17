@@ -6,26 +6,21 @@
  */
 //Namespaces
 import { networkHTML } from "./constants/networkHTML.js";
-import AllowThirdDimensionCheckbox from "./controlPanelComponents/allowThirdDimensionCheckbox.js";
-import ChangeNodeLabelVisibilityCheckbox from "./controlPanelComponents/changeNodeLabelVisibilityCheckbox.js";
-import layoutChange from "./controlPanelComponents/layoutChangeCheckbox.js";
+
 //Local classes
-import Legend from "./controlPanelComponents/legend.js";
-import ThresholdSlider from "./controlPanelComponents/thresholdSlider.js";
-import UnselectedEdgesCheckbox from "./controlPanelComponents/unselectedEdgesCheckbox.js";
-import VariableEdgeCheckbox from "./controlPanelComponents/variableEdgeCheckbox.js";
 import HorizontalLayout from "./layouts/horizontalLayout.js";
 import VerticalLayout from "./layouts/verticalLayout.js";
 import NetworksGroup from "./networksGroup.js";
 import RequestManager from "./requestManager.js";
+//Components
 import LeftAlignedToolbarItems from "./toolbarComponents/leftAlignedToolbarItems.js";
 import MidAlignedToolbarItems from "./toolbarComponents/midAlignedToolbarItems.js";
+import RightAlignedToolbarItems from "./toolbarComponents/rightAlignedToolbarItems.js";
 
 export default class ToolBar {
 
     /**
      * Constructor of the class
-
      */
     constructor() {
         this.domParser = new DOMParser();
@@ -33,6 +28,8 @@ export default class ToolBar {
         this.requestManager = new RequestManager();
         this.networksGroup = new NetworksGroup();
         this.layout = new VerticalLayout(this.networksGroup);
+
+        this.event = new Event('networkNumberChange');
 
         this.initToolbarParts();
         this.initHTML();
@@ -50,17 +47,7 @@ export default class ToolBar {
 
                     <! -- End aligned items -->
                     <div class="d-flex col flex-row-reverse">
-                        <ul class="navbar-nav">
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle btn-secondary" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Legend WIP
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <li><a class="dropdown-item unselectable" href="#">WIP</a></li>
-                                    <li><a class="dropdown-item unselectable" href="#">WIP</a></li>
-                                </ul>
-                            </li>
-                        </ul>
+                        ${this.rightAlignedItems.htmlString} 
                     </div>
                 </div>
             </div>
@@ -83,6 +70,9 @@ export default class ToolBar {
 
         this.midAlignedItems = new MidAlignedToolbarItems(this);
         this.toolbarParts.push(this.midAlignedItems);
+
+        this.rightAlignedItems = new RightAlignedToolbarItems(this);
+        this.toolbarParts.push(this.rightAlignedItems);
      }
 
     /**
@@ -172,6 +162,7 @@ export default class ToolBar {
                 config["key"] = key;
 
                 this.layout.addNetwork(key, file, config);
+                dispatchEvent(this.event);
 
             })
             .catch((error) => {
@@ -182,6 +173,7 @@ export default class ToolBar {
 
     disactivateNetwork(key){
         this.networksGroup.removeNetwork(key);
+        dispatchEvent(this.event);
     }
 
     /**
@@ -207,6 +199,26 @@ export default class ToolBar {
 
         return active;
     }
+
+
+    // restartInitialOptions() {
+    //     this.networkManager.removeAllnetworks();
+    //     this.controlPanel.removeControlpanel();
+
+    //     //remove dropdown
+    //     const parent = document.getElementById(networkHTML.algorithmDropdownContainer);
+    //     let child = parent.firstChild;
+
+    //     while (child) {
+    //         child.remove();
+    //         child = parent.firstChild;
+    //     }
+
+    //     document.getElementById(networkHTML.networksParentContainer).innerHTML = "";
+        
+
+    //     this.requestAllFiles();
+    // }
 
    
 }   

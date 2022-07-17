@@ -10,7 +10,7 @@ export default class SelectPerspectiveItem {
 
         this.htmlString = `
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle btn-secondary" data-bs-auto-close="outside" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <a class="nav-link dropdown-toggle btn-secondary unselectable" data-bs-auto-close="outside" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Select Perspective
             </a>
             <ul class="dropdown-menu" id="dropdownPerspectivesOptionsMenu" aria-labelledby="navbarDropdown">

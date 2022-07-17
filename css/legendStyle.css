@@ -73,12 +73,12 @@
 }
 
 /* Background color */
-.legend.btn.active>.container.legend>.row>.col-6>.LegendColor {
+.legend.btn.active>.container.legend>.row>.col-3>.LegendColor {
     opacity: 25%;
 }
 
 /* Border color */
-.legend.btn.active>.container.legend>.row>.col-6>.LegendBorder {
+.legend.btn.active>.container.legend>.row>.col-3>.LegendBorder {
     opacity: 25%;
 }
 
@@ -110,6 +110,6 @@
     clip-path: polygon(var(--path));
 }
 
-.legend.btn.active>.container.legend>.row>.col-6>.LegendShape {
+.legend.btn.active>.container.legend>.row>.col-3>.LegendShape {
     opacity: 35%;
 }

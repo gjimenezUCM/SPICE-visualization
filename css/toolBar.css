@@ -13,3 +13,7 @@
     color: white !important;
     border-radius: 5px;
 }
+
+.accordion-button.disabled{
+    opacity: 35%;
+}
