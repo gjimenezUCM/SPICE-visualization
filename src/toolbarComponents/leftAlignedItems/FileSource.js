@@ -1,9 +1,16 @@
+/**
+ * @fileoverview This class creates a dropdown Menu that allows the user to choose what is the
+ * source of the perspective files.
+ * @package Requires bootstrap package to be able to use the dropdown. 
+ * @author Marco Expósito Pérez
+ * 
+ */
 
 export default class FileSourceItem {
 
     /**
      * Constructor of the class
-
+     * @param {ToolBar} toolbar toolbar owner of this item
      */
     constructor(toolbar) {
         this.toolbar = toolbar;
@@ -65,5 +72,6 @@ export default class FileSourceItem {
         }
     }
 
-    setConfiguration(){}
+    setConfiguration(config){}
+
 }

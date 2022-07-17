@@ -57,7 +57,8 @@ export default class NetworkMan {
         this.chooseOptions();
         this.drawNetwork();
 
-        this.updateFilterActives(this.valuesToHide);
+        if(this.valuesToHide.length !== 0)
+            this.updateFilterActives(this.valuesToHide);
     }
 
     /**

@@ -1,14 +1,17 @@
+/**
+ * @fileoverview This class holds the items inside the UI that will be aligned to the left of the toolbox
+ * @author Marco Expósito Pérez
+ */
+//Local classes
 import FileSourceItem from "./leftAlignedItems/FileSource"
 import LayoutItem from "./leftAlignedItems/LayoutItem";
 import OptionsItem from "./leftAlignedItems/OptionsItem";
-
-
 
 export default class LeftAlignedToolbarItems {
 
     /**
      * Constructor of the class
-
+     * @param {ToolBar} toolbar toolbar owner of this item
      */
     constructor(toolbar) {
 
@@ -18,7 +21,7 @@ export default class LeftAlignedToolbarItems {
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNavbar">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand abs" href="#"> Visualization module</a>
+        <a class="navbar-brand abs" href="${window.location.href}"> Visualization module</a>
 
         <div class="navbar-collapse collapse justify-content-start" id="collapseNavbar">
             <ul class="navbar-nav">
@@ -30,7 +33,7 @@ export default class LeftAlignedToolbarItems {
     }
 
     /**
-     * Initialize all items of this toolbar side
+     * Initialize all items of this toolbar part
      */
     initItems(toolbar){
         this.items = new Array();
@@ -46,7 +49,7 @@ export default class LeftAlignedToolbarItems {
     }
     
     /**
-     * Create the events of all items of this toolbar side
+     * Create the events of all items of this toolbar part
      */
     createEvents(){
         for(const item of this.items){
@@ -54,6 +57,10 @@ export default class LeftAlignedToolbarItems {
         }
     }
 
+    /**
+     * Set the configuration file based on all items of this toolbar part
+     * @param {Object} config network configuration file
+     */
     setConfiguration(config){
         for(const item of this.items){
             item.setConfiguration(config);

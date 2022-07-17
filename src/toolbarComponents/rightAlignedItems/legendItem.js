@@ -1,19 +1,29 @@
-import { Popover } from "bootstrap";
-import { option } from "vis-util/esnext";
+/**
+ * @fileoverview This class creates a popover with the Legend of the networks on view.
+ * The legend also includes options to filter the nodes of all active networks
+ * @package Requires bootstrap package to be able to use Popover. 
+ * @author Marco Expósito Pérez
+ */
+//Namespace
 import { networkHTML } from "../../constants/networkHTML";
 import { nodes } from "../../constants/nodes";
+//Packages
+import { Popover } from "bootstrap";
 
 export default class LegendItem {
 
     /**
      * Constructor of the class
+     * @param {ToolBar} toolbar toolbar owner of this item
      */
     constructor(toolbar) {
         this.toolbar = toolbar;
 
         this.popover = null;
+        this.valuesToHide = new Array();
 
         addEventListener('networkNumberChange', () => this.networkNumberChange(), false);
+        addEventListener('toolbarReset', () => this.restart(), false);
 
         this.htmlString = `
         <li class="nav-item dropdown">
@@ -28,10 +38,44 @@ export default class LegendItem {
         </li>`;
     }
 
+    /**
+     * Create the events related with the Legend
+     */
+    createEvents() {
+        this.button = document.getElementById("TestingButton");
+        this.button.onclick = () => this.legendOnclick();
+    }
+
+    /**
+     * Function executed when the legend button is clicked. Toggle the legend popover
+     */
+    legendOnclick() {
+        if (this.popover !== null) {
+
+            if (this.button.className === "accordion-button unselectable collapsed") {
+                this.button.className = "accordion-button unselectable";
+            } else {
+                this.button.className = "accordion-button unselectable collapsed";
+            }
+
+            //If the user spams the click on the legend, the popover will break
+            if(this.popover._hoverState !== "out"){
+                this.popover.toggle();
+            }else{
+                console.log("Error with the legend popover");
+            }
+        }
+    }
+
+    /**
+     * Function executed when the event "networkNumberChange" is dispatched. 
+     * The function creates the popover if there are more than 0 networks and the popover doesnt exist yet
+     * The function also removes the popover if there are 0 networks
+     */
     networkNumberChange() {
         const nNetworks = this.toolbar.networksGroup.getNnetworks();
 
-        if (nNetworks === 0) {
+        if (nNetworks <= 0) {
             this.button.className = "accordion-button unselectable collapsed disabled";
             if (this.popover !== null) {
                 this.popover.hide();
@@ -50,13 +94,8 @@ export default class LegendItem {
     }
 
     /**
-     * Create the events related with the Legend
+     * Creates the popover that will act as the legend
      */
-    createEvents() {
-        this.button = document.getElementById("TestingButton");
-        this.button.onclick = () => this.legendOnclick();
-    }
-
     createLegendPopover() {
         const attributes = this.toolbar.networksGroup.getVisualizationAttributes();
 
@@ -66,8 +105,8 @@ export default class LegendItem {
         allowList['*'].push("name");
 
         const title = "";
-        const content = this.tooltipContent(attributes);
-        const html = this.tooltipTemplate(attributes);
+        const content = this.popoverContent(attributes);
+        const html = this.popoverTemplate(attributes);
 
         const options = {
             trigger: "manual",
@@ -90,55 +129,27 @@ export default class LegendItem {
         this.createSubButtonsOnclick(legendOptions);
     }
 
-    createSubButtonsOnclick(legendOptions){
-        
-        for(const option of legendOptions){
-            option.onclick = () => this.subButtonOnclick(option);
-        }
-    }
-
-    subButtonOnclick(option){
-        const idSanitized = (option.id).substring("legendButton".length);
-        const id = idSanitized.split("_");
-
-        const btnClass = option.className;
-        const isActive = btnClass.slice(btnClass.length - 6);
-
-        if (isActive !== "active") {
-            option.className = `${networkHTML.legendButtonClass} active`; 
-            
-            this.filterValuesToHide.push(`${id[0]}_${id[1]}`);
-        } else {
-            option.className = networkHTML.legendButtonClass;
-
-            const index = this.filterValuesToHide.indexOf(`${id[0]}_${id[1]}`);
-            if (index === -1) {
-                console.log("Legend error, value to remove not found in the values to hide list")
-                return;
-
-            } else {
-                this.filterValuesToHide.splice(index, 1);
-            }
+    /**
+     * Returns the popover html template
+     * @returns {String} returns a string with the template
+     */
+         popoverTemplate(attributes) {
+            const html = `
+            <div class="popover legend" role="tooltip" style="min-width:${networkHTML.legendColumnsWidth * attributes.length}px;">  
+                <div class="popover-body legend" id="PopoverLegend"></div>
+            </div>`;
+    
+            return html;
         }
 
-        this.toolbar.networksGroup.updateFilterActivesALL(this.filterValuesToHide);
-    }
-
-    legendOnclick() {
-        if (this.popover !== null) {
-
-            if (this.button.className === "accordion-button unselectable collapsed") {
-                this.button.className = "accordion-button unselectable";
-            } else {
-                this.button.className = "accordion-button unselectable collapsed"
-            }
-
-            this.popover.toggle();
-        }
-    }
-
-    tooltipContent(attributes) {
-        this.filterValuesToHide = new Array();
+    /**
+    * Creates the htmlstring with the contents of the popover
+    * @param {Object} Object with the attributes that change visualization
+    * Format-> {attr: (string), vals: (string[], dimension: (string))}
+    * @returns {String} returns the htmlstring
+    */
+     popoverContent(attributes) {
+        this.valuesToHide = new Array();
 
         let legendTable = "";
         for (let i = 0; i < attributes.length; i++) {
@@ -153,13 +164,12 @@ export default class LegendItem {
             legendTable += htmlString;
         }
 
-        let topBody = `
+        let body = `
         <div class="row">
             ${legendTable}
         </div>`;
 
-        return topBody;
-
+        return body;
     }
 
     /**
@@ -233,27 +243,73 @@ export default class LegendItem {
         return output.outerHTML;
     }
 
+    /**
+     * Adds the onclick function to all legend button options
+     * @param {HTMLElement[]} legendOptions Array with all buttons
+     */
+    createSubButtonsOnclick(legendOptions) {
+        for (const option of legendOptions) {
+            option.onclick = () => this.subButtonOnclick(option);
+        }
+    }
+
+    /** 
+     * Function executed when the legend button options is clicked. 
+     * Toggle the visibility of nodes related with the value
+     */
+    subButtonOnclick(option) {
+        const idSanitized = (option.id).substring("legendButton".length);
+        const id = idSanitized.split("_");
+
+        const btnClass = option.className;
+        const isActive = btnClass.slice(btnClass.length - 6);
+
+        if (isActive !== "active") {
+            option.className = `${networkHTML.legendButtonClass} active`;
+
+            this.valuesToHide.push(`${id[0]}_${id[1]}`);
+        } else {
+            option.className = networkHTML.legendButtonClass;
+
+            const index = this.valuesToHide.indexOf(`${id[0]}_${id[1]}`);
+            if (index === -1) {
+                console.log("Legend error, value to remove not found in the values to hide list")
+                return;
+
+            } else {
+                this.valuesToHide.splice(index, 1);
+            }
+        }
+
+        this.toolbar.networksGroup.updateFilterActivesALL(this.valuesToHide);
+    }
 
     /**
-     * Returns the tooltip html template
-     * @returns {String} returns a string with the template
+     * Setup the config file
+     * @param {Object} config network configuration file 
      */
-    tooltipTemplate(attributes) {
-
-        const html = `
-        <div class="popover legend" role="tooltip" style="min-width:${networkHTML.legendColumnsWidth * attributes.length}px;">  
-            <div class="popover-body legend" id="PopoverLegend"></div>
-        </div>`;
-
-        return html;
-    }
-
-
     setConfiguration(config) {
-
-
+        config["valuesToHide"] = this.valuesToHide;
     }
 
+    /**
+     * Clear the legend and disables it
+     */
+    restart() {
+        this.button.className = "accordion-button unselectable collapsed disabled";
+        if (this.popover !== null) {
+            this.popover.hide();
+            this.popover = null;
+        }
+    }
+
+    /**
+     * Auxiliar function that change strings from CamelCase to Camel Case unless all the string characters
+     * are upper case. It also trim them based on the maxLength parameter
+     * @param {String} string string to be edited
+     * @param {Integer} maxLength max possible length of the string
+     * @returns {String} Returns the string decorated 
+     */
     decorateString(string, maxLength) {
         if (string !== string.toUpperCase()) {
             const notCamelCaseString = string.replace(/([A-Z])/g, " $1");
@@ -262,9 +318,16 @@ export default class LegendItem {
         return this.trimString(string, maxLength);
     }
 
-    trimString(string, length) {
-        if (string.length > length) {
-            return string.substring(0, length)
+    /**
+     * If the string is bigger than maxLength, it will remove the last chars of the string 
+     * to fit inside the maxLenght
+     * @param {String} string string to be trimmed
+     * @param {Integer} maxLength max possible length of the string
+     * @returns {String} Returns the string decotrimmedated 
+     */
+    trimString(string, maxLength) {
+        if (string.length > maxLength) {
+            return string.substring(0, maxLength);
         } else {
             return string;
         }

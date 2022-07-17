@@ -1,7 +1,6 @@
 /**
- * @fileoverview This class creates a single control panel for all networks. The control panel is made of a slider
- * that updates the minimum edge value threshold, a checkbox that change if edges width relates to the edge value
- * and a legend that also allows the user to hide nodes that meet some attribute values.
+ * @fileoverview This class creates a toolbar that holds all utilities of the visualization module.
+ * Works as a controler between the UI items and the networks 
  * @author Marco Expósito Pérez
  */
 //Namespaces
@@ -29,10 +28,12 @@ export default class ToolBar {
         this.networksGroup = new NetworksGroup();
         this.layout = new VerticalLayout(this.networksGroup);
 
-        this.event = new Event('networkNumberChange');
+        this.nNetworkChange = new Event('networkNumberChange');
+        this.toolbarResetEvent = new Event('toolbarReset');
 
-        this.initToolbarParts();
         this.initHTML();
+        this.initToolbarParts();
+        
         const htmlString = `
         <nav class="navbar fixed-top navbar-expand-md navbar-light bg-light">
             <div class="container-fluid">
@@ -141,14 +142,23 @@ export default class ToolBar {
         this.restartToolbar();
     }
 
+    /**
+     * Toggle a perspective/network visualization hiding/showing it depending of their active state
+     * @param {Boolean} active value that decides the outcome
+     * @param {String} key key of the perspective/network
+     */
     togglePerspective(active, key){
         if (active) {
             this.activateNetwork(key);
         } else {
-            this.disactivateNetwork(key);
+            this.removeNetwork(key);
         }
     }
 
+    /**
+     * Activate a network visualization
+     * @param {String} key key of the network
+     */
     activateNetwork(key){
         const name = key + ".json";
 
@@ -162,8 +172,8 @@ export default class ToolBar {
                 config["key"] = key;
 
                 this.layout.addNetwork(key, file, config);
-                dispatchEvent(this.event);
 
+                dispatchEvent(this.nNetworkChange);
             })
             .catch((error) => {
                 console.log(error);
@@ -171,16 +181,26 @@ export default class ToolBar {
             });
     }
 
-    disactivateNetwork(key){
+    /**
+     * Remove a network visualization
+     * @param {String} key key of the network
+     */
+    removeNetwork(key){
         this.networksGroup.removeNetwork(key);
-        dispatchEvent(this.event);
+        dispatchEvent(this.nNetworkChange);
     }
 
     /**
      * Remove all networks and restart the toolbar with the current selected options 
      */
     restartToolbar(){
-        //TODO
+        this.networksGroup.removeAllnetworks();
+    
+        dispatchEvent(this.toolbarResetEvent);
+
+        document.getElementById(networkHTML.networksParentContainer).innerHTML = "";
+        
+        this.requestAllFiles();
     }
 
     /**
@@ -199,26 +219,4 @@ export default class ToolBar {
 
         return active;
     }
-
-
-    // restartInitialOptions() {
-    //     this.networkManager.removeAllnetworks();
-    //     this.controlPanel.removeControlpanel();
-
-    //     //remove dropdown
-    //     const parent = document.getElementById(networkHTML.algorithmDropdownContainer);
-    //     let child = parent.firstChild;
-
-    //     while (child) {
-    //         child.remove();
-    //         child = parent.firstChild;
-    //     }
-
-    //     document.getElementById(networkHTML.networksParentContainer).innerHTML = "";
-        
-
-    //     this.requestAllFiles();
-    // }
-
-   
 }   

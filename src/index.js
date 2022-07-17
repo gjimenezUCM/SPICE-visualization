@@ -10,9 +10,7 @@ import layout_css from "../css/networkLayout.css";
 import toolBar_css from "../css/toolBar.css";
 
 //Local classes
-import InitialOptions from "./initialOptions.js";
 import ToolBar from "./toolBar";
-
 
 window.onload = function () {
 	new ToolBar();

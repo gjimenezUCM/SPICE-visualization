@@ -1,11 +1,19 @@
+/**
+ * @fileoverview This class creates a dropdown Menu that allows the user to edit some options about the networks.
+ * User can: hide/show node labels, hide all edges unless a node is selected, change edge width based
+ * on their similarity, add a third dimension to node visuals
+ * @package Requires bootstrap package to be able to use the dropdown. 
+ * @author Marco Expósito Pérez
+ */
 
+//Namespace
 import { networkHTML } from "../../constants/networkHTML.js";
 
 export default class OptionsItem {
 
     /**
      * Constructor of the class
-
+     * @param {ToolBar} toolbar toolbar owner of this item
      */
     constructor(toolbar) {
         this.toolbar = toolbar;
@@ -146,19 +154,16 @@ export default class OptionsItem {
         text.innerHTML = value;
     }
 
+    /**
+     * Setup the config file
+     * @param {Object} config network configuration file 
+     */
     setConfiguration(config){
         config["edgeThreshold"] = this.sliderValue;
         config["variableEdge"] = this.variableEdgeWidthValue;
         config["hideUnselected"] = this.hideUnselectedEdgesValue;
-        config["valuesToHide"] = "";
         config["allowThirdDimension"] = this.thirdDimensionValue;
         config["showNodeLabels"] = this.hideNodeValue;
     }
 
-                    //     edgeThreshold: this.controlPanel.getSliderThreshold(),
-                //     variableEdge: this.controlPanel.getVariableEdgeValue(),
-                //     hideUnselected: this.controlPanel.getUnselectedEdgesValue(),
-                //     valuesToHide: this.controlPanel.getValuesToHide(),
-                //     allowThirdDimension: this.controlPanel.getThirdDimensionValue(),
-                //     showNodeLabels: this.controlPanel.getShowNodeLabelValue(),
 }
