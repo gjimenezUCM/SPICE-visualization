@@ -151,19 +151,7 @@ export default class InitialOptions {
     /**
      * Get the number of available files from the database
      */
-    requestAllFiles() {
-        const name = "dataList.json";
 
-        this.requestManager.getFile(name)
-            .then((file) => {
-                file = JSON.parse(file);
-                this.createDropdown(file)
-            })
-            .catch((error) => {
-                console.log(error);
-                alert("Error while getting the file with all file names");
-            });
-    }
 
     /** 
     * Create an option in a dropdown menu for each file to interact with every network

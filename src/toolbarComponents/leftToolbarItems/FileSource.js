@@ -18,6 +18,8 @@ export default class FileSourceItem {
         const msg = isLocalhost ? "App running as localhost" : "App running in an external server: " + window.location.hostname;
         console.log(msg);
 
+        this.toolbar.changeFileSourceURL(isLocalhost ? this.sourceURL.localOption: this.sourceURL.githubMainOption);
+
         this.htmlString = `
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -41,7 +43,7 @@ export default class FileSourceItem {
         this.fileSourceOptions = document.querySelectorAll("a[name='fileSource']");
 
         for(const option of this.fileSourceOptions){
-            option.onclick = () => this.fileSourceOnClick(option.id);
+            option.onclick = () => this.fileSourceOnclick(option.id);
         }
     }
 
@@ -49,7 +51,7 @@ export default class FileSourceItem {
      * Function executed when a file source option is clicked. Changes the file source url and restart the aplication
      * @param {String} id id of the option clicked
      */
-    fileSourceOnClick(id){
+    fileSourceOnclick(id){
         let url = this.sourceURL[id];
 
         this.toolbar.changeFileSourceURL(url);
@@ -63,4 +65,5 @@ export default class FileSourceItem {
         }
     }
 
+    setConfiguration(){}
 }

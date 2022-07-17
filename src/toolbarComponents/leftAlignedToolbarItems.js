@@ -1,4 +1,5 @@
 import FileSourceItem from "./leftToolbarItems/FileSource"
+import LayoutItem from "./leftToolbarItems/LayoutItem";
 import OptionsItem from "./leftToolbarItems/OptionsItem";
 
 
@@ -14,28 +15,17 @@ export default class LeftAlignedToolbarItems {
         this.initItems(toolbar);
         
         this.htmlString = `
-        <div class="d-flex col leftNavbarGroup">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNavbar">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <a class="navbar-brand abs" href="#"> Visualization module</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand abs" href="#"> Visualization module</a>
 
-            <div class="navbar-collapse collapse" id="collapseNavbar">
-                <ul class="navbar-nav">
-                    ${this.fileSourceItem.htmlString}
-                    ${this.optionsItems.htmlString}
-
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Layout
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#">Horizontal</a></li>
-                            <li><a class="dropdown-item" href="#">Vertical</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
+        <div class="navbar-collapse collapse justify-content-start" id="collapseNavbar">
+            <ul class="navbar-nav">
+                ${this.fileSourceItem.htmlString}
+                ${this.optionsItems.htmlString}
+                ${this.layoutItem.htmlString}
+            </ul>
         </div>`
     }
 
@@ -51,6 +41,8 @@ export default class LeftAlignedToolbarItems {
         this.optionsItems = new OptionsItem(toolbar);
         this.items.push(this.optionsItems);
 
+        this.layoutItem = new LayoutItem(toolbar);
+        this.items.push(this.layoutItem);
     }
     
     /**
@@ -60,7 +52,12 @@ export default class LeftAlignedToolbarItems {
         for(const item of this.items){
             item.createEvents();
         }
+    }
 
+    setConfiguration(config){
+        for(const item of this.items){
+            item.setConfiguration(config);
+        }
     }
 }
 

@@ -14,9 +14,12 @@ import Legend from "./controlPanelComponents/legend.js";
 import ThresholdSlider from "./controlPanelComponents/thresholdSlider.js";
 import UnselectedEdgesCheckbox from "./controlPanelComponents/unselectedEdgesCheckbox.js";
 import VariableEdgeCheckbox from "./controlPanelComponents/variableEdgeCheckbox.js";
+import HorizontalLayout from "./layouts/horizontalLayout.js";
+import VerticalLayout from "./layouts/verticalLayout.js";
 import NetworksGroup from "./networksGroup.js";
 import RequestManager from "./requestManager.js";
 import LeftAlignedToolbarItems from "./toolbarComponents/leftAlignedToolbarItems.js";
+import MidAlignedToolbarItems from "./toolbarComponents/midAlignedToolbarItems.js";
 
 export default class ToolBar {
 
@@ -30,37 +33,24 @@ export default class ToolBar {
 
         this.requestManager = new RequestManager();
         this.networksGroup = new NetworksGroup();
+        this.layout = new VerticalLayout(this.networksGroup);
 
-        this.toolbarParts = new Array();
-
-        this.leftAlignedItems = new LeftAlignedToolbarItems(this);
-        this.toolbarParts.push(this.leftAlignedItems);
-
-        this.value=0.5;
+        this.initToolbarParts();
 
         const htmlString = `
         <nav class="navbar fixed-top navbar-expand-md navbar-light bg-light">
             <div class="container-fluid">
                     <! -- Left aligned items -->
-                    ${this.leftAlignedItems.htmlString}  
-
+                    <div class="d-flex col justify-content-start">
+                        ${this.leftAlignedItems.htmlString}  
+                    </div>
                     <! -- Mid aligned items -->
-                    <div class="d-flex col">
-                        <ul class="navbar-nav">
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle btn-secondary" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Select Perspective
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <li><a class="dropdown-item unselectable" href="#">Perspective 1</a></li>
-                                    <li><a class="dropdown-item unselectable" href="#">Perspective 2 action</a></li>
-                                </ul>
-                            </li>
-                        </ul>
+                    <div class="d-flex col justify-content-center">
+                        ${this.midAlignedItems.htmlString} 
                     </div>
 
                     <! -- End aligned items -->
-                    <div class="d-flex ms-auto">
+                    <div class="d-flex col flex-row-reverse">
                         <ul class="navbar-nav">
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle btn-secondary" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -80,7 +70,37 @@ export default class ToolBar {
         const html = this.domParser.parseFromString(htmlString, "text/html").body.firstChild;
         document.body.append(html);
 
-        this.createEvents();
+        this.requestAllFiles();
+    }
+
+    /**
+     * Init all parts of the toolbar
+     */
+     initToolbarParts(){
+        this.toolbarParts = new Array();
+
+        this.leftAlignedItems = new LeftAlignedToolbarItems(this);
+        this.toolbarParts.push(this.leftAlignedItems);
+
+        this.midAlignedItems = new MidAlignedToolbarItems(this);
+        this.toolbarParts.push(this.midAlignedItems);
+     }
+
+     /**
+      * Request the name of all available perspective files
+      */
+     requestAllFiles() {
+        const name = "dataList.json";
+
+        this.requestManager.getFile(name)
+            .then((file) => {
+                this.file = JSON.parse(file).files;
+                this.createEvents()
+            })
+            .catch((error) => {
+                console.log(error);
+                alert("Error while getting the file with all file names");
+            });
     }
 
     /**
@@ -92,10 +112,68 @@ export default class ToolBar {
         }
     }
 
+    /**
+     * Change the source URL of the perspective files
+     * @param {String} url new url to be used
+     */
     changeFileSourceURL(url){
         this.requestManager.changeBaseURL(url);
 
-        //TODO: RESTART PROGRAM
+        this.restartToolbar();
+    }
+
+    /**
+     * Change the current layout of the aplication
+     * @param {String} layout key of the layout
+     */
+    changeLayout(layout){
+        if(layout === "Horizontal"){
+            this.layout = new HorizontalLayout(this.networksGroup);
+        }else{
+            this.layout = new VerticalLayout(this.networksGroup);
+        }
+
+        this.restartToolbar();
+    }
+
+    togglePerspective(active, key){
+        if (active) {
+            this.activateNetwork(key);
+        } else {
+            this.disactivateNetwork(key);
+        }
+    }
+
+    activateNetwork(key){
+        const name = key + ".json";
+
+        this.requestManager.getFile(name)
+            .then((file) => {
+
+                const config = { };
+                for(const part of this.toolbarParts){
+                    part.setConfiguration(config);
+                }
+                config["key"] = key;
+
+                this.layout.addNetwork(key, file, config);
+
+            })
+            .catch((error) => {
+                console.log(error);
+                alert("Error while getting the selected file");
+            });
+    }
+
+    disactivateNetwork(key){
+        this.networksGroup.removeNetwork(key);
+    }
+
+    /**
+     * Remove all networks and restart the toolbar with the current selected options 
+     */
+    restartToolbar(){
+        //TODO
     }
 
     /**
@@ -114,8 +192,6 @@ export default class ToolBar {
 
         return active;
     }
-    /**
-     * Create the events related with the Options dropdown
-     */
+
    
 }   

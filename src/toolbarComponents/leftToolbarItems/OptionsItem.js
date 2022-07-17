@@ -1,4 +1,6 @@
 
+import { networkHTML } from "../../constants/networkHTML.js";
+
 export default class OptionsItem {
 
     /**
@@ -8,15 +10,29 @@ export default class OptionsItem {
     constructor(toolbar) {
         this.toolbar = toolbar;
 
-        const sliderValue = 0.5;
+        const hideNodeState = !networkHTML.showNodeLabelInitialValue ? " active" : "";
+        this.hideNodeValue = !networkHTML.showNodeLabelInitialValue;
+
+        const hideUnselectedEdgesState = networkHTML.unselectedEdgesInitialValue ? " active" : "";
+        this.hideUnselectedEdgesValue = networkHTML.unselectedEdgesInitialValue;
+
+        const variableEdgeWidthState = networkHTML.variableEdgeInitialValue ? " active" : "";
+        this.variableEdgeWidthValue = networkHTML.variableEdgeInitialValue;
+
+        const thirdDimensionState = networkHTML.thirdDimensionInitialValue ? " active" : "";
+        this.thirdDimensionValue = networkHTML.thirdDimensionInitialValue;
+
+        const sliderValue = networkHTML.sliderThresholdInitialValue;
+        this.sliderValue = sliderValue;
+
         this.htmlString = `                    
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" data-bs-auto-close="outside" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <a class="nav-link dropdown-toggle unselectable" data-bs-auto-close="outside" id="navbarDropdownOptionsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Options
             </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item unselectable" id="hideNodeLabels">Hide node labels</a></li>
-                <li><a class="dropdown-item unselectable" id="hideUnselectedEdges">Hide unselected Edges</a></li>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdownOptionsDropdown">
+                <li><a class="dropdown-item unselectable${hideNodeState}" id="hideNodeLabels">Hide node labels</a></li>
+                <li><a class="dropdown-item unselectable${hideUnselectedEdgesState}" id="hideUnselectedEdges">Hide unselected Edges</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
                     <div style="margin-left: 13px">          
@@ -28,16 +44,15 @@ export default class OptionsItem {
                     </div>
                 </li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item unselectable" id="variableEdgeWidth">Variable edge width</a></li>
+                <li><a class="dropdown-item unselectable${variableEdgeWidthState}" id="variableEdgeWidth">Variable edge width</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item unselectable" id="thirdDimension">Third dimension</a></li>
+                <li><a class="dropdown-item unselectable${thirdDimensionState}" id="thirdDimension">Third dimension</a></li>
             </ul>
         </li>`;
-
     }
 
     /**
-     * Create the events related with the File Source dropdown
+     * Create the events related with the Options dropdown
      */
     createEvents() {
         const hideNodeLabels = document.getElementById("hideNodeLabels");
@@ -54,7 +69,6 @@ export default class OptionsItem {
 
         const thresholdValue = document.getElementById("thresholdValue");
         const thresholdSlider = document.getElementById("thresholdSlider");
-
         thresholdSlider.onchange = () => this.thresholdChange(thresholdSlider.value);
         thresholdSlider.oninput = () => this.updateSliderText(thresholdSlider.value, thresholdValue);
     }
@@ -64,11 +78,11 @@ export default class OptionsItem {
      * @param {HTMLElement} button button clicked
      */
     toggleNodeLabels(button) {
-        let active = this.toolbar.toggleDropdownItemState(button);
-
-        //this.toolbar.networksGroup.nodeLabelVisibilityChangeALL(active);
-
+        const active = !this.toolbar.toggleDropdownItemState(button);
+        this.hideNodeValue = active;
         console.log(`toggle node labels ${active}`);
+        
+        this.toolbar.networksGroup.nodeLabelVisibilityChangeALL(active);    
     }
 
     /**
@@ -76,11 +90,11 @@ export default class OptionsItem {
      * @param {HTMLElement} button button clicked
      */
     toggleUnselectedEdges(button) {
-        let active = this.toolbar.toggleDropdownItemState(button);
-
-        //this.toolbar.networksGroup.hideUnselectedEdgesALL(active);
-
+        const active = this.toolbar.toggleDropdownItemState(button);
+        this.hideUnselectedEdgesValue = active;
         console.log(`toggle unselected edges ${active}`);
+
+        this.toolbar.networksGroup.hideUnselectedEdgesALL(active);   
     }
 
     /**
@@ -88,11 +102,11 @@ export default class OptionsItem {
      * @param {HTMLElement} button button clicked
      */
     toggleVariableEdgeWidth(button) {
-        let active = this.toolbar.toggleDropdownItemState(button);
-
-        //this.toolbar.networksGroup.variableEdgeChangeALL(active);
-
+        const active = this.toolbar.toggleDropdownItemState(button);
+        this.variableEdgeWidthValue = active;
         console.log(`toggle variableEdgeWidth ${active}`);
+       
+        this.toolbar.networksGroup.variableEdgeChangeALL(active);
     }
 
     /**
@@ -100,11 +114,11 @@ export default class OptionsItem {
      * @param {HTMLElement} button button clicked
      */
     toggleThirdDimension(button) {
-        let active = this.toolbar.toggleDropdownItemState(button);
-
-        //this.toolbar.networksGroup.variableEdgeChangeALL(active);
-
+        const active = this.toolbar.toggleDropdownItemState(button);
+        this.thirdDimensionValue = active;
         console.log(`toggle thirdDimension ${active}`);
+
+        this.toolbar.networksGroup.variableEdgeChangeALL(active);
     }
 
     /**
@@ -112,9 +126,10 @@ export default class OptionsItem {
      * @param {Integer} value value of the slider
      */
     thresholdChange(value) {
-        console.log(value)
-
-        //this.toolbar.networksGroup.thresholdChangeALL(value);
+        this.sliderValue = value;
+        console.log(`treshold change ${value}`);
+        
+        this.toolbar.networksGroup.thresholdChangeALL(value);
     }
 
     /**
@@ -123,7 +138,6 @@ export default class OptionsItem {
      * @param {HTMLElement} text text to be updated
      */
     updateSliderText(value, text) {
-
         if (value === "0")
             value = "0.0";
         else if (value === "1")
@@ -132,4 +146,19 @@ export default class OptionsItem {
         text.innerHTML = value;
     }
 
+    setConfiguration(config){
+        config["edgeThreshold"] = this.sliderValue;
+        config["variableEdge"] = this.variableEdgeWidthValue;
+        config["hideUnselected"] = this.hideUnselectedEdgesValue;
+        config["valuesToHide"] = "";
+        config["allowThirdDimension"] = this.thirdDimensionValue;
+        config["showNodeLabels"] = this.hideNodeValue;
+    }
+
+                    //     edgeThreshold: this.controlPanel.getSliderThreshold(),
+                //     variableEdge: this.controlPanel.getVariableEdgeValue(),
+                //     hideUnselected: this.controlPanel.getUnselectedEdgesValue(),
+                //     valuesToHide: this.controlPanel.getValuesToHide(),
+                //     allowThirdDimension: this.controlPanel.getThirdDimensionValue(),
+                //     showNodeLabels: this.controlPanel.getShowNodeLabelValue(),
 }

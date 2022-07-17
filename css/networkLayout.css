@@ -5,7 +5,7 @@
 
 /* Need this to make the vertical network canvas stop growing verticaly*/
 .singleNetworkContainer > div > div >  div {
-    height: 60em; /*var(--singleNetworkSize)+"em";*/
+    height: 85vh; /*var(--singleNetworkSize)+"em";*/
 }
 
 .pairNetworkVertical{
@@ -13,7 +13,7 @@
 }
 /* Need this to make the vertical network canvas stop growing verticaly*/
 .pairNetworkVertical > div > div >  div {
-    height: 30em;
+    height: 40vh;
 }
 
 .networkContainerVertical{

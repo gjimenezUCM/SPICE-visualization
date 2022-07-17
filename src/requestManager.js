@@ -23,6 +23,7 @@ export default class RequestManager {
         this.axios = new Axios({
             baseURL: baseURL,
         });
+        this.isActive = true;
     }
     /**
      * Send a GET petition to obtain a singleFile in a directory
