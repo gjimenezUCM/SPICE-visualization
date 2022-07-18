@@ -11,12 +11,16 @@ export default class LeftAlignedToolbarItems {
 
     /**
      * Constructor of the class
-     * @param {ToolBar} toolbar toolbar owner of this item
+     * @param {Object[]} items items that will be in this part of the toolbar
      */
-    constructor(toolbar) {
-
-        this.initItems(toolbar);
+    constructor(items) {   
+        this.items = items;
         
+        let body = "";
+        for(const item of this.items){
+            body += item.htmlString;
+        }
+
         this.htmlString = `
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNavbar">
             <span class="navbar-toggler-icon"></span>
@@ -25,9 +29,7 @@ export default class LeftAlignedToolbarItems {
 
         <div class="navbar-collapse collapse justify-content-start" id="collapseNavbar">
             <ul class="navbar-nav">
-                ${this.fileSourceItem.htmlString}
-                ${this.optionsItems.htmlString}
-                ${this.layoutItem.htmlString}
+                ${body}
             </ul>
         </div>`
     }

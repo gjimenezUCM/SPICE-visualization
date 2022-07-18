@@ -9,16 +9,20 @@ export default class MidAlignedToolbarItems {
 
     /**
      * Constructor of the class
-     * @param {ToolBar} toolbar toolbar owner of this item
+     * @param {Object[]} items items that will be in this part of the toolbar
      */
-    constructor(toolbar) {
-
-        this.initItems(toolbar);
+     constructor(items) {   
+        this.items = items;
         
+        let body = "";
+        for(const item of this.items){
+            body += item.htmlString;
+        }
+
         this.htmlString = `
         <div class="navbar-collapse collapse justify-content-center" id="collapseNavbar">
             <ul class="navbar-nav">
-                ${this.selectPerspective.htmlString}
+                ${body}
             </ul>
         </div>`
     }

@@ -22,9 +22,6 @@ export default class LegendItem {
         this.popover = null;
         this.valuesToHide = new Array();
 
-        addEventListener('networkNumberChange', () => this.networkNumberChange(), false);
-        addEventListener('toolbarReset', () => this.restart(), false);
-
         this.htmlString = `
         <li class="nav-item dropdown">
             <div class="accordion-item">
@@ -133,14 +130,14 @@ export default class LegendItem {
      * Returns the popover html template
      * @returns {String} returns a string with the template
      */
-         popoverTemplate(attributes) {
-            const html = `
-            <div class="popover legend" role="tooltip" style="min-width:${networkHTML.legendColumnsWidth * attributes.length}px;">  
-                <div class="popover-body legend" id="PopoverLegend"></div>
-            </div>`;
-    
-            return html;
-        }
+    popoverTemplate(attributes) {
+        const html = `
+        <div class="popover legend" role="tooltip" style="min-width:${networkHTML.legendColumnsWidth * attributes.length}px;">  
+            <div class="popover-body legend" id="PopoverLegend"></div>
+        </div>`;
+
+        return html;
+    }
 
     /**
     * Creates the htmlstring with the contents of the popover
@@ -296,10 +293,12 @@ export default class LegendItem {
      * Clear the legend and disables it
      */
     restart() {
-        this.button.className = "accordion-button unselectable collapsed disabled";
-        if (this.popover !== null) {
-            this.popover.hide();
-            this.popover = null;
+        if(this.button !== null && this.button !== undefined){
+            this.button.className = "accordion-button unselectable collapsed disabled";
+            if (this.popover !== null) {
+                this.popover.hide();
+                this.popover = null;
+            }
         }
     }
 

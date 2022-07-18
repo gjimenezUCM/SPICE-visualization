@@ -13,8 +13,6 @@ export default class SelectPerspectiveItem {
      */
     constructor(toolbar) {
         this.toolbar = toolbar;
-        
-        addEventListener('toolbarReset', () => this.restart(), false);
 
         this.htmlString = `
         <li class="nav-item dropdown">
@@ -94,6 +92,7 @@ export default class SelectPerspectiveItem {
      */
     restart(){
         const dropdownContainer = document.getElementById("dropdownPerspectivesOptionsMenu");
-        dropdownContainer.innerHTML = "";
+        if(dropdownContainer !== null)
+            dropdownContainer.innerHTML = "";
     }
 }

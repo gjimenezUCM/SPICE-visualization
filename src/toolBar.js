@@ -11,9 +11,14 @@ import HorizontalLayout from "./layouts/horizontalLayout.js";
 import VerticalLayout from "./layouts/verticalLayout.js";
 import NetworksGroup from "./networksGroup.js";
 import RequestManager from "./requestManager.js";
+import FileSourceItem from "./toolbarComponents/leftAlignedItems/FileSource.js";
+import LayoutItem from "./toolbarComponents/leftAlignedItems/LayoutItem.js";
+import OptionsItem from "./toolbarComponents/leftAlignedItems/OptionsItem.js";
 //Components
 import LeftAlignedToolbarItems from "./toolbarComponents/leftAlignedToolbarItems.js";
+import SelectPerspectiveItem from "./toolbarComponents/midAlignedItems/selectPerspectiveItem.js";
 import MidAlignedToolbarItems from "./toolbarComponents/midAlignedToolbarItems.js";
+import LegendItem from "./toolbarComponents/rightAlignedItems/legendItem.js";
 import RightAlignedToolbarItems from "./toolbarComponents/rightAlignedToolbarItems.js";
 
 export default class ToolBar {
@@ -26,10 +31,7 @@ export default class ToolBar {
 
         this.requestManager = new RequestManager();
         this.networksGroup = new NetworksGroup();
-        this.layout = new VerticalLayout(this.networksGroup);
-
-        this.nNetworkChange = new Event('networkNumberChange');
-        this.toolbarResetEvent = new Event('toolbarReset');
+        this.layout = new HorizontalLayout(this.networksGroup);
 
         this.initHTML();
         this.initToolbarParts();
@@ -65,14 +67,29 @@ export default class ToolBar {
      */
      initToolbarParts(){
         this.toolbarParts = new Array();
+        
+        this.optionsItem = new OptionsItem(this);
+        this.selectPerspectiveItem = new SelectPerspectiveItem(this);
+        this.legendItem = new LegendItem(this);
 
-        this.leftAlignedItems = new LeftAlignedToolbarItems(this);
+        const leftItems = [
+            new FileSourceItem(this),
+            new LayoutItem(this),
+            this.optionsItem
+        ];
+        this.leftAlignedItems = new LeftAlignedToolbarItems(leftItems);
         this.toolbarParts.push(this.leftAlignedItems);
 
-        this.midAlignedItems = new MidAlignedToolbarItems(this);
+        const midItems = [
+            this.selectPerspectiveItem
+        ]
+        this.midAlignedItems = new MidAlignedToolbarItems(midItems);
         this.toolbarParts.push(this.midAlignedItems);
 
-        this.rightAlignedItems = new RightAlignedToolbarItems(this);
+        const rightItems = [
+            this.legendItem
+        ]
+        this.rightAlignedItems = new RightAlignedToolbarItems(rightItems);
         this.toolbarParts.push(this.rightAlignedItems);
      }
 
@@ -124,7 +141,7 @@ export default class ToolBar {
      */
     changeFileSourceURL(url){
         this.requestManager.changeBaseURL(url);
-
+        
         this.restartToolbar();
     }
 
@@ -173,7 +190,7 @@ export default class ToolBar {
 
                 this.layout.addNetwork(key, file, config);
 
-                dispatchEvent(this.nNetworkChange);
+                this.legendItem.networkNumberChange();
             })
             .catch((error) => {
                 console.log(error);
@@ -187,7 +204,7 @@ export default class ToolBar {
      */
     removeNetwork(key){
         this.networksGroup.removeNetwork(key);
-        dispatchEvent(this.nNetworkChange);
+        this.legendItem.networkNumberChange();
     }
 
     /**
@@ -195,9 +212,10 @@ export default class ToolBar {
      */
     restartToolbar(){
         this.networksGroup.removeAllnetworks();
-    
-        dispatchEvent(this.toolbarResetEvent);
-
+        
+        this.selectPerspectiveItem.restart();
+        this.legendItem.restart();
+        
         document.getElementById(networkHTML.networksParentContainer).innerHTML = "";
         
         this.requestAllFiles();

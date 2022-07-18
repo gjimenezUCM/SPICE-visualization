@@ -127,6 +127,9 @@ export default class OptionsItem {
         console.log(`toggle thirdDimension ${active}`);
 
         this.toolbar.networksGroup.changeThirdDimensionALL(active);
+
+        this.toolbar.legendItem.restart()
+        this.toolbar.legendItem.networkNumberChange();
     }
 
     /**

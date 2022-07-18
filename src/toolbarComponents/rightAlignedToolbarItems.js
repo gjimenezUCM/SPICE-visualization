@@ -9,16 +9,20 @@ export default class RightAlignedToolbarItems {
 
     /**
      * Constructor of the class
-     * @param {ToolBar} toolbar toolbar owner of this item
+     * @param {Object[]} items items that will be in this part of the toolbar
      */
-    constructor(toolbar) {
-
-        this.initItems(toolbar);
+     constructor(items) {   
+        this.items = items;
         
+        let body = "";
+        for(const item of this.items){
+            body += item.htmlString;
+        }
+
         this.htmlString = `
         <div class="navbar-collapse collapse flex-row-reverse" id="collapseNavbar">
             <ul class="navbar-nav">
-                ${this.legend.htmlString}
+                ${body}
             </ul>
         </div>`;
         
