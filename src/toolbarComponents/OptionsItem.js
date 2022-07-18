@@ -7,7 +7,7 @@
  */
 
 //Namespace
-import { networkHTML } from "../../constants/networkHTML.js";
+import { networkHTML } from "../constants/networkHTML.js";
 
 export default class OptionsItem {
 

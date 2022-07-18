@@ -4,19 +4,13 @@
 			"name": "GAM-I"
 		},
 		{
-			"name": "HECHT-I"
-		},
-		{
-			"name": "HECHT-II"
-		},
-		{
 			"name": "TEST-II"
 		},		
 		{
 			"name": "HECHT_beliefJ (kmedoids)"
 		},
 		{
-			"name": "HECHT_beliefJ"
+			"name": "HECHT_beliefJ (agglomerative)"
 		},
 		{
 			"name": "HECHT_beliefR (agglomerative)"

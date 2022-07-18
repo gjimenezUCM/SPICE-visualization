@@ -38,7 +38,7 @@ export const networkHTML = {
     legendButtonClass: "legend btn",
 
     legendColumnsWidth: 250,
-    legendColumnsMaxTitleChars: 25,
+    legendColumnsMaxTitleChars: 20,
     legendColumnsMaxSubChars: 15,
 }
 

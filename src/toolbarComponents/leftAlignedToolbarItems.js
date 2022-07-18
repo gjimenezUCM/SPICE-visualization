@@ -2,10 +2,6 @@
  * @fileoverview This class holds the items inside the UI that will be aligned to the left of the toolbox
  * @author Marco Expósito Pérez
  */
-//Local classes
-import FileSourceItem from "./leftAlignedItems/FileSource"
-import LayoutItem from "./leftAlignedItems/LayoutItem";
-import OptionsItem from "./leftAlignedItems/OptionsItem";
 
 export default class LeftAlignedToolbarItems {
 
@@ -32,22 +28,6 @@ export default class LeftAlignedToolbarItems {
                 ${body}
             </ul>
         </div>`
-    }
-
-    /**
-     * Initialize all items of this toolbar part
-     */
-    initItems(toolbar){
-        this.items = new Array();
-
-        this.fileSourceItem = new FileSourceItem(toolbar);
-        this.items.push(this.fileSourceItem);
-
-        this.optionsItems = new OptionsItem(toolbar);
-        this.items.push(this.optionsItems);
-
-        this.layoutItem = new LayoutItem(toolbar);
-        this.items.push(this.layoutItem);
     }
     
     /**

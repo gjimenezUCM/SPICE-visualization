@@ -36,6 +36,7 @@ export default class ShapeStrategy {
             const shape = nodes.NodeAttr.getShape(i);
             this.nodeShapes.set(values[i], shape);
         }
+
     }
 
     /**

@@ -2,8 +2,6 @@
  * @fileoverview This class holds the items inside the UI that will be aligned to the right of the toolbox
  * @author Marco Expósito Pérez
  */
-//Local classes
-import LegendItem from "./rightAlignedItems/legendItem";
 
 export default class RightAlignedToolbarItems {
 
@@ -26,16 +24,6 @@ export default class RightAlignedToolbarItems {
             </ul>
         </div>`;
         
-    }
-
-    /**
-     * Initialize all items of this toolbar side
-     */
-    initItems(toolbar){
-        this.items = new Array();
-
-        this.legend = new LegendItem(toolbar);
-        this.items.push(this.legend);
     }
     
     /**

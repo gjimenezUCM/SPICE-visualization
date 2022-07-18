@@ -20,8 +20,8 @@ export default class LayoutItem {
                 Layout
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item unselectable" name="networkLayout">Horizontal</a></li>
-                <li><a class="dropdown-item unselectable active" name="networkLayout">Vertical</a></li>
+                <li><a class="dropdown-item unselectable active" name="networkLayout">Horizontal</a></li>
+                <li><a class="dropdown-item unselectable" name="networkLayout">Vertical</a></li>
             </ul>
         </li>`;
     }

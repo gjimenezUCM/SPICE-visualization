@@ -11,14 +11,14 @@ import HorizontalLayout from "./layouts/horizontalLayout.js";
 import VerticalLayout from "./layouts/verticalLayout.js";
 import NetworksGroup from "./networksGroup.js";
 import RequestManager from "./requestManager.js";
-import FileSourceItem from "./toolbarComponents/leftAlignedItems/FileSource.js";
-import LayoutItem from "./toolbarComponents/leftAlignedItems/LayoutItem.js";
-import OptionsItem from "./toolbarComponents/leftAlignedItems/OptionsItem.js";
+import FileSourceItem from "./toolbarComponents/FileSource.js";
+import LayoutItem from "./toolbarComponents/LayoutItem.js";
+import OptionsItem from "./toolbarComponents/OptionsItem.js";
 //Components
 import LeftAlignedToolbarItems from "./toolbarComponents/leftAlignedToolbarItems.js";
-import SelectPerspectiveItem from "./toolbarComponents/midAlignedItems/selectPerspectiveItem.js";
+import SelectPerspectiveItem from "./toolbarComponents/selectPerspectiveItem.js";
 import MidAlignedToolbarItems from "./toolbarComponents/midAlignedToolbarItems.js";
-import LegendItem from "./toolbarComponents/rightAlignedItems/legendItem.js";
+import LegendItem from "./toolbarComponents/legendItem.js";
 import RightAlignedToolbarItems from "./toolbarComponents/rightAlignedToolbarItems.js";
 
 export default class ToolBar {
@@ -215,7 +215,7 @@ export default class ToolBar {
         
         this.selectPerspectiveItem.restart();
         this.legendItem.restart();
-        
+
         document.getElementById(networkHTML.networksParentContainer).innerHTML = "";
         
         this.requestAllFiles();

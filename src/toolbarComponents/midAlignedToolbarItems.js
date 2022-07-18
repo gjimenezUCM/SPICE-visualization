@@ -2,8 +2,6 @@
  * @fileoverview This class holds the items inside the UI that will be aligned to the middle of the toolbox
  * @author Marco Expósito Pérez
  */
-//Local classes
-import SelectPerspectiveItem from "./midAlignedItems/selectPerspectiveItem";
 
 export default class MidAlignedToolbarItems {
 
@@ -25,16 +23,6 @@ export default class MidAlignedToolbarItems {
                 ${body}
             </ul>
         </div>`
-    }
-
-    /**
-     * Initialize all items of this toolbar part
-     */
-    initItems(toolbar){
-        this.items = new Array();
-
-        this.selectPerspective = new SelectPerspectiveItem(toolbar);
-        this.items.push(this.selectPerspective);
     }
     
     /**

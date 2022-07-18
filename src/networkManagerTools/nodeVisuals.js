@@ -34,6 +34,11 @@ export default class NodeVisuals {
         const keys = Object.keys(explicitData);
 
         keys.forEach((key) => {
+            const value = explicitData[key];
+
+            if(!isNaN(explicitData[key]))
+                explicitData[key] = value.toString();
+
             if (this.communitiesData.length === 0) {
                 this.communitiesData.push({ key: key, values: new Array(explicitData[key]) });
             } else {
@@ -41,6 +46,7 @@ export default class NodeVisuals {
 
                 if (community === undefined) {
                     this.communitiesData.push({ key: key, values: new Array(explicitData[key]) });
+
                 } else {
                     if (!community.values.includes(explicitData[key])) {
                         community.values.push(explicitData[key]);
@@ -48,6 +54,7 @@ export default class NodeVisuals {
                 }
             }
         });
+
     }
 
     /**
@@ -56,24 +63,24 @@ export default class NodeVisuals {
      */
     createNodeDimensionStrategy(nods) {
         const attributes = new Array();
-        
-        if(this.communitiesData[0] !== undefined){
+
+        if (this.communitiesData[0] !== undefined) {
             attributes.push({
-                attr: this.communitiesData[0].key,
-                vals: this.communitiesData[0].values,
+                attr: this.communitiesData[1].key,
+                vals: this.communitiesData[1].values,
                 dimension: nodes.nodeColorKey,
             })
         }
 
-        if(this.communitiesData[1] !== undefined){
+        if (this.communitiesData[1] !== undefined) {
             attributes.push({
-                attr: this.communitiesData[1].key,
-                vals: this.communitiesData[1].values,
+                attr: this.communitiesData[0].key,
+                vals: this.communitiesData[0].values,
                 dimension: nodes.nodeShapeKey,
             })
         }
 
-        if(this.communitiesData[2] !== undefined && this.activateThirdDimension){
+        if (this.communitiesData[2] !== undefined && this.activateThirdDimension) {
             attributes.push({
                 attr: this.communitiesData[2].key,
                 vals: this.communitiesData[2].values,
@@ -126,7 +133,7 @@ export default class NodeVisuals {
             for (let i = 0; i < keys.length; i++) {
                 const value = explComms[keys[i]]
                 const key = keys[i];
-                
+
                 if (filter.includes(`${key}_${value}`)) {
                     isHidden = true;
                     this.nodeDimensionStrategy.nodeVisualsToColorless(node);
@@ -146,20 +153,20 @@ export default class NodeVisuals {
      * Hide/Show the label of the nodes based on nodeLabelVisibility value
      * @param {DataSet} nodes Dataset with the network's data of all nodes
      */
-    updateNodeLabelsVisibility(nodes){
+    updateNodeLabelsVisibility(nodes) {
         const newNodes = new Array();
 
         nodes.forEach((node) => {
-            if(!this.nodeLabelVisibility)
-                node["font"].color = "#00000000"; 
-            else 
+            if (!this.nodeLabelVisibility)
+                node["font"].color = "#00000000";
+            else
                 node["font"].color = "#000000FF";
 
             newNodes.push(node);
         });
         nodes.update(newNodes);
     }
-    
+
     /** 
      * Function executed when a node is selected that update the node visual attributes
      * @param {Object} values value of the parameters that will change

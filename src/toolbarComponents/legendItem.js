@@ -5,8 +5,8 @@
  * @author Marco Expósito Pérez
  */
 //Namespace
-import { networkHTML } from "../../constants/networkHTML";
-import { nodes } from "../../constants/nodes";
+import { networkHTML } from "../constants/networkHTML";
+import { nodes } from "../constants/nodes";
 //Packages
 import { Popover } from "bootstrap";
 
@@ -86,7 +86,6 @@ export default class LegendItem {
             if (this.popover === null) {
                 this.createLegendPopover()
             }
-
         }
     }
 
@@ -310,7 +309,7 @@ export default class LegendItem {
      * @returns {String} Returns the string decorated 
      */
     decorateString(string, maxLength) {
-        if (string !== string.toUpperCase()) {
+        if (isNaN(string) && string !== string.toUpperCase()) {
             const notCamelCaseString = string.replace(/([A-Z])/g, " $1");
             string = notCamelCaseString.charAt(0).toUpperCase() + notCamelCaseString.slice(1);
         }
