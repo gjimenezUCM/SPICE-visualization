@@ -21,6 +21,7 @@ export default class LegendItem {
 
         this.popover = null;
         this.valuesToHide = new Array();
+        this.oldclick = new Date();
 
         this.htmlString = `
         <li class="nav-item dropdown">
@@ -48,18 +49,23 @@ export default class LegendItem {
      */
     legendOnclick() {
         if (this.popover !== null) {
+            const newClick = new Date();
 
-            if (this.button.className === "accordion-button unselectable collapsed") {
-                this.button.className = "accordion-button unselectable";
-            } else {
-                this.button.className = "accordion-button unselectable collapsed";
-            }
+            if (newClick - this.oldclick > 250) {
+                this.oldclick = newClick;
 
-            //If the user spams the click on the legend, the popover will break
-            if (this.popover._hoverState !== "out") {
-                this.popover.toggle();
-            } else {
-                console.log("Error with the legend popover");
+                if (this.button.className === "accordion-button unselectable collapsed") {
+                    this.button.className = "accordion-button unselectable";
+                } else {
+                    this.button.className = "accordion-button unselectable collapsed";
+                }
+
+                //If the user spams the click on the legend, the popover will break
+                if (this.popover._hoverState !== "out") {
+                    this.popover.toggle();
+                } else {
+                    console.log("Error with the legend popover");
+                }
             }
         }
     }
@@ -123,6 +129,7 @@ export default class LegendItem {
             allowList: allowList,
             html: true,
         };
+
         this.popover = new Popover(this.button, options);
 
         this.popover.show();
