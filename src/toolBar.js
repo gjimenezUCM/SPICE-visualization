@@ -150,13 +150,15 @@ export default class ToolBar {
      * @param {String} layout key of the layout
      */
     changeLayout(layout){
+        this.restartToolbar();
+        
         if(layout === "Horizontal"){
             this.layout = new HorizontalLayout(this.networksGroup);
         }else{
             this.layout = new VerticalLayout(this.networksGroup);
         }
 
-        this.restartToolbar();
+        
     }
 
     /**

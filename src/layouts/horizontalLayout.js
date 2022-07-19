@@ -98,6 +98,5 @@ export default class HorizontalLayout extends Layout{
 
             this.networkKeyToRow.set(key, `${unpairedRow.nRow}_${unpairedRow.location}`);
         }
-
     }
 }   

@@ -47,6 +47,7 @@ export default class LayoutItem {
         this.toolbar.changeLayout(layout);
 
         for(const option of this.layoutsArray){
+ 
             if(option.innerText === layout){
                 option.className = "dropdown-item unselectable active";
             }else{

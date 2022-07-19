@@ -92,6 +92,7 @@ export default class VerticalLayout extends Layout{
             this.networkKeyToRow.set(key, `${unpairedRow.nRow}_${unpairedRow.location}`);
         }
 
+
     }
 
     /**
