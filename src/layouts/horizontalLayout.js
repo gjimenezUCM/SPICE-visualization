@@ -45,7 +45,6 @@ export default class HorizontalLayout extends Layout{
      * @param {Object} config object with the initial configuration of the network
      */
     addNetwork(key, file, config){
-        
         const unpairedRow = this.unpairedRows.pop();
 
         if(unpairedRow === undefined){

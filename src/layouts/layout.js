@@ -100,6 +100,7 @@ export default class Layout {
      * @param {String} key unique key of the network to be deleted 
      */
     deleteNetwork(key){
+
         const networkRowid = this.networkKeyToRow.get(key).split("_");
 
         const nRow = networkRowid[0];
@@ -109,15 +110,18 @@ export default class Layout {
         document.getElementById(`rightCol_${nRow}_${location}`).innerHTML = "";
 
         let isUnpaired = false;
-
+        
         for(let i = 0; i < this.unpairedRows.length; i++){
             const unpairedRow = this.unpairedRows[i];
 
-            if(unpairedRow.nRow === parseInt(nRow)){
+            if(unpairedRow.nRow == nRow){
+
                 isUnpaired = true;
-                this.unpairedRows = this.unpairedRows.splice(0, i);
+                this.unpairedRows.splice(i, 1);
+                break;
             }
         }
+
         if(isUnpaired){
 
             const rowContainer = document.getElementById(`networkContainer_${nRow}`); 
@@ -132,5 +136,7 @@ export default class Layout {
 
             this.unpairedRows.push({nRow: nRow, location: location});
         }
+
+        
     }
 }   
