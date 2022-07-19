@@ -45,8 +45,10 @@ export default class NodeDimensionStrategy {
      * @param {Object} node node to be edited
      */
     changeNodeVisuals(node) {
-        for (let i = 0; i < this.attributes.length; i++) {
-            this.strategy[this.attributes[i].dimension].change(node);
+        const keys = Object.keys(this.strategy);
+
+        for (let i = 0; i < keys.length; i++) {
+            this.strategy[keys[i]].change(node);
         }
     }
 
@@ -55,10 +57,8 @@ export default class NodeDimensionStrategy {
      * @param {Object} node node to be edited
      */
     nodeColorToDefault(node) {
-        this.strategy[this.attributes[0].dimension].change(node);
-
-        if(this.attributes.length > 2)
-            this.strategy[this.attributes[2].dimension].change(node);
+        this.strategy[nodes.nodeColorKey].change(node);
+        this.strategy[nodes.nodeBorderKey].change(node);
     }
 
     /**
@@ -66,10 +66,8 @@ export default class NodeDimensionStrategy {
      * @param {Object} node node to be edited
      */
     nodeVisualsToColorless(node) {
-        this.strategy[this.attributes[0].dimension].toColorless(node);
-
-        if(this.attributes.length > 2)
-            this.strategy[this.attributes[2].dimension].toColorless(node);
+        this.strategy[nodes.nodeColorKey].toColorless(node);
+        this.strategy[nodes.nodeBorderKey].toColorless(node);
     }
 
 }

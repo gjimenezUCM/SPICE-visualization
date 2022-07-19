@@ -56,9 +56,9 @@ export default class LegendItem {
             }
 
             //If the user spams the click on the legend, the popover will break
-            if(this.popover._hoverState !== "out"){
+            if (this.popover._hoverState !== "out") {
                 this.popover.toggle();
-            }else{
+            } else {
                 console.log("Error with the legend popover");
             }
         }
@@ -79,21 +79,28 @@ export default class LegendItem {
                 this.popover = null;
             }
         } else {
-            if (this.button.className === "accordion-button unselectable collapsed disabled") {
-                this.button.className = "accordion-button unselectable collapsed";
-            }
+            const attributes = this.toolbar.networksGroup.getVisualizationAttributes();
 
-            if (this.popover === null) {
-                this.createLegendPopover()
+            if (attributes === undefined || attributes === null || attributes.length === 0) {
+                this.button.className = "accordion-button unselectable collapsed disabled";
+            } else {
+                if (this.button.className === "accordion-button unselectable collapsed disabled") {
+                    this.button.className = "accordion-button unselectable collapsed";
+                }
+
+                if (this.popover === null) {
+                    this.createLegendPopover(attributes)
+                }
             }
         }
     }
 
     /**
      * Creates the popover that will act as the legend
+     * @param {Object} Object with the attributes that change visualization
+     * Format-> {attr: (string), vals: (string[], dimension: (string))}
      */
-    createLegendPopover() {
-        const attributes = this.toolbar.networksGroup.getVisualizationAttributes();
+    createLegendPopover(attributes) {
 
         const allowList = Popover.Default.allowList;
         allowList.button = [];
@@ -144,7 +151,7 @@ export default class LegendItem {
     * Format-> {attr: (string), vals: (string[], dimension: (string))}
     * @returns {String} returns the htmlstring
     */
-     popoverContent(attributes) {
+    popoverContent(attributes) {
         this.valuesToHide = new Array();
 
         let legendTable = "";
@@ -292,7 +299,7 @@ export default class LegendItem {
      * Clear the legend and disables it
      */
     restart() {
-        if(this.button !== null && this.button !== undefined){
+        if (this.button !== null && this.button !== undefined) {
             this.button.className = "accordion-button unselectable collapsed disabled";
             if (this.popover !== null) {
                 this.popover.hide();

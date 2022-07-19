@@ -52,6 +52,9 @@ export default class ShapeStrategy {
 
             node["shape"] = shapeVals.Shape;
             node.font["vadjust"] = shapeVals.vOffset;
+        }else{
+            node["shape"] = nodes.NodeShape;
+            node.font["vadjust"] = 0;
         }
     }
 }

@@ -52,11 +52,16 @@ export default class ColorStrategy {
                 background: this.nodeColors.get(value),
             }
 
-            node["borderWidth"] = 0;
-            node["borderWidthSelected"] = 0;
-
-            node.defaultColor = true;
+        }else{
+            node["color"] = {
+                background: nodes.NodeColor,
+            }
         }
+
+        node["borderWidth"] = 0;
+        node["borderWidthSelected"] = 0;
+
+        node.defaultColor = true;
     }
 
     /**

@@ -50,12 +50,14 @@ export default class BorderStrategy {
 
             const borderColor = this.nodeBorders.get(value);
 
-            node["color"]["border"] = borderColor;
+            node["color"].border = borderColor;
 
             node["borderWidth"] = nodes.NodeWithBorderColorWidth;
             node["borderWidthSelected"] = nodes.NodeWithBorderColorWidthSelected;
 
         } else {
+            node["color"].border = "transparent";
+
             node["borderWidth"] = nodes.NodeDefaultBorderWidth;
             node["borderWidthSelected"] = nodes.NodeDefaultBorderWidthSelected;
         }

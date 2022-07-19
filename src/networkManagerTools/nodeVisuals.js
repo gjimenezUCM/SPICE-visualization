@@ -23,6 +23,8 @@ export default class NodeVisuals {
         this.activateThirdDimension = config.allowThirdDimension;
 
         this.nodeLabelVisibility = config.showNodeLabels;
+
+        this.undefinedName = "not defined";
     }
 
     /** 
@@ -31,30 +33,53 @@ export default class NodeVisuals {
      */
     findExplicitCommunities(node) {
         const explicitData = node[comms.ExpUserKsonKey];
-        const keys = Object.keys(explicitData);
+        
+        if (this.validateExplicitCommunity(explicitData)) {
 
-        keys.forEach((key) => {
-            const value = explicitData[key];
+            const keys = Object.keys(explicitData);
+            keys.forEach((key) => {
+                explicitData[key] = this.validateCommunityValue(explicitData[key]);
 
-            if(!isNaN(explicitData[key]))
-                explicitData[key] = value.toString();
+                if (explicitData[key] !== this.undefinedName) {
+                    if (this.communitiesData.length === 0) {
+                        this.communitiesData.push({ key: key, values: new Array(explicitData[key]) });
+                    } else {
+                        let community = this.communitiesData.find(element => element.key === key);
 
-            if (this.communitiesData.length === 0) {
-                this.communitiesData.push({ key: key, values: new Array(explicitData[key]) });
-            } else {
-                let community = this.communitiesData.find(element => element.key === key);
+                        if (community === undefined) {
+                            this.communitiesData.push({ key: key, values: new Array(explicitData[key]) });
 
-                if (community === undefined) {
-                    this.communitiesData.push({ key: key, values: new Array(explicitData[key]) });
-
-                } else {
-                    if (!community.values.includes(explicitData[key])) {
-                        community.values.push(explicitData[key]);
+                        } else {
+                            if (!community.values.includes(explicitData[key])) {
+                                community.values.push(explicitData[key]);
+                            }
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
+    }
 
+    validateExplicitCommunity(explicitCommunity) {
+        if (explicitCommunity === undefined ||
+            explicitCommunity === null ||
+            explicitCommunity === "{}")
+            return false;
+        else
+            return true;
+    }
+
+    validateCommunityValue(value) {
+        const type = typeof (value);
+
+        switch (type) {
+            case "string":
+                return value;
+            case "number":
+                return value.toString();
+            default:
+                return this.undefinedName;
+        }
     }
 
     /**
@@ -66,16 +91,16 @@ export default class NodeVisuals {
 
         if (this.communitiesData[0] !== undefined) {
             attributes.push({
-                attr: this.communitiesData[1].key,
-                vals: this.communitiesData[1].values,
+                attr: this.communitiesData[0].key,
+                vals: this.communitiesData[0].values,
                 dimension: nodes.nodeColorKey,
             })
         }
 
         if (this.communitiesData[1] !== undefined) {
             attributes.push({
-                attr: this.communitiesData[0].key,
-                vals: this.communitiesData[0].values,
+                attr: this.communitiesData[1].key,
+                vals: this.communitiesData[1].values,
                 dimension: nodes.nodeShapeKey,
             })
         }
