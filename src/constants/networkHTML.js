@@ -38,8 +38,8 @@ export const networkHTML = {
     legendButtonClass: "legend btn",
 
     legendColumnsWidth: 250,
-    legendColumnsMaxTitleChars: 20,
-    legendColumnsMaxSubChars: 15,
+    legendColumnsMaxTitleChars: 50,
+    legendColumnsMaxSubChars: 50,
 }
 
 

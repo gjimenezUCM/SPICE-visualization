@@ -185,8 +185,6 @@ export default class NodeData {
     getTooltipTitle(networkManager, event, titleTemplate) {
         const node = this.nodes.get(event.nodes[0]);
 
-        console.log(this.nodeVisuals.nodeLabelVisibility)
-        console.log(this.nodeVisuals)
         const title = this.nodeVisuals.nodeLabelVisibility ? node.label : node.labelHidden;
         
         return titleTemplate(title);

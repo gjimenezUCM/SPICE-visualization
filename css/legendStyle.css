@@ -1,10 +1,17 @@
-/*--- LEGEND ACCORDION ---*/
-.accordiontop {
-    margin: auto;
+/*--- LEGEND POPOVER ---*/
+
+.popover.legend{
+    direction: rtl;
+    max-width: 100% !important;
 }
 
-.accordion-button {
-    height: 40px;
+.popover.legend > *{
+    direction: ltr;
+}
+
+.col.legend{
+    max-width: 100%;
+    white-space: nowrap;
 }
 
 .Legend-subTittle {

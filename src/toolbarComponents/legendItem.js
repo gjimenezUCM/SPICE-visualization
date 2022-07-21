@@ -145,7 +145,7 @@ export default class LegendItem {
      */
     popoverTemplate(attributes) {
         const html = `
-        <div class="popover legend" role="tooltip" style="min-width:${networkHTML.legendColumnsWidth * attributes.length}px;">  
+        <div class="popover legend"  role="tooltip">  
             <div class="popover-body legend" id="PopoverLegend"></div>
         </div>`;
 
@@ -166,7 +166,7 @@ export default class LegendItem {
             const buttonsDiv = this.legendAttributeButtons(attributes[i].attr, attributes[i].vals, attributes[i].dimension);
 
             const htmlString = `
-            <div class="col ${attributes[i].dimension} ${i !== attributes.length - 1 ? "border-end border-dark" : ""}">
+            <div class="col legend ${attributes[i].dimension} ${i !== attributes.length - 1 ? "border-end border-dark" : ""}">
                 <h5 class="Legend-subTittle border-bottom border-dark text-center"> ${this.decorateString(attributes[i].attr, networkHTML.legendColumnsMaxTitleChars)} </h5>
                 ${buttonsDiv}
             </div>`;
@@ -324,12 +324,48 @@ export default class LegendItem {
      */
     decorateString(string, maxLength) {
         if (isNaN(string) && string !== string.toUpperCase()) {
-            const notCamelCaseString = string.replace(/([A-Z])/g, " $1");
-            string = notCamelCaseString.charAt(0).toUpperCase() + notCamelCaseString.slice(1);
+
+            string = this.removeSnakeCase(string);
+            string = this.removeCamelCase(string)
+    
+            string = string.charAt(0).toUpperCase() + string.slice(1);
         }
         return this.trimString(string, maxLength);
     }
 
+    /**
+     * Remove snake_case format of a string. 
+     * @param {String} string string to edit
+     * @returns {String} Returns the string edited if it had snake_case, otherwise returns the same string
+     */
+    removeSnakeCase(string){
+        const stringSplit = string.split('_');
+        
+        if(stringSplit.length > 1){
+            let output = "";
+
+            for(let i = 0; i < stringSplit.length; i++){
+                if(i === stringSplit.length - 1){
+                    output += stringSplit[i];
+                }else{
+                    output += stringSplit[i] + " ";
+                }
+            }
+            return output;
+        }
+        return string;
+    }
+
+    /**
+     * Remove camelCase format of a string. 
+     * @param {String} string string to edit
+     * @returns {String} Returns the string edited if it had camelCase, otherwise returns the same string
+     */
+    removeCamelCase(string){
+        const notCamelCaseString = string.replace(/([A-Z])/g, " $1");
+
+        return notCamelCaseString;
+    }
     /**
      * If the string is bigger than maxLength, it will remove the last chars of the string 
      * to fit inside the maxLenght
