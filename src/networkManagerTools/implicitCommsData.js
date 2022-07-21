@@ -72,17 +72,19 @@ export default class ImplicitCommsData {
         //Draw the bounding box of all groups
         for (let i = 0; i < boundingBoxes.length; i++) {
             if (boundingBoxes[i] !== null) {
+                const n = i % comms.Bb.Color.length;
+
                 //DEBUG TO SEE THE BB COLOR IN THE TABLE
-                this.implComms[i].color = this.getCommunityBBcolor(i);
+                this.implComms[i].color = this.getCommunityBBcolor(n);
 
                 //Draw Border
                 ctx.lineWidth = comms.Bb.BoderWidth;
-                ctx.strokeStyle = comms.Bb.Color[i].Border;
+                ctx.strokeStyle = comms.Bb.Color[n].Border;
                 ctx.strokeRect(boundingBoxes[i].left, boundingBoxes[i].top, boundingBoxes[i].right - boundingBoxes[i].left, boundingBoxes[i].bottom - boundingBoxes[i].top);
 
                 //Draw Background
                 ctx.lineWidth = 0;
-                ctx.fillStyle = comms.Bb.Color[i].Color;
+                ctx.fillStyle = comms.Bb.Color[n].Color;
                 ctx.fillRect(boundingBoxes[i].left, boundingBoxes[i].top, boundingBoxes[i].right - boundingBoxes[i].left, boundingBoxes[i].bottom - boundingBoxes[i].top);
             }
         }

@@ -32,6 +32,12 @@
 		},
 		{
 			"name": "IMMA_number_interactions"
+		},
+		{
+			"name": "DMH artefacts collected (agglomerative)"
+		},
+		{
+			"name": "DMH artefacts collected (kmedoids)"
 		}
 	]
 }

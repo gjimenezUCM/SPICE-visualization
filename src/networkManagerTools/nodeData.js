@@ -33,6 +33,7 @@ export default class NodeData {
         for (let node of json[nodes.UsersGlobalJsonKey]) {
             this.nodeVisuals.findExplicitCommunities(node);
 
+            node["id"] = node["id"].toString();
             //The implicit community will be used for the bounding boxes
             node[comms.ImplUserNewKey] = parseInt(node[comms.ImplUserJsonKey]);
 

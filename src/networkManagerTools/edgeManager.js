@@ -41,14 +41,14 @@ export default class EdgeManager {
                 if (edge[edges.EdgeOneKey] !== edge[edges.EdgeTwoKey]) {
 
                     //Update targets to vis format
-                    edge["from"] = edge[edges.EdgeOneKey];
-                    edge["to"] = edge[edges.EdgeTwoKey];
+                    edge["from"] = edge[edges.EdgeOneKey].toString();
+                    edge["to"] = edge[edges.EdgeTwoKey].toString();
 
                     delete edge[edges.EdgeOneKey];
                     delete edge[edges.EdgeTwoKey];
 
                     //Vis use "value" key to change edges width in case we activate the option.
-                    edge["value"] = edge[edges.EdgeValueKey];
+                    edge["value"] = edge[edges.EdgeValueKey].toString();
                     if (edges.EdgeValueKey !== "value")
                         delete edge[edges.EdgeValueKey];
 

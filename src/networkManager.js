@@ -58,7 +58,7 @@ export default class NetworkMan {
         this.chooseOptions();
         this.drawNetwork();
 
-        if(this.valuesToHide.length !== 0)
+        if (this.valuesToHide.length !== 0)
             this.updateFilterActives(this.valuesToHide);
     }
 
@@ -153,14 +153,14 @@ export default class NetworkMan {
         this.network.on("click", (event) => this.clickEvent(event));
         this.network.on("zoom", (event) => this.zoomEvent(event));
         this.network.on("dragging", (event) => this.draggingEvent(event));
-        
+
         this.network.on("animationFinished", () => this.animationFinishEvent());
     }
 
     /**
      * Function executed when a zooming animation ends. Shows the tooltip if the tooltip exists
      */
-    animationFinishEvent(){
+    animationFinishEvent() {
         this.zoomingIn = false;
         this.groupManager.showTooltip();
     }
@@ -170,9 +170,8 @@ export default class NetworkMan {
      * @param {CanvasRenderingContext2D} ctx Context object necesary to draw in the network canvas
      */
     preDrawEvent(ctx) {
-        console.log("PreDraw Event");
         //For optimization purpouses
-        if(!this.zoomingIn){
+        if (!this.zoomingIn) {
             this.implCommMan.drawBoundingBoxes(ctx, this.data.nodes, this.network);
         }
     }
@@ -186,7 +185,7 @@ export default class NetworkMan {
 
         if (event.nodes.length > 0) {
             this.nodeHasBeenClicked(event);
-   
+
         } else {
             this.noNodeIsClicked(event);
         }
@@ -204,10 +203,10 @@ export default class NetworkMan {
      * Function executed when "dragging" event is launched. Happens when the user drag a node or the canvas
      * @param {Object} event Drag event
      */
-    draggingEvent(event){
+    draggingEvent(event) {
         this.groupManager.updateTooltipPosition();
     }
-    
+
     /** 
     * Function executed only when this was the network that received the click event on top of a node
     * @param {Object} event click event 
@@ -236,15 +235,19 @@ export default class NetworkMan {
         const selectedNodes = new Array();
         selectedNodes.push(id)
 
-        const connected_edges = this.network.getConnectedEdges(selectedNodes[0]);
-        const clickedEdges = this.data.edges.get(connected_edges);
+        const connected_edges_id = this.network.getConnectedEdges(selectedNodes[0]);
+        const connectedEdges = this.data.edges.get(connected_edges_id);
 
-        clickedEdges.forEach((edge) => {
-            if (!edge.hidden) {
-                if (edge.from !== selectedNodes[0] && edge.to === selectedNodes[0]) {
-                    selectedNodes.push(edge.from);
-                } else if (edge.to !== selectedNodes[0] && edge.from === selectedNodes[0]) {
-                    selectedNodes.push(edge.to);
+        connectedEdges.forEach((edge) => {
+            if (!edge.hidden || this.edgesMan.hideUnselected) {
+                
+                if (edge.value >= this.edgesMan.edgeValueThreshold) {
+                    
+                    if (edge.from != selectedNodes[0] && edge.to == selectedNodes[0]) {
+                        selectedNodes.push(edge.from);
+                    } else if (edge.to != selectedNodes[0] && edge.from == selectedNodes[0]) {
+                        selectedNodes.push(edge.to);
+                    }
                 }
             }
         })
@@ -263,6 +266,7 @@ export default class NetworkMan {
         const newNodes = new Array();
         this.data.nodes.forEach((node) => {
             if (selectedNodes.includes(node.id)) {
+
                 if (!node.defaultColor) {
                     this.nodeVisuals.nodeDimensionStrategy.nodeColorToDefault(node);
                     newNodes.push(node);
@@ -327,7 +331,7 @@ export default class NetworkMan {
     clearNetwork() {
         this.implCommMan.removeTable();
         this.nodeData.removeTable();
-        
+
         this.network.destroy();
     }
 
@@ -344,7 +348,7 @@ export default class NetworkMan {
      * Change the network allowThirdDimension value
      * @param {Boolean} newBool New allowThirdDimension value
      */
-    changeThirdDimension(newBool){
+    changeThirdDimension(newBool) {
         this.nodeVisuals.activateThirdDimension = newBool;
         this.nodeVisuals.createNodeDimensionStrategy(this.data.nodes);
     }
@@ -353,7 +357,7 @@ export default class NetworkMan {
      * Change the network nodeLabelVisibility value
      * @param {Boolean} newBool New nodeLabelVisibility value
      */
-    nodeLabelVisibilityChange(newBool){
+    nodeLabelVisibilityChange(newBool) {
         this.nodeVisuals.nodeLabelVisibility = newBool;
         this.nodeVisuals.updateNodeLabelsVisibility(this.data.nodes);
     }
