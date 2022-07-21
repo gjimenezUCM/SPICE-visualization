@@ -87,9 +87,9 @@ export default class OptionsItem {
      */
     toggleNodeLabels(button) {
         const active = !this.toolbar.toggleDropdownItemState(button);
-        this.hideNodeValue = active;
-        console.log(`toggle node labels ${active}`);
-        
+        this.hideNodeValue = !active;
+        console.log(`toggle unselected edges ${active}`);
+
         this.toolbar.networksGroup.nodeLabelVisibilityChangeALL(active);    
     }
 

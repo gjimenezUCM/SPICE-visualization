@@ -22,6 +22,8 @@ export default class NodeData {
      */
     constructor(nodeVisuals) {
         this.nodeVisuals = nodeVisuals;
+
+        this.counter = 0;
     }
 
     /**
@@ -34,6 +36,12 @@ export default class NodeData {
             this.nodeVisuals.findExplicitCommunities(node);
 
             node["id"] = node["id"].toString();
+            //Value to show instead of the label
+            node["idHidden"] = this.counter;
+            node["labelHidden"] = this.counter;
+
+            this.counter++;
+
             //The implicit community will be used for the bounding boxes
             node[comms.ImplUserNewKey] = parseInt(node[comms.ImplUserJsonKey]);
 
@@ -44,7 +52,7 @@ export default class NodeData {
             node["defaultColor"] = true;
             node["size"] = nodes.DefaultSize;
             
-            if(!networkHTML.showNodeLabelInitialValue){
+            if(!this.nodeVisuals.nodeLabelVisibility){
                 node["font"] = {
                     color: "#00000000"
                 }
@@ -113,7 +121,10 @@ export default class NodeData {
 
         //First we include the wanted attributes
         for (let i = 0; i < nodes.NodesWantedAttr.length; i++) {
-            newRowData.set(nodes.NodesWantedAttr[i], node[nodes.NodesWantedAttr[i]]);
+            if(nodes.NodesWantedAttr[i] !== "implicit_Comm" && !this.nodeVisuals.nodeLabelVisibility){
+                newRowData.set(nodes.NodesWantedAttr[i], node[nodes.NodesWantedAttr[i]+"Hidden"]);
+            }else
+                newRowData.set(nodes.NodesWantedAttr[i], node[nodes.NodesWantedAttr[i]]);
         }
 
         //Then we add the explicit community ones
@@ -173,9 +184,11 @@ export default class NodeData {
      */
     getTooltipTitle(networkManager, event, titleTemplate) {
         const node = this.nodes.get(event.nodes[0]);
-        const title = node.label;
 
-
+        console.log(this.nodeVisuals.nodeLabelVisibility)
+        console.log(this.nodeVisuals)
+        const title = this.nodeVisuals.nodeLabelVisibility ? node.label : node.labelHidden;
+        
         return titleTemplate(title);
     }
 
@@ -190,7 +203,7 @@ export default class NodeData {
         const node = this.nodes.get(event.nodes[0]);
         const rowData = new Array();
 
-        rowData.push({ tittle: "Label", data: node.label });
+        rowData.push({ tittle: "Label", data: this.nodeVisuals.nodeLabelVisibility ? node.label : node.labelHidden });
         rowData.push({ tittle: "Group", data: node[comms.ImplUserNewKey] });
 
         const keys = Object.keys(node[comms.ExpUserKsonKey]);

@@ -22,7 +22,7 @@ export default class NodeVisuals {
 
         this.activateThirdDimension = config.allowThirdDimension;
 
-        this.nodeLabelVisibility = config.showNodeLabels;
+        this.nodeLabelVisibility = !config.showNodeLabels;
 
         this.undefinedName = "not defined";
     }

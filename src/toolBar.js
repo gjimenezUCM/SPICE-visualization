@@ -190,6 +190,7 @@ export default class ToolBar {
                 }
                 config["key"] = key;
 
+                console.log(config);
                 this.layout.addNetwork(key, file, config);
 
                 this.legendItem.networkNumberChange();
