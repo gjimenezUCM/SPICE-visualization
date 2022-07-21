@@ -34,6 +34,7 @@ export default class NetworkMan {
         this.groupManager = networkManager;
         this.key = config.key;
         this.valuesToHide = config.valuesToHide;
+        this.zoomingIn = false;
 
         this.implCommMan = new ImplicitCommsMan(jsonInput);
         this.nodeVisuals = new NodeVisuals(config);
@@ -160,6 +161,7 @@ export default class NetworkMan {
      * Function executed when a zooming animation ends. Shows the tooltip if the tooltip exists
      */
     animationFinishEvent(){
+        this.zoomingIn = false;
         this.groupManager.showTooltip();
     }
 
@@ -168,7 +170,11 @@ export default class NetworkMan {
      * @param {CanvasRenderingContext2D} ctx Context object necesary to draw in the network canvas
      */
     preDrawEvent(ctx) {
-        this.implCommMan.drawBoundingBoxes(ctx, this.data.nodes, this.network);
+        console.log("PreDraw Event");
+        //For optimization purpouses
+        if(!this.zoomingIn){
+            this.implCommMan.drawBoundingBoxes(ctx, this.data.nodes, this.network);
+        }
     }
 
     /** 
@@ -251,6 +257,7 @@ export default class NetworkMan {
             },
         }
         this.network.fit(fitOptions);
+        this.zoomingIn = true;
 
         //Update all nodes color acording to their selected status
         const newNodes = new Array();
@@ -297,6 +304,7 @@ export default class NetworkMan {
      */
     nodeDeselected() {
         this.network.fit(this.fitOptions);
+        this.zoomingIn = true;
 
         this.fitOptions = {
             animation: true,
