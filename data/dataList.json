@@ -1,25 +1,34 @@
 {
 	"files": [
 		{
-			"name": "GAM-I"
+			"name": "DMH artefacts collected (agglomerative)"
 		},
 		{
-			"name": "TEST-II"
+			"name": "DMH artefacts collected (kmedoids)"
 		},		
 		{
-			"name": "HECHT_beliefJ (kmedoids)"
+			"name": "DMH(agglomerative)"
 		},
 		{
+			"name": "DMH(kmedoids)"
+		},
+		{
+			"name": "GAM similar emotions in common artworks (agglomerative)"
+		},
+		{
+			"name": "GAM similar emotions in common artworks (kmedoids)"
+		},		
+		{
 			"name": "HECHT_beliefJ (agglomerative)"
+		},
+		{
+			"name": "HECHT_beliefJ (kmedoids)"
 		},
 		{
 			"name": "HECHT_beliefR (agglomerative)"
 		},
 		{
 			"name": "HECHT_beliefR (kmedoids)"
-		},		
-		{
-			"name": "IMMA_complex_taxonomy"
 		},
 		{
 			"name": "IMMA_country_taxonomy (kmedoids)"
@@ -28,16 +37,10 @@
 			"name": "IMMA_country_taxonomy"
 		},
 		{
-			"name": "IMMA_number_interactions (kmedoids)"
-		},
-		{
 			"name": "IMMA_number_interactions"
 		},
 		{
-			"name": "DMH artefacts collected (agglomerative)"
-		},
-		{
-			"name": "DMH artefacts collected (kmedoids)"
+			"name": "MNCN"
 		}
 	]
 }

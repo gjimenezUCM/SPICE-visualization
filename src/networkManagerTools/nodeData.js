@@ -51,12 +51,12 @@ export default class NodeData {
 
             node["defaultColor"] = true;
             node["size"] = nodes.DefaultSize;
-            
-            if(!this.nodeVisuals.nodeLabelVisibility){
+
+            if (!this.nodeVisuals.nodeLabelVisibility) {
                 node["font"] = {
                     color: "#00000000"
                 }
-            }else{
+            } else {
                 node["font"] = {
                     color: "#000000FF"
                 }
@@ -121,18 +121,20 @@ export default class NodeData {
 
         //First we include the wanted attributes
         for (let i = 0; i < nodes.NodesWantedAttr.length; i++) {
-            if(nodes.NodesWantedAttr[i] !== "implicit_Comm" && !this.nodeVisuals.nodeLabelVisibility){
-                newRowData.set(nodes.NodesWantedAttr[i], node[nodes.NodesWantedAttr[i]+"Hidden"]);
-            }else
+            if (nodes.NodesWantedAttr[i] !== "implicit_Comm" && !this.nodeVisuals.nodeLabelVisibility) {
+                newRowData.set(nodes.NodesWantedAttr[i], node[nodes.NodesWantedAttr[i] + "Hidden"]);
+            } else
                 newRowData.set(nodes.NodesWantedAttr[i], node[nodes.NodesWantedAttr[i]]);
         }
 
         //Then we add the explicit community ones
         const communities = node[comms.ExpUserKsonKey];
-        const keys = Object.keys(communities);
 
-        for (let i = 0; i < keys.length; i++) {
-            newRowData.set(keys[i], communities[keys[i]]);
+        if (communities !== undefined && communities !== null && communities !== "{}" && communities !== "[]") {
+            const keys = Object.keys(communities);
+            for (let i = 0; i < keys.length; i++) {
+                newRowData.set(keys[i], communities[keys[i]]);
+            }
         }
 
         this.dataTable.updateDataTable(newRowData)
@@ -170,7 +172,7 @@ export default class NodeData {
 
         const output = { x: clickX, y: clickY };
 
-        if (isClickOnCanvas(output, networkCanvasPosition)) 
+        if (isClickOnCanvas(output, networkCanvasPosition))
             return output;
         return null;
     }
@@ -186,7 +188,7 @@ export default class NodeData {
         const node = this.nodes.get(event.nodes[0]);
 
         const title = this.nodeVisuals.nodeLabelVisibility ? node.label : node.labelHidden;
-        
+
         return titleTemplate(title);
     }
 
@@ -204,9 +206,13 @@ export default class NodeData {
         rowData.push({ tittle: "Label", data: this.nodeVisuals.nodeLabelVisibility ? node.label : node.labelHidden });
         rowData.push({ tittle: "Group", data: node[comms.ImplUserNewKey] });
 
-        const keys = Object.keys(node[comms.ExpUserKsonKey]);
-        for (let i = 0; i < keys.length; i++) {
-            rowData.push({ tittle: keys[i], data: node[comms.ExpUserKsonKey][keys[i]] });
+        const communities = node[comms.ExpUserKsonKey];
+
+        if (communities !== undefined && communities !== null && communities !== "{}" && communities !== "[]") {
+            const keys = Object.keys(communities);
+            for (let i = 0; i < keys.length; i++) {
+                rowData.push({ tittle: keys[i], data: node[comms.ExpUserKsonKey][keys[i]] });
+            }
         }
 
         return contentTemplate(rowData);
@@ -215,7 +221,7 @@ export default class NodeData {
     /**
      * Completely remove the dataTable
      */
-     removeTable(){
+    removeTable() {
         this.dataTable.removeDataTable();
     }
 

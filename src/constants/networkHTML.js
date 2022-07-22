@@ -39,7 +39,7 @@ export const networkHTML = {
 
     legendColumnsWidth: 250,
     legendColumnsMaxTitleChars: 50,
-    legendColumnsMaxSubChars: 50,
+    legendColumnsMaxSubChars: 15,
 }
 
 

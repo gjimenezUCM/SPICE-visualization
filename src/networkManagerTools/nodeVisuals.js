@@ -63,7 +63,8 @@ export default class NodeVisuals {
     validateExplicitCommunity(explicitCommunity) {
         if (explicitCommunity === undefined ||
             explicitCommunity === null ||
-            explicitCommunity === "{}")
+            explicitCommunity === "{}" ||
+            explicitCommunity === "[]" )
             return false;
         else
             return true;
