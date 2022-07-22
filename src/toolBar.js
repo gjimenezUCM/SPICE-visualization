@@ -100,7 +100,7 @@ export default class ToolBar {
         const htmlString = `
         <div class="container">
             <div class="align-center" id="${networkHTML.toolBarParentContainer}"> </div>
-            <h1 style="margin-top: 60px;"> Visualization testing </h1>
+            <h1 style="margin-top: 80px;"> Visualization testing </h1>
             <div class="align-center" id="${networkHTML.networksParentContainer}"> </div>
         </div>`;
 
