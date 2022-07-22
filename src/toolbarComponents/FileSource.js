@@ -19,6 +19,7 @@ export default class FileSourceItem {
             githubMainOption: "https://raw.githubusercontent.com/gjimenezUCM/SPICE-visualization/main/data/",
             localOption: "../data/",
             githubDevOption: "https://raw.githubusercontent.com/gjimenezUCM/SPICE-visualization/develop/data/",
+            API: "API",
         }
 
         const isLocalhost = window.location.hostname === "localhost";
@@ -29,13 +30,14 @@ export default class FileSourceItem {
 
         this.htmlString = `
         <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle unselectable" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <a class="nav-link dropdown-toggle unselectable" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 File Source
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li><a class="dropdown-item unselectable ${!isLocalhost ? 'active"' : ""}" name="fileSource" id="githubMainOption">Github Main</a></li>
                 <li><a class="dropdown-item unselectable ${isLocalhost ? 'active"' : ""}" name="fileSource" id="localOption" >Local</a></li>
                 <li><a class="dropdown-item unselectable" name="fileSource" id="githubDevOption" >Github Develop</a></li>
+                <li><a class="dropdown-item unselectable" name="fileSource" id="API" >Use the api (WIP) </a></li>
             </ul>
         </li>`;
 

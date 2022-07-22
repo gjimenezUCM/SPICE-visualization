@@ -5,6 +5,8 @@
  * @author Marco Expósito Pérez
  */
 
+import { Tooltip } from "bootstrap";
+
 export default class SelectPerspectiveItem {
     
     /**
@@ -33,11 +35,22 @@ export default class SelectPerspectiveItem {
         const html = this.toolbar.domParser.parseFromString(htmlString, "text/html").body.firstChild;
         document.getElementById("dropdownPerspectivesOptionsMenu").append(html);
 
-        this.perspectiveOptions = document.querySelectorAll("a[name='dropdownPerspectivesOptions']");
+        const perspectiveOptions = document.querySelectorAll("a[name='dropdownPerspectivesOptions']");
 
-        for(const option of this.perspectiveOptions){
-            option.onclick = () => this.selectPerspectiveOnclick(option);
+        if(this.toolbar.usingAPI){
+            for(const option of perspectiveOptions){
+                option.onclick = () => this.selectPerspectiveOnclick(option);
+                let id = option.getAttribute("key");
+                option.onmouseover = () => this.selectPerspectiveOnmouseover(option, this.perspectiveInfo.get(id))
+                option.onmouseout = () => this.selectPerspectiveOnmouseout(option, this.perspectiveInfo.get(id))
+            }
+
+        }else{
+            for(const option of perspectiveOptions){
+                option.onclick = () => this.selectPerspectiveOnclick(option);
+            }
         }
+        
     }
     
     /**
@@ -47,14 +60,26 @@ export default class SelectPerspectiveItem {
     createDropdownMenu(){
         this.restart();
 
-        const file = this.toolbar.file;
-        const n = file.length;
+        const file = this.toolbar.allPerspectivesFile;
 
+        const n = file.length;
         let content = "<div>";
-        for (let i = 0; i < n; i++) {
-            const key = file[i].name;
-            content += this.dropdownRowTemplate(key);
+
+        if(this.toolbar.usingAPI){
+            for (let i = 0; i < n; i++) {
+                this.perspectiveInfo.set(file[i].perspective.id, file[i].perspective);
+                content += this.dropdownRowTemplate(file[i].perspective.name, file[i].perspective.id);
+            }
+
+        }else{
+
+            for (let i = 0; i < n; i++) {
+                const key = file[i].name;
+                content += this.dropdownRowTemplate(key);
+            }
+
         }
+
         content += "</div>"
 
         return content;
@@ -66,24 +91,86 @@ export default class SelectPerspectiveItem {
      */
     selectPerspectiveOnclick(button){
         const active = this.toolbar.toggleDropdownItemState(button);
-        const key = button.getAttribute("key");
+        let key = button.getAttribute("key");
+
+        if(this.toolbar.usingAPI){
+            //THIS SHOULD BE REMOVED WHEN POSSIBLE, THE PERSPECTIVE SHOULD BE ACCESED BY THE KEY/ID
+            key = this.perspectiveInfo.get(key).name;
+        }
 
         this.toolbar.togglePerspective(active, key);
     }
 
+    selectPerspectiveOnmouseover(option, info){
+        // if(this.tooltip !== null)
+        //     this.tooltip.hide();
+
+
+        const tooltipOptions = {
+            title: this.getTooltipContent(info),
+            placement: "right",
+            trigger: "manual",
+            fallbackPlacements: ["right"],
+            template: this.getTooltipTemplate(),
+            html: true,
+        };
+        this.tooltip = new Tooltip(option, tooltipOptions);
+        this.tooltip.show();
+    }
+
+    getTooltipContent(info){
+        let parameters = "";
+
+        const paramKeys = Object.keys(info.algorithm.params)
+        for(let i = 0; i < paramKeys.length; i++){
+            if(i === paramKeys.length-1){
+                parameters += `${info.algorithm.params[paramKeys[i]]}`;
+            }else{
+                parameters += `${info.algorithm.params[paramKeys[i]]}, `;
+            }
+            
+        }
+        const htmlString = `
+            <div class="row selectPerspective"> 
+                Algorithm: ${info.algorithm.name}. 
+            </div>
+            <div class="row selectPerspective">
+                Parameters used: ${parameters}
+            </div>`;
+           
+        return htmlString;
+    }
+
+    getTooltipTemplate(){
+        const htmlString=`
+        <div class="tooltip" role="tooltip">
+            <div class="tooltip-arrow"></div>
+            <div class="tooltip-inner selectPerspective"></div>
+        </div>`;
+
+        return htmlString;
+    }
+
+    selectPerspectiveOnmouseout(){
+        // this.tooltip.hide();
+        // this.tooltip = null;
+    }
     /**
      * Template of a row of the dropdown
-     * @param {String} key key of this option
+     * @param {String} name key of this option
+     * @param {String} id id of this option
      * @returns {String} returns the html string with the template
      */
-    dropdownRowTemplate(key){
+    dropdownRowTemplate(name, id = null){
         return `
         <li>
-            <a class="dropdown-item unselectable" name="dropdownPerspectivesOptions" key="${key}" id="dropdownPerspectivesOptions${key}">
-                ${key}
+            <a class="dropdown-item unselectable" name="dropdownPerspectivesOptions" key="${id === null ? name : id}" id="dropdownPerspectivesOptions${id === null ? name : id}">
+                ${name}
             </a>
         </li>`;
     }
+
+
 
     setConfiguration(){}
 
@@ -91,6 +178,9 @@ export default class SelectPerspectiveItem {
      * Clear the dropdown menu options
      */
     restart(){
+        this.perspectiveInfo = new Map();
+        this.tooltip = null;
+
         const dropdownContainer = document.getElementById("dropdownPerspectivesOptionsMenu");
         if(dropdownContainer !== null)
             dropdownContainer.innerHTML = "";

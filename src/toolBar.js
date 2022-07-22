@@ -27,6 +27,8 @@ export default class ToolBar {
      * Constructor of the class
      */
     constructor() {
+        this.usingAPI = false;
+
         this.domParser = new DOMParser();
 
         this.requestManager = new RequestManager();
@@ -35,7 +37,7 @@ export default class ToolBar {
 
         this.initHTML();
         this.initToolbarParts();
-        
+
         const htmlString = `
         <nav class="navbar fixed-top navbar-expand-md navbar-light bg-light">
             <div class="container-fluid">
@@ -65,9 +67,9 @@ export default class ToolBar {
     /**
      * Init all parts of the toolbar
      */
-     initToolbarParts(){
+    initToolbarParts() {
         this.toolbarParts = new Array();
-        
+
         this.optionsItem = new OptionsItem(this);
         this.selectPerspectiveItem = new SelectPerspectiveItem(this);
         this.legendItem = new LegendItem(this);
@@ -91,7 +93,7 @@ export default class ToolBar {
         ]
         this.rightAlignedItems = new RightAlignedToolbarItems(rightItems);
         this.toolbarParts.push(this.rightAlignedItems);
-     }
+    }
 
     /**
      * Create the basic HTML divs to support all aplication's parts
@@ -109,28 +111,42 @@ export default class ToolBar {
         document.body.appendChild(html);
     }
 
-     /**
-      * Request the name of all available perspective files
-      */
-     requestAllFiles() {
-        const name = "dataList.json";
+    /**
+     * Request the name of all available perspective files
+     */
+    requestAllFiles() {
+        if (this.usingAPI) {
 
-        this.requestManager.getFile(name)
-            .then((file) => {
-                this.file = JSON.parse(file).files;
-                this.createEvents()
-            })
-            .catch((error) => {
-                console.log(error);
-                alert("Error while getting the file with all file names");
-            });
+            this.requestManager.getAllPerspectives()
+                .then((file) => {
+                    this.allPerspectivesFile = JSON.parse(file).files;
+                    this.createEvents()
+                })
+                .catch((error) => {
+                    console.log(error);
+                    alert("Error while getting the file with all file names");
+                });
+
+        } else {
+            const name = "dataList.json";
+
+            this.requestManager.getPerspective(name)
+                .then((file) => {
+                    this.allPerspectivesFile = JSON.parse(file).files;
+                    this.createEvents()
+                })
+                .catch((error) => {
+                    console.log(error);
+                    alert("Error while getting the file with all file names");
+                });
+        }
     }
 
     /**
      * Create all events for every item of the toolbar
      */
-    createEvents(){
-        for(const part of this.toolbarParts){
+    createEvents() {
+        for (const part of this.toolbarParts) {
             part.createEvents();
         }
     }
@@ -139,9 +155,20 @@ export default class ToolBar {
      * Change the source URL of the perspective files
      * @param {String} url new url to be used
      */
-    changeFileSourceURL(url){
-        this.requestManager.changeBaseURL(url);
-        
+    changeFileSourceURL(url) {
+
+        if (url === "API") {
+            const realURL = "../dataAPI/";
+            this.requestManager.changeBaseURL(realURL);
+            this.usingAPI = true;
+
+        } else {
+
+            this.usingAPI = false;
+            this.requestManager.changeBaseURL(url);
+        }
+
+
         this.restartToolbar();
     }
 
@@ -149,16 +176,16 @@ export default class ToolBar {
      * Change the current layout of the aplication
      * @param {String} layout key of the layout
      */
-    changeLayout(layout){
+    changeLayout(layout) {
         this.restartToolbar();
-        
-        if(layout === "Horizontal"){
+
+        if (layout === "Horizontal") {
             this.layout = new HorizontalLayout(this.networksGroup);
-        }else{
+        } else {
             this.layout = new VerticalLayout(this.networksGroup);
         }
 
-        
+
     }
 
     /**
@@ -166,7 +193,7 @@ export default class ToolBar {
      * @param {Boolean} active value that decides the outcome
      * @param {String} key key of the perspective/network
      */
-    togglePerspective(active, key){
+    togglePerspective(active, key) {
         if (active) {
             this.activateNetwork(key);
         } else {
@@ -178,14 +205,14 @@ export default class ToolBar {
      * Activate a network visualization
      * @param {String} key key of the network
      */
-    activateNetwork(key){
+    activateNetwork(key) {
         const name = key + ".json";
 
-        this.requestManager.getFile(name)
+        this.requestManager.getPerspective(name)
             .then((file) => {
 
-                const config = { };
-                for(const part of this.toolbarParts){
+                const config = {};
+                for (const part of this.toolbarParts) {
                     part.setConfiguration(config);
                 }
                 config["key"] = key;
@@ -204,7 +231,7 @@ export default class ToolBar {
      * Remove a network visualization
      * @param {String} key key of the network
      */
-    removeNetwork(key){
+    removeNetwork(key) {
         this.networksGroup.removeNetwork(key);
         this.legendItem.networkNumberChange();
     }
@@ -212,14 +239,14 @@ export default class ToolBar {
     /**
      * Remove all networks and restart the toolbar with the current selected options 
      */
-    restartToolbar(){
+    restartToolbar() {
         this.networksGroup.removeAllnetworks();
-        
+
         this.selectPerspectiveItem.restart();
         this.legendItem.restart();
 
         document.getElementById(networkHTML.networksParentContainer).innerHTML = "";
-        
+
         this.requestAllFiles();
     }
 
@@ -228,12 +255,12 @@ export default class ToolBar {
      * @param {HTMLElement} item element that is going to be toggled
      * @returns {Boolean} returns the new state of the item
      */
-    toggleDropdownItemState(item){
+    toggleDropdownItemState(item) {
         let active = false;
-        if(item.className === "dropdown-item unselectable"){
+        if (item.className === "dropdown-item unselectable") {
             item.className = "dropdown-item unselectable active";
             active = true;
-        }else{
+        } else {
             item.className = "dropdown-item unselectable";
         }
 
