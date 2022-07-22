@@ -36,21 +36,26 @@ export default class SelectPerspectiveItem {
         document.getElementById("dropdownPerspectivesOptionsMenu").append(html);
 
         const perspectiveOptions = document.querySelectorAll("a[name='dropdownPerspectivesOptions']");
+        this.perspectiveOptionsMap = new Map();
 
         if(this.toolbar.usingAPI){
             for(const option of perspectiveOptions){
-                option.onclick = () => this.selectPerspectiveOnclick(option);
                 let id = option.getAttribute("key");
+                this.perspectiveOptionsMap.set(id, option);
+
+                option.onclick = () => this.selectPerspectiveOnclick(option);
                 option.onmouseover = () => this.selectPerspectiveOnmouseover(option, this.perspectiveInfo.get(id))
                 option.onmouseout = () => this.selectPerspectiveOnmouseout(option, this.perspectiveInfo.get(id))
             }
 
         }else{
             for(const option of perspectiveOptions){
+                let id = option.getAttribute("key");
+                this.perspectiveOptionsMap.set(id, option);
+
                 option.onclick = () => this.selectPerspectiveOnclick(option);
             }
         }
-        
     }
     
     /**
@@ -70,18 +75,14 @@ export default class SelectPerspectiveItem {
                 this.perspectiveInfo.set(file[i].perspective.id, file[i].perspective);
                 content += this.dropdownRowTemplate(file[i].perspective.name, file[i].perspective.id);
             }
-
         }else{
-
             for (let i = 0; i < n; i++) {
                 const key = file[i].name;
                 content += this.dropdownRowTemplate(key);
             }
-
         }
 
         content += "</div>"
-
         return content;
     }
 
@@ -102,9 +103,8 @@ export default class SelectPerspectiveItem {
     }
 
     selectPerspectiveOnmouseover(option, info){
-        // if(this.tooltip !== null)
-        //     this.tooltip.hide();
-
+        if(this.tooltip !== null)
+            this.tooltip.hide();
 
         const tooltipOptions = {
             title: this.getTooltipContent(info),
@@ -152,8 +152,8 @@ export default class SelectPerspectiveItem {
     }
 
     selectPerspectiveOnmouseout(){
-        // this.tooltip.hide();
-        // this.tooltip = null;
+        this.tooltip.hide();
+        this.tooltip = null;
     }
     /**
      * Template of a row of the dropdown
@@ -184,5 +184,10 @@ export default class SelectPerspectiveItem {
         const dropdownContainer = document.getElementById("dropdownPerspectivesOptionsMenu");
         if(dropdownContainer !== null)
             dropdownContainer.innerHTML = "";
+    }
+
+    disactivateOption(key){
+        const button = this.perspectiveOptionsMap.get(key);
+        this.toolbar.toggleDropdownItemState(button);
     }
 }

@@ -28,6 +28,7 @@ export default class ToolBar {
      */
     constructor() {
         this.usingAPI = false;
+        this.toolbarReady = false;
 
         this.domParser = new DOMParser();
 
@@ -36,7 +37,13 @@ export default class ToolBar {
         this.layout = new HorizontalLayout(this.networksGroup);
 
         this.initHTML();
-        this.initToolbarParts();
+
+        try {
+            this.initToolbarParts();
+        } catch (err) {
+            alert(`Error while starting the toolbar parts: ${err.message}`);
+            console.log(err);
+        }
 
         const htmlString = `
         <nav class="navbar fixed-top navbar-expand-md navbar-light bg-light">
@@ -118,26 +125,36 @@ export default class ToolBar {
         if (this.usingAPI) {
 
             this.requestManager.getAllPerspectives()
-                .then((file) => {
-                    this.allPerspectivesFile = JSON.parse(file).files;
-                    this.createEvents()
+                .then((response) => {
+                    if (response.status === 200) {
+                        const file = response.data;
+                        this.allPerspectivesFile = JSON.parse(file).files;
+                        this.createEvents()
+                    } else {
+                        throw new Error(`All perspectives info was ${response.statusText}`);
+                    }
                 })
                 .catch((error) => {
                     console.log(error);
-                    alert("Error while getting the file with all file names");
+                    alert(error.message);
                 });
 
         } else {
             const name = "dataList.json";
 
             this.requestManager.getPerspective(name)
-                .then((file) => {
-                    this.allPerspectivesFile = JSON.parse(file).files;
-                    this.createEvents()
+                .then((response) => {
+                    if (response.status === 200) {
+                        const file = response.data;
+                        this.allPerspectivesFile = JSON.parse(file).files;
+                        this.createEvents()
+                    } else {
+                        throw new Error(`File ${name} not found`);
+                    }
                 })
                 .catch((error) => {
                     console.log(error);
-                    alert("Error while getting the file with all file names");
+                    alert(error.message);
                 });
         }
     }
@@ -146,9 +163,15 @@ export default class ToolBar {
      * Create all events for every item of the toolbar
      */
     createEvents() {
-        for (const part of this.toolbarParts) {
-            part.createEvents();
+        try {
+            for (const part of this.toolbarParts) {
+                part.createEvents();
+            }
+        }catch(error){
+            throw new Error(`Error while creating toolbar Events ${error.message}`)
         }
+
+        this.toolbarReady = true;
     }
 
     /**
@@ -163,7 +186,6 @@ export default class ToolBar {
             this.usingAPI = true;
 
         } else {
-
             this.usingAPI = false;
             this.requestManager.changeBaseURL(url);
         }
@@ -184,8 +206,6 @@ export default class ToolBar {
         } else {
             this.layout = new VerticalLayout(this.networksGroup);
         }
-
-
     }
 
     /**
@@ -209,21 +229,31 @@ export default class ToolBar {
         const name = key + ".json";
 
         this.requestManager.getPerspective(name)
-            .then((file) => {
+            .then((response) => {
+                if (response.status === 200) {
+                    const config = {};
+                    for (const part of this.toolbarParts) {
+                        part.setConfiguration(config);
+                    }
+                    config["key"] = key;
 
-                const config = {};
-                for (const part of this.toolbarParts) {
-                    part.setConfiguration(config);
+                    const netResponse = this.layout.addNetwork(key, response.data, config);
+
+                    if(netResponse !== 200){
+                        this.selectPerspectiveItem.disactivateOption(key);
+                        throw netResponse;
+                    }else{
+                        this.legendItem.networkNumberChange();
+                    }
+                    
+
+                } else {
+                    throw new Error(`Perspective ${name} was ${response.statusText}`);
                 }
-                config["key"] = key;
-
-                this.layout.addNetwork(key, file, config);
-
-                this.legendItem.networkNumberChange();
             })
             .catch((error) => {
                 console.log(error);
-                alert("Error while getting the selected file");
+                alert(error.message);
             });
     }
 
@@ -240,14 +270,16 @@ export default class ToolBar {
      * Remove all networks and restart the toolbar with the current selected options 
      */
     restartToolbar() {
-        this.networksGroup.removeAllnetworks();
+        if (this.toolbarReady) {
+            this.networksGroup.removeAllnetworks();
 
-        this.selectPerspectiveItem.restart();
-        this.legendItem.restart();
+            this.selectPerspectiveItem.restart();
+            this.legendItem.restart();
 
-        document.getElementById(networkHTML.networksParentContainer).innerHTML = "";
+            document.getElementById(networkHTML.networksParentContainer).innerHTML = "";
 
-        this.requestAllFiles();
+            this.requestAllFiles();
+        }
     }
 
     /**

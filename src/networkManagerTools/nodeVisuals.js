@@ -32,9 +32,8 @@ export default class NodeVisuals {
      * @param {Object} node node with the explicit Community attribute
      */
     findExplicitCommunities(node) {
-        const explicitData = node[comms.ExpUserKsonKey];
-        
-        if (this.validateExplicitCommunity(explicitData)) {
+        if (this.validateExplicitCommunity(node)) {
+            const explicitData = node[comms.ExpUserKsonKey];
 
             const keys = Object.keys(explicitData);
             keys.forEach((key) => {
@@ -60,11 +59,13 @@ export default class NodeVisuals {
         }
     }
 
-    validateExplicitCommunity(explicitCommunity) {
-        if (explicitCommunity === undefined ||
-            explicitCommunity === null ||
-            explicitCommunity === "{}" ||
-            explicitCommunity === "[]" )
+    validateExplicitCommunity(node) {
+        if (node[comms.ExpUserKsonKey] === undefined ||
+            node[comms.ExpUserKsonKey] === null)
+            throw new Error(`node ${node[id]} doesnt have an explicit community attribute`);
+
+        if (node[comms.ExpUserKsonKey] === "[]" ||
+            node[comms.ExpUserKsonKey] === "{}")
             return false;
         else
             return true;

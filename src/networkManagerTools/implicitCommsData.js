@@ -21,6 +21,11 @@ export default class ImplicitCommsData {
     constructor(communityJson) {
         //Data of all implicit communities
         this.implComms = communityJson[comms.ImplGlobalJsonKey];
+
+        if (!Array.isArray(this.implComms)
+            || this.implComms.length <= 0) {
+            throw new SyntaxError("JSON file doesnt have the implicit community data.");
+        }
     }
 
     /**
@@ -49,7 +54,7 @@ export default class ImplicitCommsData {
             node_bb.left = position.x - node.size / 2 - comms.Bb.nodePadding;
             node_bb.right = position.x + node.size / 2 + comms.Bb.nodePadding;
 
-            
+
             if (boundingBoxes[group] === null) {
 
                 boundingBoxes[group] = node_bb;

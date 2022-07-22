@@ -31,7 +31,6 @@ export default class LayoutItem {
      */
      createEvents(){
         this.layoutsArray = new Array();
-
         this.layoutsArray = document.querySelectorAll("a[name='networkLayout']");
 
         for(const option of this.layoutsArray){

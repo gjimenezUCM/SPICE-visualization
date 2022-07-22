@@ -35,7 +35,7 @@ export default class RequestManager {
             params: {}
         })
             .then((response) => {
-                return response.data;
+                return response;
             })
             .catch((error) => {
                 return error;
@@ -52,7 +52,7 @@ export default class RequestManager {
             params: {}
         })
             .then((response) => {
-                return response.data;
+                return response;
             })
             .catch((error) => {
                 return error;

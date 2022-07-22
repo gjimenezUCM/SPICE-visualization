@@ -2,7 +2,7 @@
     "communities": [
         {
             "id": "0",
-            "community-type": "implicit",
+            "communitdsay-type": "implicit",
             "name": "Community 0",
             "explanation": "Representative Properties: {'Artefacts collected': 'Aalto vase, Moomin mug, Pehtoori'}",
             "users": [

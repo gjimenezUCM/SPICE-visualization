@@ -23,7 +23,6 @@ export default class RightAlignedToolbarItems {
                 ${body}
             </ul>
         </div>`;
-        
     }
     
     /**

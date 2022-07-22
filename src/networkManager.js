@@ -42,10 +42,15 @@ export default class NetworkMan {
         this.nodeData = new NodeData(this.nodeVisuals, datatableContainer);
         this.edgesMan = new EdgeManager(config);
 
+        let t0 = performance.now();
+        const edges = this.edgesMan.parseEdges(jsonInput);
+        let t1 = performance.now();
+        console.log(`Parse edges took ${t1 - t0} milliseconds.`);
+
         this.data =
         {
             nodes: this.nodeData.parseNodes(jsonInput),
-            edges: this.edgesMan.parseEdges(jsonInput)
+            edges: edges,
         };
 
         new nodeLocationSetter(this.data.nodes, this.implCommMan.implComms.length);
@@ -86,9 +91,6 @@ export default class NetworkMan {
                 color: {
                     highlight: edges.EdgeSelectedColor
                 },
-                chosen: {
-                    label: this.edgesMan.labelEdgeChosen.bind(this),
-                },
                 font: {
                     strokeWidth: edges.LabelStrokeWidth,
                     size: edges.LabelSize,
@@ -103,6 +105,9 @@ export default class NetworkMan {
             },
             nodes: {
                 shape: nodes.NodeShape,
+                shapeProperties: {
+                    interpolation: false,
+                },
                 borderWidth: nodes.NodeDefaultBorderWidth,
                 borderWidthSelected: nodes.NodeDefaultBorderWidthSelected,
                 shapeProperties: {
@@ -145,7 +150,10 @@ export default class NetworkMan {
      * Draw the network and initialize all Events
      */
     drawNetwork() {
+        let t0 = performance.now();
         this.network = new Network(this.container, this.data, this.options);
+        let t1 = performance.now();
+        console.log(`Drawing the network took ${t1 - t0} milliseconds.`);
 
         this.container.firstChild.id = `${networkHTML.topCanvasContainer}${this.key}`;
 
@@ -240,9 +248,9 @@ export default class NetworkMan {
 
         connectedEdges.forEach((edge) => {
             if (!edge.hidden || this.edgesMan.hideUnselected) {
-                
+
                 if (edge.value >= this.edgesMan.edgeValueThreshold) {
-                    
+
                     if (edge.from != selectedNodes[0] && edge.to == selectedNodes[0]) {
                         selectedNodes.push(edge.from);
                     } else if (edge.to != selectedNodes[0] && edge.from == selectedNodes[0]) {

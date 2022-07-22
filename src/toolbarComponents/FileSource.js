@@ -48,9 +48,9 @@ export default class FileSourceItem {
      */
      createEvents(){
         this.fileSourceArray = new Array();
-
         this.fileSourceOptions = document.querySelectorAll("a[name='fileSource']");
-
+        
+        
         for(const option of this.fileSourceOptions){
             option.onclick = () => this.fileSourceOnclick(option.id);
         }

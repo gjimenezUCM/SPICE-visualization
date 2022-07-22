@@ -32,39 +32,66 @@ export default class NodeData {
      * @returns {DataSet} a vis.js DataSet with the nodes data ready to draw the network
      */
     parseNodes(json) {
-        for (let node of json[nodes.UsersGlobalJsonKey]) {
-            this.nodeVisuals.findExplicitCommunities(node);
+        if (!Array.isArray(json[nodes.UsersGlobalJsonKey])
+            || json[nodes.UsersGlobalJsonKey].length <= 0) {
+            throw new SyntaxError("JSON file doesnt have the users/nodes data.");
+        }
 
-            node["id"] = node["id"].toString();
-            //Value to show instead of the label
-            node["idHidden"] = this.counter;
-            node["labelHidden"] = this.counter;
+        try {
+            for (let node of json[nodes.UsersGlobalJsonKey]) {
+                this.checkNodeValues(node);
 
-            this.counter++;
+                this.nodeVisuals.findExplicitCommunities(node);
 
-            //The implicit community will be used for the bounding boxes
-            node[comms.ImplUserNewKey] = parseInt(node[comms.ImplUserJsonKey]);
-
-            //Vis uses "group" key to change the color of all nodes with the same key. We need to remove it
-            if (comms.ImplUserJsonKey === "group")
-                delete node["group"];
-
-            node["defaultColor"] = true;
-            node["size"] = nodes.DefaultSize;
-
-            if (!this.nodeVisuals.nodeLabelVisibility) {
-                node["font"] = {
-                    color: "#00000000"
+                node["id"] = node["id"].toString();
+                
+                if(node["label"] !== undefined){
+                    node["label"] = node["id"];
                 }
-            } else {
-                node["font"] = {
-                    color: "#000000FF"
+                
+                //Value to show instead of the label
+                node["idHidden"] = this.counter;
+                node["labelHidden"] = this.counter;
+
+                this.counter++;
+
+                //The implicit community will be used for the bounding boxes
+                node[comms.ImplUserNewKey] = parseInt(node[comms.ImplUserJsonKey]);
+
+                //Vis uses "group" key to change the color of all nodes with the same key. We need to remove it
+                if (comms.ImplUserJsonKey === "group")
+                    delete node["group"];
+
+                node["defaultColor"] = true;
+                node["size"] = nodes.DefaultSize;
+
+                if (!this.nodeVisuals.nodeLabelVisibility) {
+                    node["font"] = {
+                        color: "#00000000"
+                    }
+                } else {
+                    node["font"] = {
+                        color: "#000000FF"
+                    }
                 }
             }
+            this.nodes = new DataSet(json.users);
+        }catch(error){
+            error.message = `Error while parsing node data from the json file: ${error.message}`;
+            throw(error);
         }
-        this.nodes = new DataSet(json.users);
 
         return this.nodes;
+    }
+
+    checkNodeValues(node){
+        if(node["id"] === undefined){
+            throw new SyntaxError("ID attribute is not defined");
+        }
+
+        if(node[comms.ImplUserJsonKey] === undefined){
+            throw new SyntaxError(`${comms.ImplUserJsonKey} attribute is not defined`);
+        }
     }
 
     /**
