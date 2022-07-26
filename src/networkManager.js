@@ -42,10 +42,7 @@ export default class NetworkMan {
         this.nodeData = new NodeData(this.nodeVisuals, datatableContainer);
         this.edgesMan = new EdgeManager(config);
 
-        let t0 = performance.now();
         const edges = this.edgesMan.parseEdges(jsonInput);
-        let t1 = performance.now();
-        console.log(`Parse edges took ${t1 - t0} milliseconds.`);
 
         this.data =
         {
@@ -90,6 +87,9 @@ export default class NetworkMan {
                 },
                 color: {
                     highlight: edges.EdgeSelectedColor
+                },
+                chosen: {
+                    label: this.edgesMan.labelEdgeChosen.bind(this.edgesMan),
                 },
                 font: {
                     strokeWidth: edges.LabelStrokeWidth,
@@ -150,10 +150,7 @@ export default class NetworkMan {
      * Draw the network and initialize all Events
      */
     drawNetwork() {
-        let t0 = performance.now();
         this.network = new Network(this.container, this.data, this.options);
-        let t1 = performance.now();
-        console.log(`Drawing the network took ${t1 - t0} milliseconds.`);
 
         this.container.firstChild.id = `${networkHTML.topCanvasContainer}${this.key}`;
 
@@ -244,21 +241,53 @@ export default class NetworkMan {
         selectedNodes.push(id)
 
         const connected_edges_id = this.network.getConnectedEdges(selectedNodes[0]);
+
         const connectedEdges = this.data.edges.get(connected_edges_id);
 
-        connectedEdges.forEach((edge) => {
-            if (!edge.hidden || this.edgesMan.hideUnselected) {
+        if (this.edgesMan.hideUnselected) {
+            //Check all conected edges and change their hidden value
+            const newEdges = new Array();
+            this.data.edges.forEach((edge) => {
+                if (connected_edges_id.includes(edge.id)) {
+                    if (edge.value >= this.edgesMan.edgeValueThreshold) {
+                        if (edge.from !== selectedNodes[0] && edge.to === selectedNodes[0]) {
 
-                if (edge.value >= this.edgesMan.edgeValueThreshold) {
+                            selectedNodes.push(edge.from);
 
-                    if (edge.from != selectedNodes[0] && edge.to == selectedNodes[0]) {
-                        selectedNodes.push(edge.from);
-                    } else if (edge.to != selectedNodes[0] && edge.from == selectedNodes[0]) {
-                        selectedNodes.push(edge.to);
+                        } else if (edge.to !== selectedNodes[0] && edge.from === selectedNodes[0]) {
+
+                            selectedNodes.push(edge.to);
+
+                        }
+
+                        edge.hidden = false;
+                    } else {
+                        edge.hidden = true;
+                    }
+
+
+                } else {
+                    edge.hidden = true;
+                }
+                newEdges.push(edge);
+            });
+            this.data.edges.update(newEdges);
+
+        } else {
+            
+            connectedEdges.forEach((edge) => {
+                if (!edge.hidden) {
+                    if (edge.value >= this.edgesMan.edgeValueThreshold) {
+                        if (edge.from != selectedNodes[0] && edge.to == selectedNodes[0]) {
+                            selectedNodes.push(edge.from);
+                        } else if (edge.to != selectedNodes[0] && edge.from == selectedNodes[0]) {
+                            selectedNodes.push(edge.to);
+                        }
                     }
                 }
-            }
-        })
+            })
+
+        }
 
         //Move the "camera" to focus on these nodes
         const fitOptions = {
@@ -274,7 +303,6 @@ export default class NetworkMan {
         const newNodes = new Array();
         this.data.nodes.forEach((node) => {
             if (selectedNodes.includes(node.id)) {
-
                 if (!node.defaultColor) {
                     this.nodeVisuals.nodeDimensionStrategy.nodeColorToDefault(node);
                     newNodes.push(node);
@@ -323,6 +351,18 @@ export default class NetworkMan {
             animation: {
                 duration: nodes.ZoomDuration,
             },
+        }
+
+        //Hide all edges because none is selected
+        if (this.edgesMan.hideUnselected) {
+
+            const newEdges = new Array();
+            this.data.edges.forEach((edge) => {
+                edge.hidden = true;
+                newEdges.push(edge);
+            });
+            this.data.edges.update(newEdges);
+
         }
 
         this.nodeData.clearDataTable();

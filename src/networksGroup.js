@@ -43,10 +43,7 @@ export default class NetworksGroup {
         }
 
         try {
-            let t0 = performance.now();
             network = new NetworkMan(jsonFile, networkContainer, dataTableContainer, this, config);
-            let t1 = performance.now();
-            console.log(`Adding the whole network took ${t1-t0} milliseconds.`);
 
         } catch(err){
             err.message = `${config.key} creation has failed: ${err.message}`;

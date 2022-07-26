@@ -39,14 +39,7 @@ export default class EdgeManager {
             throw new SyntaxError("JSON file doesnt have the edges/similarity data.");
         }
 
-        /*                if(node[comms.ImplUserJsonKey] !== undefined){
-                    node[comms.ImplUserNewKey] = parseInt(node[comms.ImplUserJsonKey]);
-                }else{
-                    throw new SyntaxError("Implicit community not defined");
-                }
-        */
         try {
-            let t0 = performance.now();
             for (const edge of json[edges.EdgesGlobalJsonKey]) {
                 this.checkEdgesValues(edge)
                 //Dont save edges with no similarity
@@ -63,24 +56,21 @@ export default class EdgeManager {
 
                             edge["label"] = edge["value"].toString();
 
-                            if (edge["value"] < this.edgeValueThreshold) {
+                            //Update targets to vis format
+                            edge["from"] = edge[edges.EdgeOneKey].toString();
+                            edge["to"] = edge[edges.EdgeTwoKey].toString();
+
+                            if (edges.EdgeOneKey !== "from") delete edge[edges.EdgeOneKey];
+                            if (edges.EdgeOneKey !== "to") delete edge[edges.EdgeTwoKey];
+
+                            //Hide edges
+                            if (this.hideUnselected
+                                || edge["value"] < this.edgeValueThreshold) {
+
                                 edge["hidden"] = true;
                             } else
                                 edge["hidden"] = false;
 
-                            //Update targets to vis format
-                            edge["from"] = edge[edges.EdgeOneKey].toString();
-                            edge["to"] = edge[edges.EdgeTwoKey].toString();
-                        
-                            if (edges.EdgeOneKey !== "from") delete edge[edges.EdgeOneKey];
-                            if (edges.EdgeOneKey !== "to") delete edge[edges.EdgeTwoKey];
-
-                            //Hide unselected
-                            const color = edges.EdgeDefaultColor;
-                            if (this.hideUnselected)
-                                edge.color = { color: `${color}00` };
-                            else
-                                edge.color = { color: `${color}` };
 
                             newEdges.push(edge);
                         }
@@ -103,7 +93,7 @@ export default class EdgeManager {
 
         if (edge[edges.EdgeOneKey] === undefined) {
             throw new SyntaxError(`Edge ${edges.EdgeOneKey} attribute is not defined`);
-        } 
+        }
 
         if (edge[edges.EdgeTwoKey] === undefined) {
             throw new SyntaxError(`Edge ${edges.EdgeTwoKey} attribute is not defined`);
@@ -188,10 +178,10 @@ export default class EdgeManager {
 
         this.edges.forEach((edge) => {
 
-            if (this.hideUnselected)
-                edge.color = { color: `${edges.EdgeDefaultColor}00` };
-            else
-                edge.color = { color: edges.EdgeDefaultColor };
+            if (this.hideUnselected) {
+                edge["hidden"] = true;
+            } else
+                edge["hidden"] = false;
 
             newEdges.push(edge);
         })
