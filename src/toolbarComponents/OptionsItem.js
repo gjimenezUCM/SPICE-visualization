@@ -63,22 +63,26 @@ export default class OptionsItem {
      * Create the events related with the Options dropdown
      */
     createEvents() {
-        const hideNodeLabels = document.getElementById("hideNodeLabels");
-        hideNodeLabels.onclick = () => this.toggleNodeLabels(hideNodeLabels);
+        try {
+            const hideNodeLabels = document.getElementById("hideNodeLabels");
+            hideNodeLabels.onclick = () => this.toggleNodeLabels(hideNodeLabels);
 
-        const hideUnselectedEdges = document.getElementById("hideUnselectedEdges");
-        hideUnselectedEdges.onclick = () => this.toggleUnselectedEdges(hideUnselectedEdges);
+            const hideUnselectedEdges = document.getElementById("hideUnselectedEdges");
+            hideUnselectedEdges.onclick = () => this.toggleUnselectedEdges(hideUnselectedEdges);
 
-        const variableEdgeWidth = document.getElementById("variableEdgeWidth");
-        variableEdgeWidth.onclick = () => this.toggleVariableEdgeWidth(variableEdgeWidth);
+            const variableEdgeWidth = document.getElementById("variableEdgeWidth");
+            variableEdgeWidth.onclick = () => this.toggleVariableEdgeWidth(variableEdgeWidth);
 
-        const thirdDimension = document.getElementById("thirdDimension");
-        thirdDimension.onclick = () => this.toggleThirdDimension(thirdDimension);
+            const thirdDimension = document.getElementById("thirdDimension");
+            thirdDimension.onclick = () => this.toggleThirdDimension(thirdDimension);
 
-        const thresholdValue = document.getElementById("thresholdValue");
-        const thresholdSlider = document.getElementById("thresholdSlider");
-        thresholdSlider.onchange = () => this.thresholdChange(thresholdSlider.value);
-        thresholdSlider.oninput = () => this.updateSliderText(thresholdSlider.value, thresholdValue);
+            const thresholdValue = document.getElementById("thresholdValue");
+            const thresholdSlider = document.getElementById("thresholdSlider");
+            thresholdSlider.onchange = () => this.thresholdChange(thresholdSlider.value);
+            thresholdSlider.oninput = () => this.updateSliderText(thresholdSlider.value, thresholdValue);
+        }catch(err){
+            throw new Error(`Error with options from option dropdown ${err.message}`);
+        }
     }
 
     /**
@@ -90,7 +94,7 @@ export default class OptionsItem {
         this.hideNodeValue = !active;
         console.log(`toggle unselected edges ${active}`);
 
-        this.toolbar.networksGroup.nodeLabelVisibilityChangeALL(active);    
+        this.toolbar.networksGroup.nodeLabelVisibilityChangeALL(active);
     }
 
     /**
@@ -102,7 +106,7 @@ export default class OptionsItem {
         this.hideUnselectedEdgesValue = active;
         console.log(`toggle unselected edges ${active}`);
 
-        this.toolbar.networksGroup.hideUnselectedEdgesALL(active);   
+        this.toolbar.networksGroup.hideUnselectedEdgesALL(active);
     }
 
     /**
@@ -113,7 +117,7 @@ export default class OptionsItem {
         const active = this.toolbar.toggleDropdownItemState(button);
         this.variableEdgeWidthValue = active;
         console.log(`toggle variableEdgeWidth ${active}`);
-       
+
         this.toolbar.networksGroup.variableEdgeChangeALL(active);
     }
 
@@ -139,7 +143,7 @@ export default class OptionsItem {
     thresholdChange(value) {
         this.sliderValue = value;
         console.log(`treshold change ${value}`);
-        
+
         this.toolbar.networksGroup.thresholdChangeALL(value);
     }
 
@@ -161,7 +165,7 @@ export default class OptionsItem {
      * Setup the config file
      * @param {Object} config network configuration file 
      */
-    setConfiguration(config){
+    setConfiguration(config) {
         config["edgeThreshold"] = this.sliderValue;
         config["variableEdge"] = this.variableEdgeWidthValue;
         config["hideUnselected"] = this.hideUnselectedEdgesValue;

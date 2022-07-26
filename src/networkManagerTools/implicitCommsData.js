@@ -21,23 +21,26 @@ export default class ImplicitCommsData {
     constructor(communityJson) {
         //Data of all implicit communities
         this.implComms = communityJson[comms.ImplGlobalJsonKey];
+
+        if (!Array.isArray(this.implComms)
+            || this.implComms.length <= 0) {
+            throw new SyntaxError("JSON file doesnt have the implicit community data.");
+        }
     }
 
-    /**
-     * Draw the bounding boxes behind the network nodes
-     * @param {CanvasRenderingContext2D} ctx Context of the canvas 
-     * @param {DataSet} data Data of the nodes in the network
-     * @param {Network} network Network where the bounding boxes are being drawn on
-     */
-    drawBoundingBoxes(ctx, data, network) {
+    /** Calculate the bounding boxes of the implicit communities
+    * @param {DataSet} data Data of the nodes in the network
+    * @param {Network} network Network where the bounding boxes are being drawn on
+    */
+    calculateBoundingBoxes(nodes, network) {
         //Initialize all bounding boxes
-        const boundingBoxes = new Array();
+        this.bb = new Array();
         for (let i = 0; i < Object.keys(this.implComms).length; i++) {
-            boundingBoxes.push(null);
+            this.bb.push(null);
         }
 
         //Obtain the bounding box of every Implicit Community of nodes
-        data.forEach((node) => {
+        nodes.forEach((node) => {
             const group = node[comms.ImplUserNewKey];
             const node_bb = {};
 
@@ -49,29 +52,33 @@ export default class ImplicitCommsData {
             node_bb.left = position.x - node.size / 2 - comms.Bb.nodePadding;
             node_bb.right = position.x + node.size / 2 + comms.Bb.nodePadding;
 
-            
-            if (boundingBoxes[group] === null) {
+            if (this.bb[group] === null) {
 
-                boundingBoxes[group] = node_bb;
+                this.bb[group] = node_bb;
 
             } else {
-                if (node_bb.left < boundingBoxes[group].left)
-                    boundingBoxes[group].left = node_bb.left;
+                if (node_bb.left < this.bb[group].left)
+                    this.bb[group].left = node_bb.left;
 
-                if (node_bb.top < boundingBoxes[group].top)
-                    boundingBoxes[group].top = node_bb.top;
+                if (node_bb.top < this.bb[group].top)
+                    this.bb[group].top = node_bb.top;
 
-                if (node_bb.right > boundingBoxes[group].right)
-                    boundingBoxes[group].right = node_bb.right;
+                if (node_bb.right > this.bb[group].right)
+                    this.bb[group].right = node_bb.right;
 
-                if (node_bb.bottom > boundingBoxes[group].bottom)
-                    boundingBoxes[group].bottom = node_bb.bottom;
+                if (node_bb.bottom > this.bb[group].bottom)
+                    this.bb[group].bottom = node_bb.bottom;
             }
         })
-
+    }
+    /**
+     * Draw the bounding boxes behind the network nodes
+     * @param {CanvasRenderingContext2D} ctx Context of the canvas 
+     */
+    drawBoundingBoxes(ctx) {
         //Draw the bounding box of all groups
-        for (let i = 0; i < boundingBoxes.length; i++) {
-            if (boundingBoxes[i] !== null) {
+        for (let i = 0; i < this.bb.length; i++) {
+            if (this.bb[i] !== null) {
                 const n = i % comms.Bb.Color.length;
 
                 //DEBUG TO SEE THE BB COLOR IN THE TABLE
@@ -80,19 +87,13 @@ export default class ImplicitCommsData {
                 //Draw Border
                 ctx.lineWidth = comms.Bb.BoderWidth;
                 ctx.strokeStyle = comms.Bb.Color[n].Border;
-                ctx.strokeRect(boundingBoxes[i].left, boundingBoxes[i].top, boundingBoxes[i].right - boundingBoxes[i].left, boundingBoxes[i].bottom - boundingBoxes[i].top);
+                ctx.strokeRect(this.bb[i].left, this.bb[i].top, this.bb[i].right - this.bb[i].left, this.bb[i].bottom - this.bb[i].top);
 
                 //Draw Background
                 ctx.lineWidth = 0;
                 ctx.fillStyle = comms.Bb.Color[n].Color;
-                ctx.fillRect(boundingBoxes[i].left, boundingBoxes[i].top, boundingBoxes[i].right - boundingBoxes[i].left, boundingBoxes[i].bottom - boundingBoxes[i].top);
+                ctx.fillRect(this.bb[i].left, this.bb[i].top, this.bb[i].right - this.bb[i].left, this.bb[i].bottom - this.bb[i].top);
             }
-        }
-
-        //Array with all bounding boxes coordinates
-        this.bb = new Array();
-        for (let i = 0; i < boundingBoxes.length; i++) {
-            this.bb.push({ ...boundingBoxes[i] });
         }
     }
 

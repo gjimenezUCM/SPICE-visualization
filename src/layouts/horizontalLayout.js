@@ -46,6 +46,7 @@ export default class HorizontalLayout extends Layout{
      */
     addNetwork(key, file, config){
         const unpairedRow = this.unpairedRows.pop();
+        let networkResponse = null;
 
         if(unpairedRow === undefined){
             //Create the new row in Layout
@@ -67,7 +68,7 @@ export default class HorizontalLayout extends Layout{
             tabledataContainer.append(htmlTittle);
 
             //Create the network
-            this.networksGroup.addNetwork(file, networkContainer, tabledataContainer, config)
+            networkResponse = this.networksGroup.addNetwork(file, networkContainer, tabledataContainer, config)
 
             this.networkKeyToRow.set(key, `${this.nRows}_${networkHTML.networkFirst}`);
             this.unpairedRows.push({nRow: this.nRows, location: networkHTML.networkSecond});
@@ -93,9 +94,16 @@ export default class HorizontalLayout extends Layout{
             }
 
             tabledataContainer.append(htmlTittle);
-            this.networksGroup.addNetwork(file, networkContainer, tabledataContainer, config)
+            networkResponse = this.networksGroup.addNetwork(file, networkContainer, tabledataContainer, config)
 
             this.networkKeyToRow.set(key, `${unpairedRow.nRow}_${unpairedRow.location}`);
         }
+
+        if(networkResponse !== 200){
+            this.deleteNetwork(key);
+            return networkResponse;
+        }
+
+        return 200;
     }
 }   

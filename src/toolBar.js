@@ -27,6 +27,9 @@ export default class ToolBar {
      * Constructor of the class
      */
     constructor() {
+        this.usingAPI = false;
+        this.toolbarReady = false;
+
         this.domParser = new DOMParser();
 
         this.requestManager = new RequestManager();
@@ -34,8 +37,14 @@ export default class ToolBar {
         this.layout = new HorizontalLayout(this.networksGroup);
 
         this.initHTML();
-        this.initToolbarParts();
-        
+
+        try {
+            this.initToolbarParts();
+        } catch (err) {
+            alert(`Error while starting the toolbar parts: ${err.message}`);
+            console.log(err);
+        }
+
         const htmlString = `
         <nav class="navbar fixed-top navbar-expand-md navbar-light bg-light">
             <div class="container-fluid">
@@ -65,9 +74,9 @@ export default class ToolBar {
     /**
      * Init all parts of the toolbar
      */
-     initToolbarParts(){
+    initToolbarParts() {
         this.toolbarParts = new Array();
-        
+
         this.optionsItem = new OptionsItem(this);
         this.selectPerspectiveItem = new SelectPerspectiveItem(this);
         this.legendItem = new LegendItem(this);
@@ -91,7 +100,7 @@ export default class ToolBar {
         ]
         this.rightAlignedItems = new RightAlignedToolbarItems(rightItems);
         this.toolbarParts.push(this.rightAlignedItems);
-     }
+    }
 
     /**
      * Create the basic HTML divs to support all aplication's parts
@@ -109,39 +118,79 @@ export default class ToolBar {
         document.body.appendChild(html);
     }
 
-     /**
-      * Request the name of all available perspective files
-      */
-     requestAllFiles() {
-        const name = "dataList.json";
+    /**
+     * Request the name of all available perspective files
+     */
+    requestAllFiles() {
+        if (this.usingAPI) {
 
-        this.requestManager.getFile(name)
-            .then((file) => {
-                this.file = JSON.parse(file).files;
-                this.createEvents()
-            })
-            .catch((error) => {
-                console.log(error);
-                alert("Error while getting the file with all file names");
-            });
+            this.requestManager.getAllPerspectives()
+                .then((response) => {
+                    if (response.status === 200) {
+                        const file = response.data;
+                        this.allPerspectivesFile = JSON.parse(file).files;
+                        this.createEvents()
+                    } else {
+                        throw new Error(`All perspectives info was ${response.statusText}`);
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                    alert(error.message);
+                });
+
+        } else {
+            const name = "dataList.json";
+
+            this.requestManager.getPerspective(name)
+                .then((response) => {
+                    if (response.status === 200) {
+                        const file = response.data;
+                        this.allPerspectivesFile = JSON.parse(file).files;
+                        this.createEvents()
+                    } else {
+                        throw new Error(`File ${name} not found`);
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                    alert(error.message);
+                });
+        }
     }
 
     /**
      * Create all events for every item of the toolbar
      */
-    createEvents(){
-        for(const part of this.toolbarParts){
-            part.createEvents();
+    createEvents() {
+        try {
+            for (const part of this.toolbarParts) {
+                part.createEvents();
+            }
+        }catch(error){
+            throw new Error(`Error while creating toolbar Events ${error.message}`)
         }
+
+        this.toolbarReady = true;
     }
 
     /**
      * Change the source URL of the perspective files
      * @param {String} url new url to be used
      */
-    changeFileSourceURL(url){
-        this.requestManager.changeBaseURL(url);
-        
+    changeFileSourceURL(url) {
+
+        if (url === "API") {
+            const realURL = "../dataAPI/";
+            this.requestManager.changeBaseURL(realURL);
+            this.usingAPI = true;
+
+        } else {
+            this.usingAPI = false;
+            this.requestManager.changeBaseURL(url);
+        }
+
+
         this.restartToolbar();
     }
 
@@ -149,16 +198,14 @@ export default class ToolBar {
      * Change the current layout of the aplication
      * @param {String} layout key of the layout
      */
-    changeLayout(layout){
+    changeLayout(layout) {
         this.restartToolbar();
-        
-        if(layout === "Horizontal"){
+
+        if (layout === "Horizontal") {
             this.layout = new HorizontalLayout(this.networksGroup);
-        }else{
+        } else {
             this.layout = new VerticalLayout(this.networksGroup);
         }
-
-        
     }
 
     /**
@@ -166,7 +213,7 @@ export default class ToolBar {
      * @param {Boolean} active value that decides the outcome
      * @param {String} key key of the perspective/network
      */
-    togglePerspective(active, key){
+    togglePerspective(active, key) {
         if (active) {
             this.activateNetwork(key);
         } else {
@@ -178,25 +225,35 @@ export default class ToolBar {
      * Activate a network visualization
      * @param {String} key key of the network
      */
-    activateNetwork(key){
+    activateNetwork(key) {
         const name = key + ".json";
 
-        this.requestManager.getFile(name)
-            .then((file) => {
+        this.requestManager.getPerspective(name)
+            .then((response) => {
+                if (response.status === 200) {
+                    const config = {};
+                    for (const part of this.toolbarParts) {
+                        part.setConfiguration(config);
+                    }
+                    config["key"] = key;
 
-                const config = { };
-                for(const part of this.toolbarParts){
-                    part.setConfiguration(config);
+                    const netResponse = this.layout.addNetwork(key, response.data, config);
+
+                    if(netResponse !== 200){
+                        this.selectPerspectiveItem.disactivateOption(key);
+                        throw netResponse;
+                    }else{
+                        this.legendItem.networkNumberChange();
+                    }
+                    
+
+                } else {
+                    throw new Error(`Perspective ${name} was ${response.statusText}`);
                 }
-                config["key"] = key;
-
-                this.layout.addNetwork(key, file, config);
-
-                this.legendItem.networkNumberChange();
             })
             .catch((error) => {
                 console.log(error);
-                alert("Error while getting the selected file");
+                alert(error.message);
             });
     }
 
@@ -204,7 +261,7 @@ export default class ToolBar {
      * Remove a network visualization
      * @param {String} key key of the network
      */
-    removeNetwork(key){
+    removeNetwork(key) {
         this.networksGroup.removeNetwork(key);
         this.legendItem.networkNumberChange();
     }
@@ -212,15 +269,17 @@ export default class ToolBar {
     /**
      * Remove all networks and restart the toolbar with the current selected options 
      */
-    restartToolbar(){
-        this.networksGroup.removeAllnetworks();
-        
-        this.selectPerspectiveItem.restart();
-        this.legendItem.restart();
+    restartToolbar() {
+        if (this.toolbarReady) {
+            this.networksGroup.removeAllnetworks();
 
-        document.getElementById(networkHTML.networksParentContainer).innerHTML = "";
-        
-        this.requestAllFiles();
+            this.selectPerspectiveItem.restart();
+            this.legendItem.restart();
+
+            document.getElementById(networkHTML.networksParentContainer).innerHTML = "";
+
+            this.requestAllFiles();
+        }
     }
 
     /**
@@ -228,12 +287,12 @@ export default class ToolBar {
      * @param {HTMLElement} item element that is going to be toggled
      * @returns {Boolean} returns the new state of the item
      */
-    toggleDropdownItemState(item){
+    toggleDropdownItemState(item) {
         let active = false;
-        if(item.className === "dropdown-item unselectable"){
+        if (item.className === "dropdown-item unselectable") {
             item.className = "dropdown-item unselectable active";
             active = true;
-        }else{
+        } else {
             item.className = "dropdown-item unselectable";
         }
 

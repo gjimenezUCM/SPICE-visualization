@@ -47,6 +47,7 @@ export default class VerticalLayout extends Layout{
     addNetwork(key, file, config){
         
         const unpairedRow = this.unpairedRows.pop();
+        let networkResponse;
 
         if(unpairedRow === undefined){
             //Create the new row in Layout
@@ -68,7 +69,7 @@ export default class VerticalLayout extends Layout{
             rightContainer.append(htmlTittle);
 
             //Create the network
-            this.networksGroup.addNetwork(file, leftContainer, rightContainer, config)
+            networkResponse = this.networksGroup.addNetwork(file, leftContainer, rightContainer, config)
 
             this.networkKeyToRow.set(key, `${this.nRows}_${networkHTML.networkFirst}`);
             this.unpairedRows.push({nRow: this.nRows, location: networkHTML.networkSecond});
@@ -87,13 +88,18 @@ export default class VerticalLayout extends Layout{
             datatableContainer.append(htmlTittle);
 
             //Create the network
-            this.networksGroup.addNetwork(file, networkContainer, datatableContainer, config)
+            networkResponse = this.networksGroup.addNetwork(file, networkContainer, datatableContainer, config)
 
             this.networkKeyToRow.set(key, `${unpairedRow.nRow}_${unpairedRow.location}`);
         }
 
+        if(networkResponse !== 200){
+            this.deleteNetwork(key);
+            return networkResponse.status;
+        }
 
-    }
+        return 200;
+    }   
 
     /**
      * Make a row of the layout a single node network. The network will be bigger

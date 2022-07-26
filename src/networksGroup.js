@@ -23,6 +23,7 @@ export default class NetworksGroup {
     setLayout(layout){
         this.layout = layout;
     }
+
     /** 
      * Create and add a network to the web
      * @param {String} key Identifier of the new network
@@ -35,22 +36,24 @@ export default class NetworksGroup {
         let network;
 
         try {
-            jsonFile = JSON.parse(file);
-        } catch (e) {
-            console.log(e);
-            alert("Json parsing has failed");
-            return;
+            jsonFile = JSON.parse(file);  
+        } catch (err) {
+            err.message = `${config.key} json parsing has failed: ${err.message}`;
+            return err;
         }
 
         try {
             network = new NetworkMan(jsonFile, networkContainer, dataTableContainer, this, config);
-        } catch(e){
-            console.log(e);
-            alert("Network creation has failed");
-            return;
+
+        } catch(err){
+            err.message = `${config.key} creation has failed: ${err.message}`;
+            return err;
         }
+        
         this.activesNetworksMap.set(config.key, network);
         this.activesNetworksArray.push(network);
+
+        return 200;
     }
 
     /** 
@@ -148,7 +151,7 @@ export default class NetworksGroup {
     hideUnselectedEdges(key, newBool) {
         const network = this.activesNetworksMap.get(key);
 
-        network.edgesMan.hideUnselectedEdges(newBool);
+        network.edgesMan.hideUnselectedEdges(newBool, network.selectedEdges);
     }
 
     /**

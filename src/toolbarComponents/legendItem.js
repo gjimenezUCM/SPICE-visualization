@@ -32,7 +32,6 @@ export default class LegendItem {
                     </button>
                 </h2>
             </div>
-    
         </li>`;
     }
 
@@ -64,7 +63,7 @@ export default class LegendItem {
                 if (this.popover._hoverState !== "out") {
                     this.popover.toggle();
                 } else {
-                    console.log("Error with the legend popover");
+                    throw new Error("Legend popover error. Reload the app");
                 }
             }
         }

@@ -8,7 +8,7 @@ body {
 h1 {
   font-weight: 200%;
   text-align: center;
-} 
+}
 
 canvas {
   border-style: dotted;
@@ -42,11 +42,19 @@ canvas {
   text-align: left;
 }
 
-.dataTable{
+.dataTable {
   margin-left: 10px;
 }
 
 /*--- TOOLTIP ---*/
 .popover.node {
   opacity: 0.8;
+}
+
+.tooltip-inner.selectPerspective {
+  max-width: 100%;
+}
+
+.row.selectPerspective {
+  margin: auto;
 }
