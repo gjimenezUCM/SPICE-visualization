@@ -34,7 +34,6 @@ export default class NetworkMan {
         this.groupManager = networkManager;
         this.key = config.key;
         this.valuesToHide = config.valuesToHide;
-        this.zoomingIn = false;
 
         this.implCommMan = new ImplicitCommsMan(jsonInput);
         this.nodeVisuals = new NodeVisuals(config);
@@ -151,6 +150,7 @@ export default class NetworkMan {
      */
     drawNetwork() {
         this.network = new Network(this.container, this.data, this.options);
+        this.implCommMan.calculateBoundingBoxes(this.data.nodes, this.network);
 
         this.container.firstChild.id = `${networkHTML.topCanvasContainer}${this.key}`;
 
@@ -166,7 +166,6 @@ export default class NetworkMan {
      * Function executed when a zooming animation ends. Shows the tooltip if the tooltip exists
      */
     animationFinishEvent() {
-        this.zoomingIn = false;
         this.groupManager.showTooltip();
     }
 
@@ -175,10 +174,7 @@ export default class NetworkMan {
      * @param {CanvasRenderingContext2D} ctx Context object necesary to draw in the network canvas
      */
     preDrawEvent(ctx) {
-        //For optimization purpouses
-        if (!this.zoomingIn) {
-            this.implCommMan.drawBoundingBoxes(ctx, this.data.nodes, this.network);
-        }
+        this.implCommMan.drawBoundingBoxes(ctx, this.data.nodes, this.network);
     }
 
     /** 
@@ -241,11 +237,10 @@ export default class NetworkMan {
         selectedNodes.push(id)
 
         const connected_edges_id = this.network.getConnectedEdges(selectedNodes[0]);
-
         const connectedEdges = this.data.edges.get(connected_edges_id);
-
+        
         if (this.edgesMan.hideUnselected) {
-            //Check all conected edges and change their hidden value
+            //Update the hidden value of all edges based on if they are connected to the selected node
             const newEdges = new Array();
             this.data.edges.forEach((edge) => {
                 if (connected_edges_id.includes(edge.id)) {
@@ -257,7 +252,6 @@ export default class NetworkMan {
                         } else if (edge.to !== selectedNodes[0] && edge.from === selectedNodes[0]) {
 
                             selectedNodes.push(edge.to);
-
                         }
 
                         edge.hidden = false;
@@ -274,7 +268,7 @@ export default class NetworkMan {
             this.data.edges.update(newEdges);
 
         } else {
-            
+            //Check what nodes should be "selected"
             connectedEdges.forEach((edge) => {
                 if (!edge.hidden) {
                     if (edge.value >= this.edgesMan.edgeValueThreshold) {
@@ -344,7 +338,6 @@ export default class NetworkMan {
      */
     nodeDeselected() {
         this.network.fit(this.fitOptions);
-        this.zoomingIn = true;
 
         this.fitOptions = {
             animation: true,

@@ -134,7 +134,7 @@ export default class EdgeManager {
 
         const newEdges = new Array();
         this.edges.forEach((edge) => {
-            if (edge["value"] < this.edgeValueThreshold) {
+            if (this.hideUnselected || edge["value"] < this.edgeValueThreshold) {
                 if (!edge["hidden"]) {
                     edge["hidden"] = true;
                 }
