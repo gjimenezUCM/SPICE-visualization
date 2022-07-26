@@ -171,17 +171,18 @@ export default class EdgeManager {
      * Change base edge color based on the value of hideUnselected
      * @param {Bool} newBool new value of hideUnselected
      */
-    hideUnselectedEdges(newBool) {
+    hideUnselectedEdges(newBool, selectedEdges) {
         this.hideUnselected = newBool;
 
         const newEdges = new Array();
 
         this.edges.forEach((edge) => {
-
-            if (this.hideUnselected) {
+            if (this.hideUnselected && (selectedEdges === undefined || !selectedEdges.includes(edge.id))) {
                 edge["hidden"] = true;
-            } else
+            } else{
                 edge["hidden"] = false;
+            }
+                
 
             newEdges.push(edge);
         })

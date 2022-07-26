@@ -242,32 +242,32 @@ export default class NetworkMan {
         if (this.edgesMan.hideUnselected) {
             //Update the hidden value of all edges based on if they are connected to the selected node
             const newEdges = new Array();
-            this.data.edges.forEach((edge) => {
-                if (connected_edges_id.includes(edge.id)) {
-                    if (edge.value >= this.edgesMan.edgeValueThreshold) {
-                        if (edge.from !== selectedNodes[0] && edge.to === selectedNodes[0]) {
+            this.hideSelectedEdges();
 
-                            selectedNodes.push(edge.from);
+            connectedEdges.forEach((edge) => {
 
-                        } else if (edge.to !== selectedNodes[0] && edge.from === selectedNodes[0]) {
+                if (edge.value >= this.edgesMan.edgeValueThreshold) {
+                    if (edge.from !== selectedNodes[0] && edge.to === selectedNodes[0]) {
 
-                            selectedNodes.push(edge.to);
-                        }
+                        selectedNodes.push(edge.from);
 
-                        edge.hidden = false;
-                    } else {
-                        edge.hidden = true;
+                    } else if (edge.to !== selectedNodes[0] && edge.from === selectedNodes[0]) {
+
+                        selectedNodes.push(edge.to);
                     }
 
-
+                    this.selectedEdges.push(edge.id);
+                    edge.hidden = false;
                 } else {
                     edge.hidden = true;
                 }
+
                 newEdges.push(edge);
             });
             this.data.edges.update(newEdges);
 
         } else {
+            this.selectedEdges = new Array();
             //Check what nodes should be "selected"
             connectedEdges.forEach((edge) => {
                 if (!edge.hidden) {
@@ -277,6 +277,7 @@ export default class NetworkMan {
                         } else if (edge.to != selectedNodes[0] && edge.from == selectedNodes[0]) {
                             selectedNodes.push(edge.to);
                         }
+                        this.selectedEdges.push(edge.id)
                     }
                 }
             })
@@ -309,6 +310,22 @@ export default class NetworkMan {
         });
 
         this.data.nodes.update(newNodes);
+    }
+
+    /**
+     * Hide the edges that are currently selected/highlighted
+     */
+    hideSelectedEdges() {
+        if (this.selectedEdges !== undefined) {
+            const newEdges = new Array();
+            this.data.edges.get(this.selectedEdges).forEach((edge) => {
+                edge.hidden = true;
+                newEdges.push(edge);
+            });
+            this.data.edges.update(newEdges);
+        }
+
+        this.selectedEdges = new Array();
     }
 
     /** 
@@ -348,14 +365,7 @@ export default class NetworkMan {
 
         //Hide all edges because none is selected
         if (this.edgesMan.hideUnselected) {
-
-            const newEdges = new Array();
-            this.data.edges.forEach((edge) => {
-                edge.hidden = true;
-                newEdges.push(edge);
-            });
-            this.data.edges.update(newEdges);
-
+            this.hideSelectedEdges();
         }
 
         this.nodeData.clearDataTable();
