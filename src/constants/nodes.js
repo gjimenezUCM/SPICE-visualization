@@ -26,7 +26,7 @@ export const nodes = {
     NoFocusColor: { Background: "rgba(155, 155, 155, 0.3)", Border: "rgba(100, 100, 100, 0.3)" },
 
     //Default value for a background color when the explicit community doesnt change it
-    NodeColor: "#D2C7F9",
+    NodeColor: "rgb(30, 236, 164, 1)",
     //Default value for a node shape when the explicit community doesnt change it
     NodeShape: "dot",
     //Default value for vAdjust label for the default shape,
@@ -84,6 +84,8 @@ export const nodes = {
         "rgb(255, 252, 25, 1)", //Yellow
         "rgb(232, 134, 12, 1)", //Orange
         "rgb(123, 12, 232, 1)", //Purple
+        "rgb(234, 10, 120, 1)", //Pink
+        "rgb(30, 236, 164, 1)", //green-blue
     ],
 
     BoderColors: [
@@ -93,6 +95,8 @@ export const nodes = {
         "rgb(128, 0, 0, 1)", //Red
         "rgb(62, 6, 116, 1)", //Purple
         "rgb(116, 67, 6, 1)", //Orange
+        "rgb(117, 5, 60, 1)", //Pink
+        "rgb(15, 118, 82, 1)", //green-blue
     ],
 
     AvailableShapes: [

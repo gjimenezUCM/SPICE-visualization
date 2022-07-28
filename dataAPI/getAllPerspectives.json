@@ -1,0 +1,186 @@
+{
+    "files": [
+        {
+            "perspective": {
+                "id": "001",
+                "name": "DMH artefacts collected 1",
+                "algorithm": {
+                    "name": "agglomerative",
+                    "params": {
+                        "param0": "dummyValue 0",
+                        "param1": "dummyValue 1"
+                    }
+                }
+            }
+        },
+        {
+            "perspective": {
+                "id": "002",
+                "name": "DMH artefacts collected 2",
+                "algorithm": {
+                    "name": "kmedoids",
+                    "params": {
+                        "param0": "dummyValue 0",
+                        "param1": "dummyValue 1"
+                    }
+                }
+            }
+        },
+        {
+            "perspective": {
+                "id": "003",
+                "name": "DMH 1",
+                "algorithm": {
+                    "name": "agglomerative",
+                    "params": {
+                        "param0": "dummyValue 0",
+                        "param1": "dummyValue 1"
+                    }
+                }
+            }
+        },
+        {
+            "perspective": {
+                "id": "004",
+                "name": "DMH 2",
+                "algorithm": {
+                    "name": "kmedoids",
+                    "params": {
+                        "param0": "dummyValue 0",
+                        "param1": "dummyValue 1"
+                    }
+                }
+            }
+        },
+        {
+            "perspective": {
+                "id": "005",
+                "name": "GAM similar emotions in common artworks 1",
+                "algorithm": {
+                    "name": "agglomerative",
+                    "params": {
+                        "param0": "dummyValue 0",
+                        "param1": "dummyValue 1"
+                    }
+                }
+            }
+        },
+        {
+            "perspective": {
+                "id": "006",
+                "name": "GAM similar emotions in common artworks 2",
+                "algorithm": {
+                    "name": "kmedoids",
+                    "params": {
+                        "param0": "dummyValue 0",
+                        "param1": "dummyValue 1"
+                    }
+                }
+            }
+        },
+        {
+            "perspective": {
+                "id": "007",
+                "name": "HECHT_beliefJ 1",
+                "algorithm": {
+                    "name": "agglomerative",
+                    "params": {
+                        "param0": "dummyValue 0",
+                        "param1": "dummyValue 1"
+                    }
+                }
+            }
+        },
+        {
+            "perspective": {
+                "id": "008",
+                "name": "HECHT_beliefJ 2",
+                "algorithm": {
+                    "name": "kmedoids",
+                    "params": {
+                        "param0": "dummyValue 0",
+                        "param1": "dummyValue 1"
+                    }
+                }
+            }
+        },
+        {
+            "perspective": {
+                "id": "009",
+                "name": "HECHT_beliefR 1",
+                "algorithm": {
+                    "name": "agglomerative",
+                    "params": {
+                        "param0": "dummyValue 0",
+                        "param1": "dummyValue 1"
+                    }
+                }
+            }
+        },
+        {
+            "perspective": {
+                "id": "010",
+                "name": "HECHT_beliefR 2",
+                "algorithm": {
+                    "name": "kmedoids",
+                    "params": {
+                        "param0": "dummyValue 0",
+                        "param1": "dummyValue 1"
+                    }
+                }
+            }
+        },
+        {
+            "perspective": {
+                "id": "011",
+                "name": "IMMA_country_taxonomy 1",
+                "algorithm": {
+                    "name": "kmedoids",
+                    "params": {
+                        "param0": "dummyValue 0",
+                        "param1": "dummyValue 1"
+                    }
+                }
+            }
+        },
+        {
+            "perspective": {
+                "id": "012",
+                "name": "IMMA_country_taxonomy 2",
+                "algorithm": {
+                    "name": "not defined",
+                    "params": {
+                        "param0": "dummyValue 0",
+                        "param1": "dummyValue 1"
+                    }
+                }
+            }
+        },
+        {
+            "perspective": {
+                "id": "013",
+                "name": "IMMA_number_interactions",
+                "algorithm": {
+                    "name": "not defined",
+                    "params": {
+                        "param0": "dummyValue 0",
+                        "param1": "dummyValue 1"
+                    }
+                }
+            }
+        },
+        {
+            "perspective": {
+                "id": "014",
+                "name": "MNCN",
+                "algorithm": {
+                    "name": "not defined",
+                    "params": {
+                        "param0": "dummyValue 0",
+                        "param1": "dummyValue 1"
+                    }
+                }
+            }
+        }
+    ]
+}

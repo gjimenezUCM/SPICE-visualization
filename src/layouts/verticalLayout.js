@@ -6,80 +6,62 @@
  */
 //Namespaces
 import { networkHTML } from "../constants/networkHTML";
+import Layout from "./layout";
 //Local classes
 
-
-export default class VerticalLayout {
+export default class VerticalLayout extends Layout{
 
     /**
      * Constructor of the class
      * @param {NetworksGroup} networksGroup group of networks that will be controled by this panel
      */
-    constructor(networksGroup, controlPanel) {
-        this.controlPanel = controlPanel;
-        this.networksGroup = networksGroup;
-
-        this.domParser = new DOMParser();
-        this.unpairedRows = new Array();
-        this.networkKeyToRow = new Map();
-        this.nRows = 0;
-        
-        this.networksGroup.setLayout(this);
+    constructor(networksGroup) {
+        super(networksGroup, {main: "col singleNetworkContainer", second: "", pair: "col pairNetworkVertical"});
     }
 
+    /**
+     * Returns an htmlString with the basic layout of the vertical layout. 2 rows of networks
+     * @param {Integer} nRow numer of the row used as a key
+     * @returns {String} returns the html string
+     */
     verticalLayoutTemplate(nRow) {
         const htmlString = `
         <div id="networkContainer_${nRow}">
             <div class="row" id="topRow_${nRow}">
-                ${this.networkTemplate(`${this.nRows}_first`)}
+                ${this.networkTemplate(`${this.nRows}_${networkHTML.networkFirst}`)}
             </div>
             <div class="row" id="bottomRow_${nRow}">
-                ${this.networkTemplate(`${this.nRows}_second`)}
+                ${this.networkTemplate(`${this.nRows}_${networkHTML.networkSecond}`)}
             </div>
         </div>`;
 
         return htmlString;
     }
 
-    networkTemplate(key) {
-        const htmlString = `
-        <div id="${networkHTML.topNetworkContainer}${key}">
-            <div class="row" id="">
-                <div class="col-sm-8" id="leftCol_${key}"> </div>
-                <div class="col-sm-4" id="rightCol_${key}"> </div>
-            </div>
-        </div>`;
-
-        return htmlString;
-    }
-
-    addNetwork(key, file){
+    /**
+     * Add a new network to the layout
+     * @param {String} key key of the network 
+     * @param {String} file file with the data of the network
+     * @param {Object} config object with the initial configuration of the network
+     */
+    addNetwork(key, file, config){
         
         const unpairedRow = this.unpairedRows.pop();
-
-        const config = {
-            edgeThreshold: this.controlPanel.getSliderThreshold(),
-            variableEdge: this.controlPanel.getVariableEdgeValue(),
-            hideUnselected: this.controlPanel.getUnselectedEdgesValue(),
-            valuesToHide: this.controlPanel.getValuesToHide(),
-            allowThirdDimension: this.controlPanel.getThirdDimensionValue(),
-            showNodeLabels: this.controlPanel.getShowNodeLabelValue(),
-            key: key
-        };
+        let networkResponse;
 
         if(unpairedRow === undefined){
-            //Create the new ro Layout
+            //Create the new row in Layout
             const htmlString = this.verticalLayoutTemplate(this.nRows);
             const html = this.domParser.parseFromString(htmlString, "text/html").body.firstChild;
 
             const allNetworksContainer = document.getElementById(networkHTML.networksParentContainer);
             allNetworksContainer.append(html);
 
-            this.makeSingleNetworkRow(this.nRows, 0);
+            this.makeSingleNetworkRow(this.nRows, networkHTML.networkFirst);
 
             //Create the networkContainers
-            const leftContainer = document.getElementById(`leftCol_${this.nRows}_first`);
-            const rightContainer = document.getElementById(`rightCol_${this.nRows}_first`);
+            const leftContainer = document.getElementById(`leftCol_${this.nRows}_${networkHTML.networkFirst}`);
+            const rightContainer = document.getElementById(`rightCol_${this.nRows}_${networkHTML.networkFirst}`);
             
             const htmlTittleString = this.networkTittleTemplate(key);
             const htmlTittle = this.domParser.parseFromString(htmlTittleString, "text/html").body.firstChild;
@@ -87,48 +69,61 @@ export default class VerticalLayout {
             rightContainer.append(htmlTittle);
 
             //Create the network
-            this.networksGroup.addNetwork(file, leftContainer, rightContainer, config)
+            networkResponse = this.networksGroup.addNetwork(file, leftContainer, rightContainer, config)
 
-            this.networkKeyToRow.set(key, `${this.nRows}_first`);
-            this.unpairedRows.push({nRow: this.nRows, location: "second"});
+            this.networkKeyToRow.set(key, `${this.nRows}_${networkHTML.networkFirst}`);
+            this.unpairedRows.push({nRow: this.nRows, location: networkHTML.networkSecond});
             this.nRows++;
 
         }else{
             this.makePairNetworkRow(unpairedRow.nRow);
 
             //Create the networkContainers
-            const leftContainer = document.getElementById(`leftCol_${unpairedRow.nRow}_${unpairedRow.location}`);
-            const rightContainer = document.getElementById(`rightCol_${unpairedRow.nRow}_${unpairedRow.location}`);
+            const networkContainer = document.getElementById(`leftCol_${unpairedRow.nRow}_${unpairedRow.location}`);
+            const datatableContainer = document.getElementById(`rightCol_${unpairedRow.nRow}_${unpairedRow.location}`);
 
             const htmlTittleString = this.networkTittleTemplate(key);
             const htmlTittle = this.domParser.parseFromString(htmlTittleString, "text/html").body.firstChild;
 
-            rightContainer.append(htmlTittle);
+            datatableContainer.append(htmlTittle);
 
             //Create the network
-            this.networksGroup.addNetwork(file, leftContainer, rightContainer, config)
+            networkResponse = this.networksGroup.addNetwork(file, networkContainer, datatableContainer, config)
 
             this.networkKeyToRow.set(key, `${unpairedRow.nRow}_${unpairedRow.location}`);
         }
 
-        this.controlPanel.createControlPanel()
-    }
+        if(networkResponse !== 200){
+            this.deleteNetwork(key);
+            return networkResponse.status;
+        }
 
+        return 200;
+    }   
 
+    /**
+     * Make a row of the layout a single node network. The network will be bigger
+     * @param {Integer} nRow number/key of the row
+     * @param {String} position string with the position of the network to make bigger
+     */
     makeSingleNetworkRow(nRow, position){
         //Make the current network single
-        let rowId = position === 0 ? "topRow" : "bottomRow";
+        let rowId = position === networkHTML.networkFirst ? "topRow" : "bottomRow";
         let container = document.getElementById(`${rowId}_${nRow}`);
 
         container.className = "row singleNetworkContainer";
 
         //Fix the other network position
-        rowId = position === 1 ? "topRow" : "bottomRow";
+        rowId = position !== networkHTML.networkFirst ? "topRow" : "bottomRow";
         container = document.getElementById(`${rowId}_${nRow}`);
 
         container.className = "row";
     }
 
+    /**
+     * Make a row of the layout work as a vertical layout row. Both networks height will be reduced
+     * @param {Integer} nRow number/key of the row
+     */
     makePairNetworkRow(nRow){
         const topContainer = document.getElementById(`topRow_${nRow}`);
         const bottomContainer = document.getElementById(`bottomRow_${nRow}`);
@@ -137,51 +132,19 @@ export default class VerticalLayout {
         bottomContainer.className = "row pairNetworkVertical";
     }
 
-    networkTittleTemplate(name){
+    /**
+     * Template for the tittle of a network
+     * @param {String} tittle tittle of the network
+     * @returns {String} htmlstring with the tittle
+     */
+    networkTittleTemplate(tittle){
         const htmlString = `
         <div class="row">
             <h2 class="text-start">
-                ${name}
+                ${tittle}
             </h2>
             <hr>
         </div>`;
         return htmlString;
     }
-
-
-    deleteNetwork(key){
-        const networkRowid = this.networkKeyToRow.get(key).split("_");
-
-        const nRow = networkRowid[0];
-        const location = networkRowid[1];
-        
-        document.getElementById(`leftCol_${nRow}_${location}`).innerHTML = "";
-        document.getElementById(`rightCol_${nRow}_${location}`).innerHTML = "";
-
-        let isUnpaired = false;
-
-        for(let i = 0; i < this.unpairedRows.length; i++){
-            const unpairedRow = this.unpairedRows[i];
-
-            if(unpairedRow.nRow === nRow){
-                isUnpaired = true;
-                this.unpairedRows = this.unpairedRows.splice(0, i);
-            }
-        }
-        if(isUnpaired){
-
-            const rowContainer = document.getElementById(`networkContainer_${nRow}`); 
-            document.getElementById(networkHTML.networksParentContainer).removeChild(rowContainer);
-
-        }else{
-            if(location === "second"){
-                this.makeSingleNetworkRow(nRow, 0);
-            }else{
-                this.makeSingleNetworkRow(nRow, 1);
-            }
-
-            this.unpairedRows.push({nRow: nRow, location: location});
-        }
-    }
-
 }   

@@ -4,9 +4,6 @@
  * @author Marco Expósito Pérez
  */
 
-//Namespace
-import { networkHTML } from "./constants/networkHTML.js";
-
 //Local classes
 import NetworkMan from "./networkManager.js";
 import Tooltip from "./networkManagerTools/tooltip.js";
@@ -16,10 +13,7 @@ export default class NetworksGroup {
     /**
      * Constructor of the class
      */
-    constructor(initialOptions) {
-        this.initialOptions = initialOptions;
-        this.secondNetworkTag = this.initialOptions.secondNetworkTag;
-
+    constructor() {
         this.activesNetworksMap = new Map();
         this.activesNetworksArray = new Array();
 
@@ -29,34 +23,37 @@ export default class NetworksGroup {
     setLayout(layout){
         this.layout = layout;
     }
+
     /** 
      * Create and add a network to the web
      * @param {String} key Identifier of the new network
      * @param {File} file File with the config of the network
-     * @param {HTMLElement} leftContainer Container where the network will be placed
-     * @param {HTMLElement} rightContainer Container where the network data will be placed
+     * @param {HTMLElement} networkContainer Container where the network will be placed
+     * @param {HTMLElement} dataTableContainer Container where the dataTable will be placed
      */
-    addNetwork(file, leftContainer, rightContainer, config) {
+    addNetwork(file, networkContainer, dataTableContainer, config) {
         let jsonFile;
         let network;
 
         try {
-            jsonFile = JSON.parse(file);
-        } catch (e) {
-            console.log(e);
-            alert("Json parsing has failed");
-            return;
+            jsonFile = JSON.parse(file);  
+        } catch (err) {
+            err.message = `${config.key} json parsing has failed: ${err.message}`;
+            return err;
         }
 
         try {
-            network = new NetworkMan(jsonFile, leftContainer, rightContainer, this, config);
-        } catch(e){
-            console.log(e);
-            alert("Network creation has failed");
-            return;
+            network = new NetworkMan(jsonFile, networkContainer, dataTableContainer, this, config);
+
+        } catch(err){
+            err.message = `${config.key} creation has failed: ${err.message}`;
+            return err;
         }
+        
         this.activesNetworksMap.set(config.key, network);
         this.activesNetworksArray.push(network);
+
+        return 200;
     }
 
     /** 
@@ -72,6 +69,7 @@ export default class NetworksGroup {
             this.activesNetworksArray = this.activesNetworksArray.filter(data => data.key != key);
 
             network.clearNetwork();
+
             this.layout.deleteNetwork(key);
   
             this.activesNetworksMap.delete(key);
@@ -153,7 +151,7 @@ export default class NetworksGroup {
     hideUnselectedEdges(key, newBool) {
         const network = this.activesNetworksMap.get(key);
 
-        network.edgesMan.hideUnselectedEdges(newBool);
+        network.edgesMan.hideUnselectedEdges(newBool, network.selectedEdges);
     }
 
     /**

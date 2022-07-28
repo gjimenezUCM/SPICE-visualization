@@ -1,10 +1,17 @@
-/*--- LEGEND ACCORDION ---*/
-.accordiontop {
-    margin: auto;
+/*--- LEGEND POPOVER ---*/
+
+.popover.legend{
+    direction: rtl;
+    max-width: 100% !important;
 }
 
-.accordion-button {
-    height: 40px;
+.popover.legend > *{
+    direction: ltr;
+}
+
+.col.legend{
+    max-width: 100%;
+    white-space: nowrap;
 }
 
 .Legend-subTittle {
@@ -73,12 +80,12 @@
 }
 
 /* Background color */
-.legend.btn.active>.container.legend>.row>.col-6>.LegendColor {
+.legend.btn.active>.container.legend>.row>.col-3>.LegendColor {
     opacity: 25%;
 }
 
 /* Border color */
-.legend.btn.active>.container.legend>.row>.col-6>.LegendBorder {
+.legend.btn.active>.container.legend>.row>.col-3>.LegendBorder {
     opacity: 25%;
 }
 
@@ -110,6 +117,16 @@
     clip-path: polygon(var(--path));
 }
 
-.legend.btn.active>.container.legend>.row>.col-6>.LegendShape {
+.triangleDown {
+    --path: 0% 0%, 50% 100%, 100% 0%;
+    clip-path: polygon(var(--path));
+}
+
+.hexagon{
+    --path: 25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%;
+    clip-path: polygon(var(--path));
+}
+
+.legend.btn.active>.container.legend>.row>.col-3>.LegendShape {
     opacity: 35%;
 }

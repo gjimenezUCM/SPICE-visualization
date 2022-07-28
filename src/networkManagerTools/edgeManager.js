@@ -34,48 +34,71 @@ export default class EdgeManager {
     parseEdges(json) {
         const newEdges = new Array();
 
-        for (const edge of json[edges.EdgesGlobalJsonKey]) {
-            //Dont save edges with no similarity
-            if (edge[edges.EdgeValueKey]) {
-                //Dont save autoedges
-                if (edge[edges.EdgeOneKey] !== edge[edges.EdgeTwoKey]) {
-
-                    //Update targets to vis format
-                    edge["from"] = edge[edges.EdgeOneKey];
-                    edge["to"] = edge[edges.EdgeTwoKey];
-
-                    delete edge[edges.EdgeOneKey];
-                    delete edge[edges.EdgeTwoKey];
-
-                    //Vis use "value" key to change edges width in case we activate the option.
-                    edge["value"] = edge[edges.EdgeValueKey];
-                    if (edges.EdgeValueKey !== "value")
-                        delete edge[edges.EdgeValueKey];
-
-                    edge["label"] = edge["value"].toString();
-
-                    if (edge["value"] < this.edgeValueThreshold) {
-                        edge["hidden"] = true;
-                    } else
-                        edge["hidden"] = false;
-
-                    //Hide unselected
-                    const color = edges.EdgeDefaultColor;
-                    if (this.hideUnselected)
-                        edge.color = { color: `${color}00` };
-                    else
-                        edge.color = { color: `${color}` };
-
-                    newEdges.push(edge);
-                }
-            }
-
+        if (!Array.isArray(json[edges.EdgesGlobalJsonKey])
+            || json[edges.EdgesGlobalJsonKey].length <= 0) {
+            throw new SyntaxError("JSON file doesnt have the edges/similarity data.");
         }
 
-        this.edges = new DataSet(newEdges);
+        try {
+            for (const edge of json[edges.EdgesGlobalJsonKey]) {
+                this.checkEdgesValues(edge)
+                //Dont save edges with no similarity
+                if (edge[edges.EdgeValueKey]) {
+                    //Dont save autoedges
+                    if (edge[edges.EdgeOneKey] !== edge[edges.EdgeTwoKey]) {
+                        //Vis use "value" key to change edges width in case we activate the option.
+                        edge["value"] = edge[edges.EdgeValueKey].toString();
+
+                        if (edge["value"] > "0.0") {
+
+                            if (edges.EdgeValueKey !== "value")
+                                delete edge[edges.EdgeValueKey];
+
+                            edge["label"] = edge["value"].toString();
+
+                            //Update targets to vis format
+                            edge["from"] = edge[edges.EdgeOneKey].toString();
+                            edge["to"] = edge[edges.EdgeTwoKey].toString();
+
+                            if (edges.EdgeOneKey !== "from") delete edge[edges.EdgeOneKey];
+                            if (edges.EdgeOneKey !== "to") delete edge[edges.EdgeTwoKey];
+
+                            //Hide edges
+                            if (this.hideUnselected
+                                || edge["value"] < this.edgeValueThreshold) {
+
+                                edge["hidden"] = true;
+                            } else
+                                edge["hidden"] = false;
+
+
+                            newEdges.push(edge);
+                        }
+                    }
+                }
+            }
+            this.edges = new DataSet(newEdges);
+        } catch (error) {
+            error.message = `Error while parsing edge data from the json file: ${error.message}`;
+            throw (error);
+        }
+
         return this.edges;
     }
 
+    checkEdgesValues(edge) {
+        if (edge[edges.EdgeValueKey] === undefined) {
+            throw new SyntaxError(`Edge ${edges.EdgeValueKey} attribute is not defined`);
+        }
+
+        if (edge[edges.EdgeOneKey] === undefined) {
+            throw new SyntaxError(`Edge ${edges.EdgeOneKey} attribute is not defined`);
+        }
+
+        if (edge[edges.EdgeTwoKey] === undefined) {
+            throw new SyntaxError(`Edge ${edges.EdgeTwoKey} attribute is not defined`);
+        }
+    }
     /**
      * Calculate what is the max edge width based on the variable Edge parameter
      * @returns {Integer} returns an integer with the max edge width
@@ -111,7 +134,7 @@ export default class EdgeManager {
 
         const newEdges = new Array();
         this.edges.forEach((edge) => {
-            if (edge["value"] < this.edgeValueThreshold) {
+            if (this.hideUnselected || edge["value"] < this.edgeValueThreshold) {
                 if (!edge["hidden"]) {
                     edge["hidden"] = true;
                 }
@@ -148,17 +171,18 @@ export default class EdgeManager {
      * Change base edge color based on the value of hideUnselected
      * @param {Bool} newBool new value of hideUnselected
      */
-    hideUnselectedEdges(newBool) {
+    hideUnselectedEdges(newBool, selectedEdges) {
         this.hideUnselected = newBool;
 
         const newEdges = new Array();
 
         this.edges.forEach((edge) => {
-
-            if (this.hideUnselected)
-                edge.color = { color: `${edges.EdgeDefaultColor}00` };
-            else
-                edge.color = { color: edges.EdgeDefaultColor };
+            if (this.hideUnselected && (selectedEdges === undefined || !selectedEdges.includes(edge.id))) {
+                edge["hidden"] = true;
+            } else{
+                edge["hidden"] = false;
+            }
+                
 
             newEdges.push(edge);
         })

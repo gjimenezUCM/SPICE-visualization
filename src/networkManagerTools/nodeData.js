@@ -22,6 +22,8 @@ export default class NodeData {
      */
     constructor(nodeVisuals) {
         this.nodeVisuals = nodeVisuals;
+
+        this.counter = 0;
     }
 
     /**
@@ -30,32 +32,66 @@ export default class NodeData {
      * @returns {DataSet} a vis.js DataSet with the nodes data ready to draw the network
      */
     parseNodes(json) {
-        for (let node of json[nodes.UsersGlobalJsonKey]) {
-            this.nodeVisuals.findExplicitCommunities(node);
+        if (!Array.isArray(json[nodes.UsersGlobalJsonKey])
+            || json[nodes.UsersGlobalJsonKey].length <= 0) {
+            throw new SyntaxError("JSON file doesnt have the users/nodes data.");
+        }
 
-            //The implicit community will be used for the bounding boxes
-            node[comms.ImplUserNewKey] = parseInt(node[comms.ImplUserJsonKey]);
+        try {
+            for (let node of json[nodes.UsersGlobalJsonKey]) {
+                this.checkNodeValues(node);
 
-            //Vis uses "group" key to change the color of all nodes with the same key. We need to remove it
-            if (comms.ImplUserJsonKey === "group")
-                delete node["group"];
+                this.nodeVisuals.findExplicitCommunities(node);
 
-            node["defaultColor"] = true;
-            node["size"] = nodes.DefaultSize;
-            
-            if(!networkHTML.showNodeLabelInitialValue){
-                node["font"] = {
-                    color: "#00000000"
+                node["id"] = node["id"].toString();
+                
+                if(node["label"] !== undefined){
+                    node["label"] = node["id"];
                 }
-            }else{
-                node["font"] = {
-                    color: "#000000FF"
+                
+                //Value to show instead of the label
+                node["idHidden"] = this.counter;
+                node["labelHidden"] = this.counter;
+
+                this.counter++;
+
+                //The implicit community will be used for the bounding boxes
+                node[comms.ImplUserNewKey] = parseInt(node[comms.ImplUserJsonKey]);
+
+                //Vis uses "group" key to change the color of all nodes with the same key. We need to remove it
+                if (comms.ImplUserJsonKey === "group")
+                    delete node["group"];
+
+                node["defaultColor"] = true;
+                node["size"] = nodes.DefaultSize;
+
+                if (!this.nodeVisuals.nodeLabelVisibility) {
+                    node["font"] = {
+                        color: "#00000000"
+                    }
+                } else {
+                    node["font"] = {
+                        color: "#000000FF"
+                    }
                 }
             }
+            this.nodes = new DataSet(json.users);
+        }catch(error){
+            error.message = `Error while parsing node data from the json file: ${error.message}`;
+            throw(error);
         }
-        this.nodes = new DataSet(json.users);
 
         return this.nodes;
+    }
+
+    checkNodeValues(node){
+        if(node["id"] === undefined){
+            throw new SyntaxError("ID attribute is not defined");
+        }
+
+        if(node[comms.ImplUserJsonKey] === undefined){
+            throw new SyntaxError(`${comms.ImplUserJsonKey} attribute is not defined`);
+        }
     }
 
     /**
@@ -112,15 +148,20 @@ export default class NodeData {
 
         //First we include the wanted attributes
         for (let i = 0; i < nodes.NodesWantedAttr.length; i++) {
-            newRowData.set(nodes.NodesWantedAttr[i], node[nodes.NodesWantedAttr[i]]);
+            if (nodes.NodesWantedAttr[i] !== "implicit_Comm" && !this.nodeVisuals.nodeLabelVisibility) {
+                newRowData.set(nodes.NodesWantedAttr[i], node[nodes.NodesWantedAttr[i] + "Hidden"]);
+            } else
+                newRowData.set(nodes.NodesWantedAttr[i], node[nodes.NodesWantedAttr[i]]);
         }
 
         //Then we add the explicit community ones
         const communities = node[comms.ExpUserKsonKey];
-        const keys = Object.keys(communities);
 
-        for (let i = 0; i < keys.length; i++) {
-            newRowData.set(keys[i], communities[keys[i]]);
+        if (communities !== undefined && communities !== null && communities !== "{}" && communities !== "[]") {
+            const keys = Object.keys(communities);
+            for (let i = 0; i < keys.length; i++) {
+                newRowData.set(keys[i], communities[keys[i]]);
+            }
         }
 
         this.dataTable.updateDataTable(newRowData)
@@ -158,7 +199,7 @@ export default class NodeData {
 
         const output = { x: clickX, y: clickY };
 
-        if (isClickOnCanvas(output, networkCanvasPosition)) 
+        if (isClickOnCanvas(output, networkCanvasPosition))
             return output;
         return null;
     }
@@ -172,8 +213,8 @@ export default class NodeData {
      */
     getTooltipTitle(networkManager, event, titleTemplate) {
         const node = this.nodes.get(event.nodes[0]);
-        const title = node.label;
 
+        const title = this.nodeVisuals.nodeLabelVisibility ? node.label : node.labelHidden;
 
         return titleTemplate(title);
     }
@@ -189,12 +230,16 @@ export default class NodeData {
         const node = this.nodes.get(event.nodes[0]);
         const rowData = new Array();
 
-        rowData.push({ tittle: "Label", data: node.label });
+        rowData.push({ tittle: "Label", data: this.nodeVisuals.nodeLabelVisibility ? node.label : node.labelHidden });
         rowData.push({ tittle: "Group", data: node[comms.ImplUserNewKey] });
 
-        const keys = Object.keys(node[comms.ExpUserKsonKey]);
-        for (let i = 0; i < keys.length; i++) {
-            rowData.push({ tittle: keys[i], data: node[comms.ExpUserKsonKey][keys[i]] });
+        const communities = node[comms.ExpUserKsonKey];
+
+        if (communities !== undefined && communities !== null && communities !== "{}" && communities !== "[]") {
+            const keys = Object.keys(communities);
+            for (let i = 0; i < keys.length; i++) {
+                rowData.push({ tittle: keys[i], data: node[comms.ExpUserKsonKey][keys[i]] });
+            }
         }
 
         return contentTemplate(rowData);
@@ -203,7 +248,7 @@ export default class NodeData {
     /**
      * Completely remove the dataTable
      */
-     removeTable(){
+    removeTable() {
         this.dataTable.removeDataTable();
     }
 

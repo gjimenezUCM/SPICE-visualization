@@ -24,13 +24,13 @@ export default class NetworkMan {
     /**
      * Constructor of the class
      * @param {Object} jsonInput json input with all the network data
-     * @param {HTMLElement} container container of the network
-     * @param {HTMLElement} rightContainer container of the dataTables
+     * @param {HTMLElement} networkContainer container of the network
+     * @param {HTMLElement} datatableContainer container of the dataTables
      * @param {NetworkGroupManager} networkManager manager of all active networks
      * @param {Object} config config options for edges
      */
-    constructor(jsonInput, container, rightContainer, networkManager, config) {
-        this.container = container;
+    constructor(jsonInput, networkContainer, datatableContainer, networkManager, config) {
+        this.container = networkContainer;
         this.groupManager = networkManager;
         this.key = config.key;
         this.valuesToHide = config.valuesToHide;
@@ -38,26 +38,29 @@ export default class NetworkMan {
         this.implCommMan = new ImplicitCommsMan(jsonInput);
         this.nodeVisuals = new NodeVisuals(config);
 
-        this.nodeData = new NodeData(this.nodeVisuals, rightContainer);
+        this.nodeData = new NodeData(this.nodeVisuals, datatableContainer);
         this.edgesMan = new EdgeManager(config);
+
+        const edges = this.edgesMan.parseEdges(jsonInput);
 
         this.data =
         {
             nodes: this.nodeData.parseNodes(jsonInput),
-            edges: this.edgesMan.parseEdges(jsonInput)
+            edges: edges,
         };
 
         new nodeLocationSetter(this.data.nodes, this.implCommMan.implComms.length);
 
-        this.nodeData.createNodeDataTable(rightContainer);
-        this.implCommMan.createCommunityDataTable(rightContainer);
+        this.nodeData.createNodeDataTable(datatableContainer);
+        this.implCommMan.createCommunityDataTable(datatableContainer);
 
         this.nodeVisuals.createNodeDimensionStrategy(this.data.nodes);
 
         this.chooseOptions();
         this.drawNetwork();
 
-        this.updateFilterActives(this.valuesToHide);
+        if (this.valuesToHide.length !== 0)
+            this.updateFilterActives(this.valuesToHide);
     }
 
     /**
@@ -85,7 +88,7 @@ export default class NetworkMan {
                     highlight: edges.EdgeSelectedColor
                 },
                 chosen: {
-                    label: this.edgesMan.labelEdgeChosen.bind(this),
+                    label: this.edgesMan.labelEdgeChosen.bind(this.edgesMan),
                 },
                 font: {
                     strokeWidth: edges.LabelStrokeWidth,
@@ -101,6 +104,9 @@ export default class NetworkMan {
             },
             nodes: {
                 shape: nodes.NodeShape,
+                shapeProperties: {
+                    interpolation: false,
+                },
                 borderWidth: nodes.NodeDefaultBorderWidth,
                 borderWidthSelected: nodes.NodeDefaultBorderWidthSelected,
                 shapeProperties: {
@@ -144,6 +150,7 @@ export default class NetworkMan {
      */
     drawNetwork() {
         this.network = new Network(this.container, this.data, this.options);
+        this.implCommMan.calculateBoundingBoxes(this.data.nodes, this.network);
 
         this.container.firstChild.id = `${networkHTML.topCanvasContainer}${this.key}`;
 
@@ -151,14 +158,14 @@ export default class NetworkMan {
         this.network.on("click", (event) => this.clickEvent(event));
         this.network.on("zoom", (event) => this.zoomEvent(event));
         this.network.on("dragging", (event) => this.draggingEvent(event));
-        
+
         this.network.on("animationFinished", () => this.animationFinishEvent());
     }
 
     /**
      * Function executed when a zooming animation ends. Shows the tooltip if the tooltip exists
      */
-    animationFinishEvent(){
+    animationFinishEvent() {
         this.groupManager.showTooltip();
     }
 
@@ -179,7 +186,7 @@ export default class NetworkMan {
 
         if (event.nodes.length > 0) {
             this.nodeHasBeenClicked(event);
-   
+
         } else {
             this.noNodeIsClicked(event);
         }
@@ -197,10 +204,10 @@ export default class NetworkMan {
      * Function executed when "dragging" event is launched. Happens when the user drag a node or the canvas
      * @param {Object} event Drag event
      */
-    draggingEvent(event){
+    draggingEvent(event) {
         this.groupManager.updateTooltipPosition();
     }
-    
+
     /** 
     * Function executed only when this was the network that received the click event on top of a node
     * @param {Object} event click event 
@@ -229,18 +236,53 @@ export default class NetworkMan {
         const selectedNodes = new Array();
         selectedNodes.push(id)
 
-        const connected_edges = this.network.getConnectedEdges(selectedNodes[0]);
-        const clickedEdges = this.data.edges.get(connected_edges);
+        const connected_edges_id = this.network.getConnectedEdges(selectedNodes[0]);
+        const connectedEdges = this.data.edges.get(connected_edges_id);
+        
+        if (this.edgesMan.hideUnselected) {
+            //Update the hidden value of all edges based on if they are connected to the selected node
+            const newEdges = new Array();
+            this.hideSelectedEdges();
 
-        clickedEdges.forEach((edge) => {
-            if (!edge.hidden) {
-                if (edge.from !== selectedNodes[0] && edge.to === selectedNodes[0]) {
-                    selectedNodes.push(edge.from);
-                } else if (edge.to !== selectedNodes[0] && edge.from === selectedNodes[0]) {
-                    selectedNodes.push(edge.to);
+            connectedEdges.forEach((edge) => {
+
+                if (edge.value >= this.edgesMan.edgeValueThreshold) {
+                    if (edge.from !== selectedNodes[0] && edge.to === selectedNodes[0]) {
+
+                        selectedNodes.push(edge.from);
+
+                    } else if (edge.to !== selectedNodes[0] && edge.from === selectedNodes[0]) {
+
+                        selectedNodes.push(edge.to);
+                    }
+
+                    this.selectedEdges.push(edge.id);
+                    edge.hidden = false;
+                } else {
+                    edge.hidden = true;
                 }
-            }
-        })
+
+                newEdges.push(edge);
+            });
+            this.data.edges.update(newEdges);
+
+        } else {
+            this.selectedEdges = new Array();
+            //Check what nodes should be "selected"
+            connectedEdges.forEach((edge) => {
+                if (!edge.hidden) {
+                    if (edge.value >= this.edgesMan.edgeValueThreshold) {
+                        if (edge.from != selectedNodes[0] && edge.to == selectedNodes[0]) {
+                            selectedNodes.push(edge.from);
+                        } else if (edge.to != selectedNodes[0] && edge.from == selectedNodes[0]) {
+                            selectedNodes.push(edge.to);
+                        }
+                        this.selectedEdges.push(edge.id)
+                    }
+                }
+            })
+
+        }
 
         //Move the "camera" to focus on these nodes
         const fitOptions = {
@@ -250,6 +292,7 @@ export default class NetworkMan {
             },
         }
         this.network.fit(fitOptions);
+        this.zoomingIn = true;
 
         //Update all nodes color acording to their selected status
         const newNodes = new Array();
@@ -267,6 +310,22 @@ export default class NetworkMan {
         });
 
         this.data.nodes.update(newNodes);
+    }
+
+    /**
+     * Hide the edges that are currently selected/highlighted
+     */
+    hideSelectedEdges() {
+        if (this.selectedEdges !== undefined) {
+            const newEdges = new Array();
+            this.data.edges.get(this.selectedEdges).forEach((edge) => {
+                edge.hidden = true;
+                newEdges.push(edge);
+            });
+            this.data.edges.update(newEdges);
+        }
+
+        this.selectedEdges = new Array();
     }
 
     /** 
@@ -304,6 +363,11 @@ export default class NetworkMan {
             },
         }
 
+        //Hide all edges because none is selected
+        if (this.edgesMan.hideUnselected) {
+            this.hideSelectedEdges();
+        }
+
         this.nodeData.clearDataTable();
         this.implCommMan.clearDataTable();
 
@@ -318,7 +382,7 @@ export default class NetworkMan {
     clearNetwork() {
         this.implCommMan.removeTable();
         this.nodeData.removeTable();
-        
+
         this.network.destroy();
     }
 
@@ -335,7 +399,7 @@ export default class NetworkMan {
      * Change the network allowThirdDimension value
      * @param {Boolean} newBool New allowThirdDimension value
      */
-    changeThirdDimension(newBool){
+    changeThirdDimension(newBool) {
         this.nodeVisuals.activateThirdDimension = newBool;
         this.nodeVisuals.createNodeDimensionStrategy(this.data.nodes);
     }
@@ -344,7 +408,7 @@ export default class NetworkMan {
      * Change the network nodeLabelVisibility value
      * @param {Boolean} newBool New nodeLabelVisibility value
      */
-    nodeLabelVisibilityChange(newBool){
+    nodeLabelVisibilityChange(newBool) {
         this.nodeVisuals.nodeLabelVisibility = newBool;
         this.nodeVisuals.updateNodeLabelsVisibility(this.data.nodes);
     }

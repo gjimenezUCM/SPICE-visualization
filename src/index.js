@@ -7,19 +7,13 @@ import bt_css from "../node_modules/bootstrap/dist/css/bootstrap.css";
 import base_css from "../css/genericStyle.css";
 import legend_css from "../css/legendStyle.css";
 import layout_css from "../css/networkLayout.css";
+import toolBar_css from "../css/toolBar.css";
 
 //Local classes
-import InitialOptions from "./initialOptions.js";
-
+import ToolBar from "./toolBar";
 
 window.onload = function () {
-
-	const isLocalhost = window.location.hostname === "localhost";
-
-	const msg = isLocalhost ? "App running as localhost" : "App running in an external server: " + window.location.hostname;
-	console.log(msg);
-
-	new InitialOptions(isLocalhost);
+	new ToolBar();
 }
 
 

@@ -4,46 +4,6 @@
             "id": "0",
             "community-type": "implicit",
             "name": "Community 0",
-            "explanation": "Representative Properties: {'beliefJ': 'Traitor'}",
-            "users": [
-                "3",
-                "13",
-                "16",
-                "19",
-                "21",
-                "24",
-                "26",
-                "36",
-                "38",
-                "49",
-                "51",
-                "52",
-                "85",
-                "86",
-                "88",
-                "95",
-                "104",
-                "121",
-                "127",
-                "128",
-                "132",
-                "134",
-                "138",
-                "139",
-                "145",
-                "147",
-                "148",
-                "160",
-                "170",
-                "171",
-                "174",
-                "181"
-            ]
-        },
-        {
-            "id": "1",
-            "community-type": "implicit",
-            "name": "Community 1",
             "explanation": "Representative Properties: {'LQAOTPrepOpenBeleifsImportant': '4'; 'beliefJ': 'NotTraitor'}",
             "users": [
                 "1",
@@ -105,39 +65,125 @@
             ]
         },
         {
+            "id": "1",
+            "community-type": "implicit",
+            "name": "Community 1",
+            "explanation": "Representative Properties: {'beliefJ': 'Traitor'}",
+            "users": [
+                "3",
+                "13",
+                "16",
+                "19",
+                "21",
+                "24",
+                "26",
+                "30",
+                "34",
+                "36",
+                "38",
+                "46",
+                "49",
+                "51",
+                "52",
+                "66",
+                "85",
+                "86",
+                "88",
+                "95",
+                "104",
+                "121",
+                "127",
+                "128",
+                "132",
+                "134",
+                "138",
+                "139",
+                "145",
+                "147",
+                "148",
+                "150",
+                "156",
+                "160",
+                "165",
+                "170",
+                "171",
+                "174",
+                "175",
+                "181",
+                "182",
+                "188"
+            ]
+        },
+        {
             "id": "2",
             "community-type": "implicit",
             "name": "Community 2",
             "explanation": "Representative Properties: {'beliefJ': 'CantJudge'}",
             "users": [
+                "0",
+                "2",
+                "4",
                 "5",
+                "6",
                 "7",
+                "10",
+                "14",
                 "15",
+                "20",
+                "23",
                 "27",
+                "28",
+                "29",
                 "37",
                 "39",
+                "40",
                 "41",
+                "53",
                 "57",
                 "58",
                 "59",
                 "61",
                 "62",
+                "63",
+                "64",
                 "65",
+                "67",
+                "68",
+                "69",
+                "74",
                 "80",
                 "81",
+                "83",
+                "84",
                 "91",
                 "93",
+                "102",
                 "105",
                 "106",
+                "110",
                 "111",
                 "114",
                 "118",
+                "120",
                 "125",
+                "126",
                 "129",
+                "131",
+                "133",
                 "146",
+                "154",
+                "162",
+                "166",
                 "167",
+                "168",
+                "176",
+                "178",
+                "179",
+                "183",
+                "186",
                 "187",
                 "189",
+                "192",
                 "194"
             ]
         },
@@ -145,94 +191,48 @@
             "id": "3",
             "community-type": "implicit",
             "name": "Community 3",
-            "explanation": "Representative Properties: {'beliefJ': 'CantJudge'}",
+            "explanation": "Representative Properties: {'LQRHMSPrepHistUnderstandNews': '1'; 'beliefJ': 'Traitor'}",
             "users": [
-                "0",
-                "2",
-                "4",
-                "6",
-                "8",
-                "10",
-                "14",
-                "20",
-                "23",
-                "28",
-                "29",
-                "35",
-                "40",
-                "48",
-                "53",
-                "63",
-                "64",
-                "67",
-                "68",
-                "69",
-                "71",
-                "72",
-                "74",
-                "76",
-                "79",
-                "82",
-                "83",
-                "84",
-                "100",
-                "102",
-                "110",
-                "113",
-                "120",
-                "124",
-                "126",
-                "131",
-                "133",
-                "137",
-                "143",
-                "144",
-                "149",
-                "153",
-                "154",
-                "157",
-                "158",
-                "161",
-                "162",
-                "163",
-                "166",
-                "168",
-                "169",
-                "172",
-                "176",
-                "178",
-                "179",
-                "183",
-                "186",
-                "190",
-                "191",
-                "192"
+                "108",
+                "116",
+                "135",
+                "141",
+                "142",
+                "177",
+                "180",
+                "185"
             ]
         },
         {
             "id": "4",
             "community-type": "implicit",
             "name": "Community 4",
-            "explanation": "Representative Properties: {'LQAOTPrepOpenBeleifsImportant': '6'; 'beliefJ': 'Traitor'}",
+            "explanation": "Representative Properties: {'beliefJ': 'CantJudge'}",
             "users": [
-                "30",
-                "34",
-                "46",
-                "66",
-                "108",
-                "116",
-                "135",
-                "141",
-                "142",
-                "150",
-                "156",
-                "165",
-                "175",
-                "177",
-                "180",
-                "182",
-                "185",
-                "188"
+                "8",
+                "35",
+                "48",
+                "71",
+                "72",
+                "76",
+                "79",
+                "82",
+                "100",
+                "113",
+                "124",
+                "137",
+                "143",
+                "144",
+                "149",
+                "153",
+                "157",
+                "158",
+                "161",
+                "163",
+                "169",
+                "172",
+                "190",
+                "191"
             ]
         }
     ],
@@ -240,7 +240,7 @@
         {
             "id": "AL111479",
             "label": "AL111479",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -249,7 +249,7 @@
         {
             "id": "AL111552",
             "label": "AL111552",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -258,7 +258,7 @@
         {
             "id": "AL11162",
             "label": "AL11162",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -267,7 +267,7 @@
         {
             "id": "AL112330",
             "label": "AL112330",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -276,7 +276,7 @@
         {
             "id": "AL115129",
             "label": "AL115129",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -294,7 +294,7 @@
         {
             "id": "AL115709",
             "label": "AL115709",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "M",
                 "DemographicPolitics": "R"
@@ -312,7 +312,7 @@
         {
             "id": "AL122986",
             "label": "AL122986",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "M",
                 "DemographicPolitics": "R"
@@ -321,7 +321,7 @@
         {
             "id": "AL125076",
             "label": "AL125076",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -330,7 +330,7 @@
         {
             "id": "AL125209",
             "label": "AL125209",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "M",
                 "DemographicPolitics": "VR"
@@ -339,7 +339,7 @@
         {
             "id": "AL127150",
             "label": "AL127150",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "L"
@@ -348,7 +348,7 @@
         {
             "id": "AL127472",
             "label": "AL127472",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -357,7 +357,7 @@
         {
             "id": "AL128344",
             "label": "AL128344",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -366,7 +366,7 @@
         {
             "id": "AL128705",
             "label": "AL128705",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -384,7 +384,7 @@
         {
             "id": "AL134098",
             "label": "AL134098",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "M",
                 "DemographicPolitics": "R"
@@ -393,7 +393,7 @@
         {
             "id": "AL135843",
             "label": "AL135843",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -402,7 +402,7 @@
         {
             "id": "AL135850",
             "label": "AL135850",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -411,7 +411,7 @@
         {
             "id": "AL136592",
             "label": "AL136592",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "L"
@@ -420,7 +420,7 @@
         {
             "id": "AL13805",
             "label": "AL13805",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -429,7 +429,7 @@
         {
             "id": "AL138476",
             "label": "AL138476",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -438,7 +438,7 @@
         {
             "id": "AL138958",
             "label": "AL138958",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -447,7 +447,7 @@
         {
             "id": "AL141426",
             "label": "AL141426",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -456,7 +456,7 @@
         {
             "id": "AL141761",
             "label": "AL141761",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -465,7 +465,7 @@
         {
             "id": "AL142046",
             "label": "AL142046",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -474,7 +474,7 @@
         {
             "id": "AL142721",
             "label": "AL142721",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -492,7 +492,7 @@
         {
             "id": "AL146531",
             "label": "AL146531",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -501,7 +501,7 @@
         {
             "id": "AL146802",
             "label": "AL146802",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -510,7 +510,7 @@
         {
             "id": "AL212652",
             "label": "AL212652",
-            "group": 4,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -519,7 +519,7 @@
         {
             "id": "AL214462",
             "label": "AL214462",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -528,7 +528,7 @@
         {
             "id": "AL215239",
             "label": "AL215239",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -537,7 +537,7 @@
         {
             "id": "AL215426",
             "label": "AL215426",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -546,7 +546,7 @@
         {
             "id": "AL216171",
             "label": "AL216171",
-            "group": 4,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "M",
                 "DemographicPolitics": "R"
@@ -555,7 +555,7 @@
         {
             "id": "AL218049",
             "label": "AL218049",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -564,7 +564,7 @@
         {
             "id": "AL218705",
             "label": "AL218705",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -582,7 +582,7 @@
         {
             "id": "AL221199",
             "label": "AL221199",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -600,7 +600,7 @@
         {
             "id": "AL224157",
             "label": "AL224157",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -618,7 +618,7 @@
         {
             "id": "AL22433",
             "label": "AL22433",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -627,7 +627,7 @@
         {
             "id": "AL225536",
             "label": "AL225536",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -636,7 +636,7 @@
         {
             "id": "AL225908",
             "label": "AL225908",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "M",
                 "DemographicPolitics": "R"
@@ -645,7 +645,7 @@
         {
             "id": "AL226198",
             "label": "AL226198",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -654,7 +654,7 @@
         {
             "id": "AL227166",
             "label": "AL227166",
-            "group": 4,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -663,7 +663,7 @@
         {
             "id": "AL227637",
             "label": "AL227637",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "M",
                 "DemographicPolitics": "R"
@@ -672,7 +672,7 @@
         {
             "id": "AL232064",
             "label": "AL232064",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "VL"
@@ -681,7 +681,7 @@
         {
             "id": "AL233418",
             "label": "AL233418",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -690,7 +690,7 @@
         {
             "id": "AL233500",
             "label": "AL233500",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -699,7 +699,7 @@
         {
             "id": "AL234038",
             "label": "AL234038",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -708,7 +708,7 @@
         {
             "id": "AL236092",
             "label": "AL236092",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -717,7 +717,7 @@
         {
             "id": "AL236265",
             "label": "AL236265",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -726,7 +726,7 @@
         {
             "id": "AL236359",
             "label": "AL236359",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -735,7 +735,7 @@
         {
             "id": "AL239793",
             "label": "AL239793",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -744,7 +744,7 @@
         {
             "id": "AL239974",
             "label": "AL239974",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -780,7 +780,7 @@
         {
             "id": "AL243050",
             "label": "AL243050",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -807,7 +807,7 @@
         {
             "id": "AL247500",
             "label": "AL247500",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -816,7 +816,7 @@
         {
             "id": "AL248782",
             "label": "AL248782",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -834,7 +834,7 @@
         {
             "id": "AL249890",
             "label": "AL249890",
-            "group": 4,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -843,7 +843,7 @@
         {
             "id": "IA111636",
             "label": "IA111636",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -852,7 +852,7 @@
         {
             "id": "IA112839",
             "label": "IA112839",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -861,7 +861,7 @@
         {
             "id": "IA114376",
             "label": "IA114376",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -870,7 +870,7 @@
         {
             "id": "IA1147",
             "label": "IA1147",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "M",
                 "DemographicPolitics": "DK"
@@ -879,7 +879,7 @@
         {
             "id": "IA117139",
             "label": "IA117139",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -888,7 +888,7 @@
         {
             "id": "IA117390",
             "label": "IA117390",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -897,7 +897,7 @@
         {
             "id": "IA118826",
             "label": "IA118826",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -906,7 +906,7 @@
         {
             "id": "IA119159",
             "label": "IA119159",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -915,7 +915,7 @@
         {
             "id": "IA119376",
             "label": "IA119376",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -924,7 +924,7 @@
         {
             "id": "IA12120",
             "label": "IA12120",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -933,7 +933,7 @@
         {
             "id": "IA121700",
             "label": "IA121700",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -942,7 +942,7 @@
         {
             "id": "IA122215",
             "label": "IA122215",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -951,7 +951,7 @@
         {
             "id": "IA124653",
             "label": "IA124653",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "M",
                 "DemographicPolitics": "R"
@@ -978,7 +978,7 @@
         {
             "id": "IA126389",
             "label": "IA126389",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -987,7 +987,7 @@
         {
             "id": "IA127277",
             "label": "IA127277",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -996,7 +996,7 @@
         {
             "id": "IA127717",
             "label": "IA127717",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -1005,7 +1005,7 @@
         {
             "id": "IA132695",
             "label": "IA132695",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -1014,7 +1014,7 @@
         {
             "id": "IA13536",
             "label": "IA13536",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -1023,7 +1023,7 @@
         {
             "id": "IA135743",
             "label": "IA135743",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -1032,7 +1032,7 @@
         {
             "id": "IA136434",
             "label": "IA136434",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "M",
                 "DemographicPolitics": "R"
@@ -1041,7 +1041,7 @@
         {
             "id": "IA136570",
             "label": "IA136570",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -1050,7 +1050,7 @@
         {
             "id": "IA138292",
             "label": "IA138292",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1068,7 +1068,7 @@
         {
             "id": "IA13895",
             "label": "IA13895",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "L"
@@ -1086,7 +1086,7 @@
         {
             "id": "IA143883",
             "label": "IA143883",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -1095,7 +1095,7 @@
         {
             "id": "IA144247",
             "label": "IA144247",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -1104,7 +1104,7 @@
         {
             "id": "IA145068",
             "label": "IA145068",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "M",
                 "DemographicPolitics": "R"
@@ -1113,7 +1113,7 @@
         {
             "id": "IA148099",
             "label": "IA148099",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "VR"
@@ -1122,7 +1122,7 @@
         {
             "id": "IA148405",
             "label": "IA148405",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -1131,7 +1131,7 @@
         {
             "id": "IA1495",
             "label": "IA1495",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -1140,7 +1140,7 @@
         {
             "id": "IA212134",
             "label": "IA212134",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -1149,7 +1149,7 @@
         {
             "id": "IA213822",
             "label": "IA213822",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -1158,7 +1158,7 @@
         {
             "id": "IA216234",
             "label": "IA216234",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -1167,7 +1167,7 @@
         {
             "id": "IA218713",
             "label": "IA218713",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -1176,7 +1176,7 @@
         {
             "id": "IA218847",
             "label": "IA218847",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -1203,7 +1203,7 @@
         {
             "id": "IA225399",
             "label": "IA225399",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -1212,7 +1212,7 @@
         {
             "id": "IA226791",
             "label": "IA226791",
-            "group": 4,
+            "group": 3,
             "explicit_community": {
                 "DemographicReligous": "M",
                 "DemographicPolitics": "DK"
@@ -1221,7 +1221,7 @@
         {
             "id": "IA229468",
             "label": "IA229468",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -1230,7 +1230,7 @@
         {
             "id": "IA229945",
             "label": "IA229945",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -1248,7 +1248,7 @@
         {
             "id": "IA235886",
             "label": "IA235886",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "M",
                 "DemographicPolitics": "R"
@@ -1257,7 +1257,7 @@
         {
             "id": "IA23703",
             "label": "IA23703",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -1275,7 +1275,7 @@
         {
             "id": "IA239550",
             "label": "IA239550",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "L"
@@ -1284,7 +1284,7 @@
         {
             "id": "IA243402",
             "label": "IA243402",
-            "group": 4,
+            "group": 3,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "C"
@@ -1293,7 +1293,7 @@
         {
             "id": "IA243808",
             "label": "IA243808",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "R"
@@ -1311,7 +1311,7 @@
         {
             "id": "IA24816",
             "label": "IA24816",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "S",
                 "DemographicPolitics": "DK"
@@ -1320,7 +1320,7 @@
         {
             "id": "IA248601",
             "label": "IA248601",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "M",
                 "DemographicPolitics": "R"
@@ -1329,7 +1329,7 @@
         {
             "id": "NR111300",
             "label": "NR111300",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1338,7 +1338,7 @@
         {
             "id": "NR111352",
             "label": "NR111352",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1347,7 +1347,7 @@
         {
             "id": "NR112800",
             "label": "NR112800",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1356,7 +1356,7 @@
         {
             "id": "NR115421",
             "label": "NR115421",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1374,7 +1374,7 @@
         {
             "id": "NR116510",
             "label": "NR116510",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1383,7 +1383,7 @@
         {
             "id": "NR121823",
             "label": "NR121823",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1392,7 +1392,7 @@
         {
             "id": "NR125123",
             "label": "NR125123",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1410,7 +1410,7 @@
         {
             "id": "NR12604",
             "label": "NR12604",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1419,7 +1419,7 @@
         {
             "id": "NR126116",
             "label": "NR126116",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1428,7 +1428,7 @@
         {
             "id": "NR128556",
             "label": "NR128556",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1437,7 +1437,7 @@
         {
             "id": "NR131128",
             "label": "NR131128",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1446,7 +1446,7 @@
         {
             "id": "NR133037",
             "label": "NR133037",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1455,7 +1455,7 @@
         {
             "id": "NR133426",
             "label": "NR133426",
-            "group": 4,
+            "group": 3,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1464,7 +1464,7 @@
         {
             "id": "NR13449",
             "label": "NR13449",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1473,7 +1473,7 @@
         {
             "id": "NR134627",
             "label": "NR134627",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1482,7 +1482,7 @@
         {
             "id": "NR134793",
             "label": "NR134793",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1491,7 +1491,7 @@
         {
             "id": "NR144520",
             "label": "NR144520",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1500,7 +1500,7 @@
         {
             "id": "NR146451",
             "label": "NR146451",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1509,7 +1509,7 @@
         {
             "id": "NR146930",
             "label": "NR146930",
-            "group": 4,
+            "group": 3,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1518,7 +1518,7 @@
         {
             "id": "NR147897",
             "label": "NR147897",
-            "group": 4,
+            "group": 3,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1527,7 +1527,7 @@
         {
             "id": "PH111052",
             "label": "PH111052",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1536,7 +1536,7 @@
         {
             "id": "PH111172",
             "label": "PH111172",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1545,7 +1545,7 @@
         {
             "id": "PH112020",
             "label": "PH112020",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1563,7 +1563,7 @@
         {
             "id": "PH112469",
             "label": "PH112469",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1572,7 +1572,7 @@
         {
             "id": "PH112908",
             "label": "PH112908",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1581,7 +1581,7 @@
         {
             "id": "PH112935",
             "label": "PH112935",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1590,7 +1590,7 @@
         {
             "id": "PH113257",
             "label": "PH113257",
-            "group": 4,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1599,7 +1599,7 @@
         {
             "id": "PH113622",
             "label": "PH113622",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1608,7 +1608,7 @@
         {
             "id": "PH114060",
             "label": "PH114060",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1617,7 +1617,7 @@
         {
             "id": "PH115272",
             "label": "PH115272",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1626,7 +1626,7 @@
         {
             "id": "PH115643",
             "label": "PH115643",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1635,7 +1635,7 @@
         {
             "id": "PH115712",
             "label": "PH115712",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1644,7 +1644,7 @@
         {
             "id": "PH121103",
             "label": "PH121103",
-            "group": 4,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1653,7 +1653,7 @@
         {
             "id": "PH121881",
             "label": "PH121881",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1662,7 +1662,7 @@
         {
             "id": "PH12201",
             "label": "PH12201",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1671,7 +1671,7 @@
         {
             "id": "PH123120",
             "label": "PH123120",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1680,7 +1680,7 @@
         {
             "id": "PH123152",
             "label": "PH123152",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1689,7 +1689,7 @@
         {
             "id": "PH123633",
             "label": "PH123633",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1698,7 +1698,7 @@
         {
             "id": "PH123892",
             "label": "PH123892",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1707,7 +1707,7 @@
         {
             "id": "PH124671",
             "label": "PH124671",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1716,7 +1716,7 @@
         {
             "id": "PH124901",
             "label": "PH124901",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1725,7 +1725,7 @@
         {
             "id": "PH124989",
             "label": "PH124989",
-            "group": 4,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1734,7 +1734,7 @@
         {
             "id": "PH125433",
             "label": "PH125433",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1752,7 +1752,7 @@
         {
             "id": "PH231219",
             "label": "PH231219",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1761,7 +1761,7 @@
         {
             "id": "PH231637",
             "label": "PH231637",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1770,7 +1770,7 @@
         {
             "id": "PH231979",
             "label": "PH231979",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1779,7 +1779,7 @@
         {
             "id": "PH232228",
             "label": "PH232228",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1788,7 +1788,7 @@
         {
             "id": "PH23272",
             "label": "PH23272",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1797,7 +1797,7 @@
         {
             "id": "PH232819",
             "label": "PH232819",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1806,7 +1806,7 @@
         {
             "id": "PH233877",
             "label": "PH233877",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1815,7 +1815,7 @@
         {
             "id": "PH235355",
             "label": "PH235355",
-            "group": 4,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1824,7 +1824,7 @@
         {
             "id": "PH235809",
             "label": "PH235809",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1833,7 +1833,7 @@
         {
             "id": "PH235830",
             "label": "PH235830",
-            "group": 4,
+            "group": 3,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1842,7 +1842,7 @@
         {
             "id": "PH236328",
             "label": "PH236328",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1851,7 +1851,7 @@
         {
             "id": "PH236659",
             "label": "PH236659",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1860,7 +1860,7 @@
         {
             "id": "PH241681",
             "label": "PH241681",
-            "group": 4,
+            "group": 3,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1869,7 +1869,7 @@
         {
             "id": "PH243071",
             "label": "PH243071",
-            "group": 0,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1878,7 +1878,7 @@
         {
             "id": "PH243072",
             "label": "PH243072",
-            "group": 4,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1887,7 +1887,7 @@
         {
             "id": "PH24344",
             "label": "PH24344",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1896,7 +1896,7 @@
         {
             "id": "PH243832",
             "label": "PH243832",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1905,7 +1905,7 @@
         {
             "id": "PH244236",
             "label": "PH244236",
-            "group": 4,
+            "group": 3,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1914,7 +1914,7 @@
         {
             "id": "PH244330",
             "label": "PH244330",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1932,7 +1932,7 @@
         {
             "id": "PH245669",
             "label": "PH245669",
-            "group": 4,
+            "group": 1,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1950,7 +1950,7 @@
         {
             "id": "PH246799",
             "label": "PH246799",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1959,7 +1959,7 @@
         {
             "id": "PH246943",
             "label": "PH246943",
-            "group": 3,
+            "group": 4,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1968,7 +1968,7 @@
         {
             "id": "PH247209",
             "label": "PH247209",
-            "group": 3,
+            "group": 2,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"
@@ -1977,7 +1977,7 @@
         {
             "id": "PH248703",
             "label": "PH248703",
-            "group": 1,
+            "group": 0,
             "explicit_community": {
                 "DemographicReligous": "R",
                 "DemographicPolitics": "DK"

@@ -10,26 +10,49 @@ import { Axios } from 'axios'
 export default class RequestManager {
     /**
      * Constructor of the class
-     * @param {String} baseURL base url of all axios petitions
      */
-    constructor(baseURL) {
-        this.axios = new Axios({
-            baseURL: baseURL,
-        });
+    constructor() {
+        this.isActive = false;
     }
 
     /**
+     * Initialize axios API
+     * @param {String} baseURL base url of all axios petitions
+     */
+    init(baseURL) {
+        this.axios = new Axios({
+            baseURL: baseURL,
+        });
+        this.isActive = true;
+    }
+    /**
      * Send a GET petition to obtain a singleFile in a directory
      * @param {String} name Name of the file we want to get. It needs to include the extension
-     * @param {String} directory Optional parameter to change the target directory
-     * @returns 
+     * @returns {Object} Returns the file
      */
-    getFile(name) {
+    getPerspective(name) {
         return this.axios.get(name, {
             params: {}
         })
             .then((response) => {
-                return response.data;
+                return response;
+            })
+            .catch((error) => {
+                return error;
+            });
+    }
+
+    /**
+     * Get all perspectives information 
+     * @returns {Object} returns the information of all perspectives
+     */
+    getAllPerspectives() {
+        const perspectiveFilesName = "getAllPerspectives.json";
+        return this.axios.get(perspectiveFilesName, {
+            params: {}
+        })
+            .then((response) => {
+                return response;
             })
             .catch((error) => {
                 return error;
@@ -41,6 +64,12 @@ export default class RequestManager {
      * @param {String} newURL the new url
      */
     changeBaseURL(newURL) {
-        this.axios.defaults.baseURL = newURL;
+        if (this.isActive) {
+            this.axios.defaults.baseURL = newURL;
+        } else {
+            this.init(newURL);
+        }
+
+        console.log(`Source url changed to ${newURL}`)
     }
 }
