@@ -126,15 +126,19 @@ export default class ToolBar {
 
             this.requestManager.getAllPerspectives()
                 .then((response) => {
-                    if (response.status === 200) {
-                        const file = response.data;
-                        this.allPerspectivesFile = JSON.parse(file).files;
-                        this.createEvents()
-                    } else {
-                        throw new Error(`All perspectives info was ${response.statusText}`);
-                    }
+                    console.log("Response received");
+                    console.log(response);
+                    
+                    // if (response.status === 200) {
+                    //     const file = response.data;
+                    //     this.allPerspectivesFile = JSON.parse(file).files;
+                    //     this.createEvents()
+                    // } else {
+                    //     throw new Error(`All perspectives info was ${response.statusText}`);
+                    // }
                 })
                 .catch((error) => {
+                    console.log("Error received");
                     console.log(error);
                     alert(error.message);
                 });
@@ -181,8 +185,8 @@ export default class ToolBar {
     changeFileSourceURL(url) {
 
         if (url === "API") {
-            const realURL = "../dataAPI/";
-            this.requestManager.changeBaseURL(realURL);
+            const apiURL = "http://localhost:8080/v1.1/";
+            this.requestManager.changeBaseURL(apiURL);
             this.usingAPI = true;
 
         } else {

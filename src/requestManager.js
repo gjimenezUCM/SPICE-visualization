@@ -22,6 +22,7 @@ export default class RequestManager {
     init(baseURL) {
         this.axios = new Axios({
             baseURL: baseURL,
+            headers: { "Access-Control-Allow-Origin": "*" }
         });
         this.isActive = true;
     }
@@ -47,7 +48,8 @@ export default class RequestManager {
      * @returns {Object} returns the information of all perspectives
      */
     getAllPerspectives() {
-        const perspectiveFilesName = "getAllPerspectives.json";
+        const perspectiveFilesName = "Perspectives";
+        console.log(this.axios)
         return this.axios.get(perspectiveFilesName, {
             params: {}
         })
@@ -55,7 +57,7 @@ export default class RequestManager {
                 return response;
             })
             .catch((error) => {
-                return error;
+                throw error;
             });
     }
 
