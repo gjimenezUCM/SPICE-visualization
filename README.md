@@ -7,7 +7,7 @@ Online deployment: https://gjimenezucm.github.io/SPICE-visualization/
 
 1- Download the project:
 <br> [Last stable update.](https://codeload.github.com/gjimenezUCM/SPICE-visualization/zip/refs/heads/main)
-<br> [Last updated.](https://codeload.github.com/gjimenezUCM/SPICE-visualization/zip/refs/heads/develop) 
+<br> [Last update.](https://codeload.github.com/gjimenezUCM/SPICE-visualization/zip/refs/heads/develop) 
 
 2- Open the project folder with powershell.
 
