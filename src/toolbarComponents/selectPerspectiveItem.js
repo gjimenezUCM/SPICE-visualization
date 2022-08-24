@@ -30,6 +30,7 @@ export default class SelectPerspectiveItem {
      * Create the events related with the Select perspective dropdown
      */
     createEvents(){
+
         const htmlString = this.createDropdownMenu();
 
         const html = this.toolbar.domParser.parseFromString(htmlString, "text/html").body.firstChild;
@@ -37,8 +38,8 @@ export default class SelectPerspectiveItem {
 
         const perspectiveOptions = document.querySelectorAll("a[name='dropdownPerspectivesOptions']");
         this.perspectiveOptionsMap = new Map();
-
         if(this.toolbar.usingAPI){
+
             for(const option of perspectiveOptions){
                 let id = option.getAttribute("key");
                 this.perspectiveOptionsMap.set(id, option);
@@ -56,6 +57,7 @@ export default class SelectPerspectiveItem {
                 option.onclick = () => this.selectPerspectiveOnclick(option);
             }
         }
+
     }
     
     /**
@@ -66,10 +68,10 @@ export default class SelectPerspectiveItem {
         this.restart();
 
         const file = this.toolbar.allPerspectivesFile;
-
+        
         const n = file.length;
         let content = "<div>";
-
+        
         if(this.toolbar.usingAPI){
             for (let i = 0; i < n; i++) {
                 this.perspectiveInfo.set(file[i].perspective.id, file[i].perspective);

@@ -22,7 +22,6 @@ export default class RequestManager {
     init(baseURL) {
         this.axios = new Axios({
             baseURL: baseURL,
-            headers: { "Access-Control-Allow-Origin": "*" }
         });
         this.isActive = true;
     }
@@ -47,9 +46,8 @@ export default class RequestManager {
      * Get all perspectives information 
      * @returns {Object} returns the information of all perspectives
      */
-    getAllPerspectives() {
-        const perspectiveFilesName = "Perspectives";
-        console.log(this.axios)
+    getAllPerspectivesAPI() {
+        const perspectiveFilesName = "v1.1/perspectives";
         return this.axios.get(perspectiveFilesName, {
             params: {}
         })
@@ -60,6 +58,20 @@ export default class RequestManager {
                 throw error;
             });
     }
+
+    getAllPerspectives() {
+        const perspectiveFilesName = "dataList.json";
+        return this.axios.get(perspectiveFilesName, {
+            params: {}
+        })
+            .then((response) => {
+                return response;
+            })
+            .catch((error) => {
+                throw error;
+            });
+    }
+
 
     /**
      * Update the baseURL of the requestManager
