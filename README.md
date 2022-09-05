@@ -1,6 +1,6 @@
 # SPICE-visualization
-
-Online deployment: https://gjimenezucm.github.io/SPICE-visualization/
+Original version in javascript of the [React port](https://github.com/MarcoExpPer/SPICE-visualization-ReactPort) to react and typescript.
+This version is older and may have some unresolved errors or format problems. Using the react port is recommended.
 
 
 ## How to download and launch the project localy
@@ -47,7 +47,3 @@ To test new data u need:
 1- To add the json file to /data/ folder. Be aware that it must follow the format of a perspective, otherwise the app wont handle it.
 
 2- Update the /data/dataList.json to include the name of the new perspective. 
-
-3- Update/reload the web page so the application reconize the changes.
-
-4- Make sure to select Local as the file source.
